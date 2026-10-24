@@ -79,9 +79,9 @@ a distinct autonomous assignment.
 |    10 | Scripted pursuit       | target sailor ID    | “I have some business with you.” | not handled by the ordinary report table   |
 
 Objective 3's argument is a port whose coordinates become the destination,
-as for objectives 0–2 and 9; Otto's scenario, for example, assigns it with
+as for objectives 0–2 and 9; Otto's storyline, for example, assigns it with
 port IDs 28 (Nantes) and 48 (Santo Domingo)
-([Otto's scenario](../scenarios/scenario-3-otto-baynes.md)).
+([Otto's storyline](../storylines/otto-baynes.md)).
 
 Objectives 5–7 deliberately share the same public wording and all follow the
 target's fleet. Values 5 and 6 use the same pursuit branches in the movement,
@@ -218,7 +218,7 @@ exemption for objective 0, and an inactive target sends the fleet home.
 For fleet-targeted objectives the stored argument is the target captain's
 sailor ID, not the target fleet ID. The game resolves the sailor's current
 fleet through sailor byte `+0x24`, allowing the reference to remain valid if a
-scenario changes that captain's fleet.
+story script changes that captain's fleet.
 
 ## Assignment lifecycle
 
@@ -235,7 +235,7 @@ return home (0)
 ```
 
 Investment and trade handlers explicitly reset the objective to 0 after doing
-their port work. Combat, destruction, scenario events, and target validity can
+their port work. Combat, destruction, story events, and target validity can
 also retarget a fleet or send it home.
 
 ### Investing and trading
@@ -325,7 +325,7 @@ included, are a bare `retf` (`0x39C3A–0x39C41`). Arrival (`0x1F3E3`) sets
 on its target's fleet (5–8, 10), clears the docked bit again for objective
 3, sets the delay and runs the handler at once. A guard-port fleet therefore
 docks at its home port on arrival and stays docked: its delay never counts
-down and it never chooses another objective. Only relaunch, a scenario, or
+down and it never chooses another objective. Only relaunch, a story script, or
 the guard reaction below sends it out again.
 
 Convoy, voyaging and pirate fleets guarding (objectives 8 and 9) react to
@@ -440,7 +440,7 @@ undocked fleets within 2 tiles of the player's fleet on both axes (`0x183EC`)
 ### Story flag `0x40`
 
 No executable routine sets fleet flag `0x40`, and no fleet has it in the
-new-game data. Scenario scripts give it to the fleets they direct, writing
+new-game data. Story scripts give it to the fleets they direct, writing
 flags `0x41` (active plus `0x40`) to Catalina's pursuers, Ezequiel's fleets,
 Otto's armada, Rudolph's fleet, and similar story fleets. The flag survives
 defeat (`0x1531F` and `0x1F9D5` clear only the active bit) and is removed

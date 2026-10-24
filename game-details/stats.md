@@ -23,16 +23,16 @@ modifies them.
 
 ## How attributes are raised
 
-| Attribute     | Raised by                                                                                               |
-| ------------- | ------------------------------------------------------------------------------------------------------- |
-| Leadership    | Navigation level-up (0–4); Battle level-up (0–2)                                                        |
-| Seamanship    | Navigation level-up (0–4); Battle level-up (0–2)                                                        |
-| Knowledge     | Navigation level-up (0–4); Battle level-up (0–2)                                                        |
-| Intuition     | Navigation level-up (0–2); Battle level-up (0–2)                                                        |
-| Courage       | Battle level-up (0–2 per level); a duel during a naval battle (0–2)                                     |
-| Swordsmanship | Battle level-up (0–1 per level); a duel during a naval battle (0–2)                                     |
-| Charm         | nothing                                                                                                 |
-| Luck          | Pray (0–1, once per visit); a large donation at a Church or Mosque; one story choice in João's scenario |
+| Attribute     | Raised by                                                                                                |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| Leadership    | Navigation level-up (0–4); Battle level-up (0–2)                                                         |
+| Seamanship    | Navigation level-up (0–4); Battle level-up (0–2)                                                         |
+| Knowledge     | Navigation level-up (0–4); Battle level-up (0–2)                                                         |
+| Intuition     | Navigation level-up (0–2); Battle level-up (0–2)                                                         |
+| Courage       | Battle level-up (0–2 per level); a duel during a naval battle (0–2)                                      |
+| Swordsmanship | Battle level-up (0–1 per level); a duel during a naval battle (0–2)                                      |
+| Charm         | nothing                                                                                                  |
+| Luck          | Pray (0–1, once per visit); a large donation at a Church or Mosque; one story choice in João's storyline |
 
 ### Level-ups
 
@@ -62,7 +62,7 @@ Swordsmanship += random(3)    # 0–2, capped at 100
 Courage       += random(3)    # 0–2, capped at 100
 ```
 
-Duels outside naval battles, which only a scenario script starts (`E8`),
+Duels outside naval battles, which only a story script starts (`E8`),
 use a different entry (`0x17F8A`) that gives neither experience nor
 attributes. See [Dueling](dueling.md).
 
@@ -76,7 +76,7 @@ attributes. See [Dueling](dueling.md).
   `(random(5) + 1) × 100` gold. The gain is 1–10; donating all your gold gives
   +10. Smaller donations never change Luck.
   See [Church and Mosque](buildings.md#church-and-mosque-command-dialogue).
-- In João's scenario, choosing **Donate** when Father Felippe offers gold in
+- In João's storyline, choosing **Donate** when Father Felippe offers gold in
   Lisbon's church sets João's Luck to 100 (`SNR1.DAT 0x04D8`).
 - A new game starts the protagonist's Luck at `random(101)`, 0–100
   (`0x1BA96`), replacing the 50 stored for every protagonist in
@@ -85,17 +85,17 @@ attributes. See [Dueling](dueling.md).
 ### Charm
 
 No routine in the executable raises Charm, no item modifies it, and the only
-scenario write is João's failure penalty, which sets it to 50. Charm therefore
+story script write is João's failure penalty, which sets it to 50. Charm therefore
 stays at its starting value unless it is lowered.
 
 ## How attributes are lowered
 
-| Attribute              | Lowered by                                                                                                                                                                                                                                                                                                      |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Charm                  | Plundering a village: −2, or only down to 50 from 50–51; from 0–1 it wraps to 254–255 ([Villages](at-sea.md#villages))                                                                                                                                                                                          |
-| Luck                   | Plundering a village (up to −2); the Ghost ship sea event (up to −30) ([Event types](at-sea.md#event-types))                                                                                                                                                                                                    |
-| Courage                | The Kraken sea event: the protagonist and every mate lose up to 10 ([Event types](at-sea.md#event-types))                                                                                                                                                                                                       |
-| All but Charm and Luck | Story penalties set them to 10: attacking an ally in João's finale, where Charm is also set to 50 and Luck to 0 ([João](scenarios/scenario-1-joao-franco.md)), and attacking Ezequiel's retreating Spanish fleets a fifth time in Otto's story ([Otto](scenarios/scenario-3-otto-baynes.md), `SNR3.DAT 0x18CE`) |
+| Attribute              | Lowered by                                                                                                                                                                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Charm                  | Plundering a village: −2, or only down to 50 from 50–51; from 0–1 it wraps to 254–255 ([Villages](at-sea.md#villages))                                                                                                                                                                      |
+| Luck                   | Plundering a village (up to −2); the Ghost ship sea event (up to −30) ([Event types](at-sea.md#event-types))                                                                                                                                                                                |
+| Courage                | The Kraken sea event: the protagonist and every mate lose up to 10 ([Event types](at-sea.md#event-types))                                                                                                                                                                                   |
+| All but Charm and Luck | Story penalties set them to 10: attacking an ally in João's finale, where Charm is also set to 50 and Luck to 0 ([João](storylines/joao-franco.md)), and attacking Ezequiel's retreating Spanish fleets a fifth time in Otto's story ([Otto](storylines/otto-baynes.md), `SNR3.DAT 0x18CE`) |
 
 ## What each attribute does
 

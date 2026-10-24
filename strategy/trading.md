@@ -52,14 +52,14 @@ With steering:
 
 ## Starting position
 
-| Item       | Value                                                                                                                                                                                    |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Date       | 17 May 1522, from the new-game data (`DATA1.015`); the model starts trading at 04:00 on 18 May, after the opening in Lisbon                                                              |
-| Gold       | 8,779, or 8,099 after 10 crew (44 each) and remodelling the _Hermes II_ (240) ([below](#starting-gold))                                                                                  |
-| Ship       | _Hermes II_, Caravela Latina: capacity 120, minimum crew 10                                                                                                                              |
-| João       | Navigation and Battle Level 1, Seamanship 75, Knowledge 73, Charm 89, Negotiation, No Rank                                                                                               |
-| Mates      | Rocco (Navigation Level 30, Seamanship 82) and Enrico (Seamanship 48); Domingo (Seamanship 68) joins on voyage day 3 ([Scenario 1](../game-details/scenarios/scenario-1-joao-franco.md)) |
-| Used ships | Lisbon always offers Balsa, Xebec, and Galleon at the start ([Ships](../game-details/ships.md#used-ship-purchase-state))                                                                 |
+| Item       | Value                                                                                                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Date       | 17 May 1522, from the new-game data (`DATA1.015`); the model starts trading at 04:00 on 18 May, after the opening in Lisbon                                                          |
+| Gold       | 8,779, or 8,099 after 10 crew (44 each) and remodelling the _Hermes II_ (240) ([below](#starting-gold))                                                                              |
+| Ship       | _Hermes II_, Caravela Latina: capacity 120, minimum crew 10                                                                                                                          |
+| João       | Navigation and Battle Level 1, Seamanship 75, Knowledge 73, Charm 89, Negotiation, No Rank                                                                                           |
+| Mates      | Rocco (Navigation Level 30, Seamanship 82) and Enrico (Seamanship 48); Domingo (Seamanship 68) joins on voyage day 3 ([João's storyline](../game-details/storylines/joao-franco.md)) |
+| Used ships | Lisbon always offers Balsa, Xebec, and Galleon at the start ([Ships](../game-details/ships.md#used-ship-purchase-state))                                                             |
 
 ### Starting gold
 
@@ -228,7 +228,7 @@ There are two sources:
   is armed, and that audience offers the mission instead of the ruler's menu
   ([Palace](../game-details/buildings.md#palace-command-dialogue)). João needs
   at least the title of Page: 500 Fame in one category and a royal mission
-  ([Royal missions](../game-details/scenarios/scenario-0-common-quests-and-royal-missions.md)).
+  ([Royal missions](../game-details/storylines/common-quests-and-royal-missions.md)).
 
 Salonika is 12–19 days from Lisbon or Madeira but only 6–7 days from Ceuta for
 a fleet of two empty Light Galleys, and Tripoli is about 7 days from Madeira.

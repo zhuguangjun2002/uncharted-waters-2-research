@@ -15,7 +15,7 @@ The saved table begins at slot-relative `0x1BA2` (`MAIN.EXE 0:5972` returns
 `DS:0x29CA + index × 16`) and contains 30 records of 16 bytes. Each record
 stores the name at `+0x00`, port ID at `+0x0B`, favor at `+0x0C`, and
 preference/eligibility flags at `+0x0F`. A record's portrait code is
-`0x61 + record index`, the same code scenario dialogue uses.
+`0x61 + record index`, the same code story script dialogue uses.
 
 Record 0 is Carlotta (Lisbon, flags `0x6F`). Her flag `0x40` excludes her from
 the Waitress command and the Love reading; instead, while protagonist byte
@@ -25,7 +25,7 @@ the Waitress command and the Love reading; instead, while protagonist byte
 the waitresses below.
 
 No protagonist ever has byte `+0x29` bit `0x10` set: it is clear in the
-starting data, and neither the executable nor any scenario script sets it. The
+starting data, and neither the executable nor any story script sets it. The
 branches that depend on it are therefore unreachable in normal play: Carlotta
 always greets in Lisbon, the attendant never adds raw 307 or 308, and the
 attendant lookup never consults the previous Pub's attendant record
@@ -246,7 +246,7 @@ The comparisons are unsigned checks against 80 and 50 at
 same numeric favor field, not a separate permanent state or reward.
 
 All waitress records initialize favor to 0, including Lucia's and Ladia's.
-Scenario scripts change a few: João's opening sets Carlotta's and Lucia's favor
+Story scripts change a few: João's opening sets Carlotta's and Lucia's favor
 to 100 (`SNR1.DAT 0x041F–0x042C`) and later removes Lucia from the Waitress
 command by clearing her flag `0x08` (`0x1A35–0x1A44`); Ali's story sets
 Ladia's favor to 50 and later 100.
@@ -268,7 +268,7 @@ with a nonpreferred story. A preferred story is different: that path explicitly
 clears the flag before applying its own gain. The waitress command begins at
 `MAIN.EXE 0x2D102`; the royal-mission Job Info handler and its favor update are
 at `0x2CD38–0x2D06B`. See
-[the royal-mission notes](scenarios/scenario-0-royal-missions.md#waitress-job-info)
+[the royal-mission notes](storylines/royal-missions.md#waitress-job-info)
 for the full state flow.
 
 ## Open questions

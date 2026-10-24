@@ -20,35 +20,35 @@ import {
 } from "./ordinary-dialogue.js";
 import { type Townsperson, townspersonLines } from "./townspeople.js";
 import {
-  inspectSharedScenario,
+  inspectSharedStoryScript,
   loadGeneralText,
   isBuildingOpen,
-  loadProtagonistScenario,
-  loadSharedScenario,
-  nextScenarioRandom,
+  loadProtagonistStoryScript,
+  loadSharedStoryScript,
+  nextStoryScriptRandom,
   parseQueryAction,
   parseQueryVisit,
-  protagonistScenarioRandomSeed,
-  queryScenario,
+  protagonistStoryScriptRandomSeed,
+  queryStoryScript,
   queryVisit,
-  sharedScenarioRandomSeed,
+  sharedStoryScriptRandomSeed,
 } from "./query.js";
 
 async function originalSave(): Promise<Buffer> {
   return readFile(join(repoRoot, "raw/KOUKAI2.DAT"));
 }
 
-test("reproduces protagonist scenario random draws", () => {
-  const seed = protagonistScenarioRandomSeed(21, 4, 17, 24, 10, 1_224);
+test("reproduces protagonist story script random draws", () => {
+  const seed = protagonistStoryScriptRandomSeed(21, 4, 17, 24, 10, 1_224);
   assert.equal(seed, 0x0195_1100);
-  assert.deepEqual(nextScenarioRandom(seed, 3), {
+  assert.deepEqual(nextStoryScriptRandom(seed, 3), {
     state: 0x680a_b501,
     result: 2,
   });
 });
 
-test("reproduces shared scenario random seeds without time of day", () => {
-  assert.equal(sharedScenarioRandomSeed(21, 4, 17, 10, 1_224), 0x0194_f900);
+test("reproduces shared story script random seeds without time of day", () => {
+  assert.equal(sharedStoryScriptRandomSeed(21, 4, 17, 10, 1_224), 0x0194_f900);
 });
 
 test("parses nested ordinary command paths", () => {
@@ -88,16 +88,16 @@ test("executes a shared Transport Goods progress route", async () => {
   const today = (save[base + 6]! * 12 + save[base + 7]!) * 30 + save[base + 8]!;
   save.writeUInt16LE(today + 30, sharedVariable(24));
 
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     save,
     1,
     parseQueryAction("market"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
-  assert.equal(result.sharedScenario.confidence, "decoded");
+  assert.equal(result.sharedStoryScript.confidence, "decoded");
   assert.deepEqual(
-    result.sharedScenario.outcomes.map((outcome) => ({
+    result.sharedStoryScript.outcomes.map((outcome) => ({
       messages: outcome.dialogue.map((line) => line.messageId),
       effects: outcome.effects,
     })),
@@ -105,7 +105,7 @@ test("executes a shared Transport Goods progress route", async () => {
       {
         messages: [27, 33],
         effects: [
-          "answer Yes (set scenario flag 1 to 1)",
+          "answer Yes (set story script flag 1 to 1)",
           "advance section when the interpreter returns",
           "suppress normal building menu and force exit",
           "set control variable 63 (skip the ordinary greeting)",
@@ -114,7 +114,7 @@ test("executes a shared Transport Goods progress route", async () => {
       {
         messages: [27, 33],
         effects: [
-          "answer No (set scenario flag 1 to 0)",
+          "answer No (set story script flag 1 to 0)",
           "suppress normal building menu and force exit",
           "set control variable 63 (skip the ordinary greeting)",
         ],
@@ -148,15 +148,15 @@ test("uses fleet free capacity in the shared Transport Goods offer", async () =>
   save.writeUInt16LE(16, base + 0xc4 + 17 * 2);
   save.writeUInt16LE(0, base + 0xc4 + 23 * 2);
 
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     save,
     1,
     parseQueryAction("market"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
   assert.deepEqual(
-    result.sharedScenario.outcomes.map((outcome) =>
+    result.sharedStoryScript.outcomes.map((outcome) =>
       outcome.dialogue.map((line) => line.messageId),
     ),
     [[13]],
@@ -174,19 +174,19 @@ test("follows the cached royal invitation into the visible Palace offer", async 
   save.writeUInt16LE(3, base + 0xc4 + 18 * 2);
   save.writeUInt16LE(7, base + 0xc4 + 30 * 2);
 
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     save,
     1,
     parseQueryAction("palace"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
   assert.deepEqual(
     {
-      executionSection: result.sharedScenario.executionSection,
-      executionSubsection: result.sharedScenario.executionSubsection,
-      route: result.sharedScenario.route?.key,
-      messages: result.sharedScenario.outcomes.map((outcome) =>
+      executionSection: result.sharedStoryScript.executionSection,
+      executionSubsection: result.sharedStoryScript.executionSubsection,
+      route: result.sharedStoryScript.route?.key,
+      messages: result.sharedStoryScript.outcomes.map((outcome) =>
         outcome.dialogue.map((line) => line.messageId),
       ),
     },
@@ -215,15 +215,15 @@ test("selects destination and home ruler document-mission transcripts", async ()
 
   save[base + 0x0a] = 29;
   save.writeUInt32LE(0x0005_0001, base + 0xbc);
-  const destination = await queryScenario(
+  const destination = await queryStoryScript(
     save,
     1,
     parseQueryAction("palace"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
   assert.deepEqual(
-    destination.sharedScenario.outcomes.map((outcome) =>
+    destination.sharedStoryScript.outcomes.map((outcome) =>
       outcome.dialogue.map((line) => line.messageId),
     ),
     [[173]],
@@ -231,22 +231,22 @@ test("selects destination and home ruler document-mission transcripts", async ()
 
   save[base + 0x0a] = 0;
   save.writeUInt32LE(0x0005_0003, base + 0xbc);
-  const home = await queryScenario(
+  const home = await queryStoryScript(
     save,
     1,
     parseQueryAction("palace"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
   assert.deepEqual(
-    home.sharedScenario.outcomes.map((outcome) =>
+    home.sharedStoryScript.outcomes.map((outcome) =>
       outcome.dialogue.map((line) => line.messageId),
     ),
     [[165, 0]],
   );
   // D9 selector 4 presents the promotion from MESSAGE.DAT after the rank
   // increment, as recorded in q04-snr0-diplomatic-return.mp4.
-  const promotion = home.sharedScenario.outcomes[0]!.dialogue[1]!;
+  const promotion = home.sharedStoryScript.outcomes[0]!.dialogue[1]!;
   assert.equal(promotion.generalMessageIndex, 945);
   assert.equal(
     promotion.body,
@@ -257,18 +257,18 @@ test("selects destination and home ruler document-mission transcripts", async ()
 test("decodes source placeholders in query dialogue", async () => {
   const save = await originalSave();
   save[slotOffset(1) + 0x0a] = 0;
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     save,
     1,
     parseQueryAction("pub"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
   const bodies = result.outcomes.flatMap((outcome) =>
     outcome.dialogue.map((line) => line.body),
   );
   assert.ok(bodies.some((body) => body.includes("$n")));
-  assert.equal(result.sharedScenario.route?.key, 0xa3ff);
+  assert.equal(result.sharedStoryScript.route?.key, 0xa3ff);
 });
 
 test("reports decoded shared royal-mission state and tie priority", async () => {
@@ -281,11 +281,11 @@ test("reports decoded shared royal-mission state and tie priority", async () => 
   save.writeUInt32LE(0x0003_0000, base + 0xbc);
   save.writeUInt16LE(11, base + 0xc4 + 30 * 2);
 
-  const shared = inspectSharedScenario(
+  const shared = inspectSharedStoryScript(
     save,
     1,
     parseQueryAction("pub"),
-    await loadSharedScenario(),
+    await loadSharedStoryScript(),
   );
   assert.deepEqual(
     {
@@ -318,11 +318,11 @@ test("reports decoded shared royal-mission state and tie priority", async () => 
 
   save[base + 0x0a] = 100;
   assert.equal(
-    inspectSharedScenario(
+    inspectSharedStoryScript(
       save,
       1,
       parseQueryAction("pub"),
-      await loadSharedScenario(),
+      await loadSharedStoryScript(),
     ).route?.key,
     0xa3ff,
   );
@@ -339,12 +339,12 @@ test("applies decoded building hours before reporting triggerable dialogue", asy
   const base = slotOffset(1);
   save[base + 0x0a] = 0;
   save[base + 9] = 0;
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     save,
     1,
     parseQueryAction("market"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
   assert.equal(result.buildingOpen, false);
   assert.equal(result.confidence, "none");
@@ -363,13 +363,13 @@ test("resolves Ernst's Mercator-contract branch and renewal effects", async () =
     base + CARTOGRAPHER_TABLE + index * CARTOGRAPHER_RECORD_SIZE + 0x16;
   mercator[cartographerFlags(4)]! |= 0x10;
 
-  const scenario = await loadProtagonistScenario(4);
-  const shared = await loadSharedScenario();
-  const mercatorResult = await queryScenario(
+  const storyScript = await loadProtagonistStoryScript(4);
+  const shared = await loadSharedStoryScript();
+  const mercatorResult = await queryStoryScript(
     mercator,
     1,
     parseQueryAction("special-building"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.equal(mercatorResult.confidence, "decoded");
@@ -383,11 +383,11 @@ test("resolves Ernst's Mercator-contract branch and renewal effects", async () =
   const gerard = Buffer.from(mercator);
   gerard[cartographerFlags(4)]! &= ~0x10;
   gerard[cartographerFlags(1)]! |= 0x10;
-  const gerardResult = await queryScenario(
+  const gerardResult = await queryStoryScript(
     gerard,
     1,
     parseQueryAction("special-building"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.equal(gerardResult.confidence, "decoded");
@@ -412,13 +412,13 @@ test("distinguishes Pietro's forced Church exit from his usable Lodge", async ()
   save[base + 0x30] = 0;
   save[base + 0x31] = 1;
 
-  const scenario = await loadProtagonistScenario(5);
-  const shared = await loadSharedScenario();
-  const church = await queryScenario(
+  const storyScript = await loadProtagonistStoryScript(5);
+  const shared = await loadSharedStoryScript();
+  const church = await queryStoryScript(
     save,
     1,
     parseQueryAction("church"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.deepEqual(
@@ -434,11 +434,11 @@ test("distinguishes Pietro's forced Church exit from his usable Lodge", async ()
   assert.deepEqual(church.ordinaryBuilding?.dialogue, []);
   assert.deepEqual(church.ordinaryBuilding?.menu, []);
 
-  const lodge = await queryScenario(
+  const lodge = await queryStoryScript(
     save,
     1,
     parseQueryAction("lodge"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.deepEqual(
@@ -989,16 +989,16 @@ test("resolves Guild assignment rows and cached Country Info", async () => {
     "copy shared variable 3 to variable 8",
   );
   assert.match(selected.command?.effects[2] ?? "", /section 0, subsection 1/);
-  const routed = await queryScenario(
+  const routed = await queryStoryScript(
     save,
     1,
     parseQueryAction("guild:job-assignment:1"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
-  assert.equal(routed.sharedScenario.executionSubsection, 1);
+  assert.equal(routed.sharedStoryScript.executionSubsection, 1);
   assert.deepEqual(
-    routed.sharedScenario.outcomes.map((outcome) =>
+    routed.sharedStoryScript.outcomes.map((outcome) =>
       outcome.dialogue.map((entry) => entry.messageId),
     ),
     [[1], [1]],
@@ -2304,13 +2304,13 @@ test("decodes Pietro's one-gold-ingot Pub gate independently of Adventure Fame",
   save[base + ITEM_INVENTORY + 1] = 0x4b;
   save = setFame(save, 1, 4, "adventure", 0, 0);
 
-  const scenario = await loadProtagonistScenario(5);
-  const shared = await loadSharedScenario();
-  const below = await queryScenario(
+  const storyScript = await loadProtagonistStoryScript(5);
+  const shared = await loadSharedStoryScript();
+  const below = await queryStoryScript(
     setGold(save, 1, 9_999),
     1,
     parseQueryAction("pub"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.equal(below.confidence, "decoded");
@@ -2326,11 +2326,11 @@ test("decodes Pietro's one-gold-ingot Pub gate independently of Adventure Fame",
   ]);
   assert.ok(below.notes.some((note) => note.includes("one Gold Ingot")));
 
-  const at = await queryScenario(
+  const at = await queryStoryScript(
     setGold(save, 1, 10_000),
     1,
     parseQueryAction("pub"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.notEqual(at.confidence, "none");
@@ -2347,13 +2347,13 @@ test("resolves Catalina's 1,500 and 2,000 Piracy Fame transitions", async () => 
   save[base + 0x31] = 0;
   save[base + 0x612 + 1 * 42 + 0x29] = 0x66;
 
-  const scenario = await loadProtagonistScenario(2);
-  const shared = await loadSharedScenario();
-  const belowRumor = await queryScenario(
+  const storyScript = await loadProtagonistStoryScript(2);
+  const shared = await loadSharedStoryScript();
+  const belowRumor = await queryStoryScript(
     setFame(save, 1, 1, "piracy", 0, 1_499),
     1,
     parseQueryAction("market"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.equal(belowRumor.confidence, "decoded");
@@ -2368,11 +2368,11 @@ test("resolves Catalina's 1,500 and 2,000 Piracy Fame transitions", async () => 
   ]);
 
   save = setFame(save, 1, 1, "piracy", 0, 1_500);
-  const rumor = await queryScenario(
+  const rumor = await queryStoryScript(
     save,
     1,
     parseQueryAction("market"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.equal(rumor.outcomes[0]!.dialogue[0]!.messageId, 229);
@@ -2383,11 +2383,11 @@ test("resolves Catalina's 1,500 and 2,000 Piracy Fame transitions", async () => 
   );
 
   save[base + 0x31] = 1;
-  const belowSearch = await queryScenario(
+  const belowSearch = await queryStoryScript(
     setFame(save, 1, 1, "piracy", 1_500, 1_999),
     1,
     parseQueryAction("pub"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.ok(
@@ -2399,11 +2399,11 @@ test("resolves Catalina's 1,500 and 2,000 Piracy Fame transitions", async () => 
     ),
   );
 
-  const search = await queryScenario(
+  const search = await queryStoryScript(
     setFame(save, 1, 1, "piracy", 1_500, 2_000),
     1,
     parseQueryAction("pub"),
-    scenario,
+    storyScript,
     shared,
   );
   assert.ok(
@@ -2424,8 +2424,8 @@ test("resolves Catalina's Lucia wait counter and calendar-day rollover", async (
   baseline[base + 0x31] = 2;
   baseline.writeUInt16LE(8, base + 0x3a);
 
-  const scenario = await loadProtagonistScenario(2);
-  const shared = await loadSharedScenario();
+  const storyScript = await loadProtagonistStoryScript(2);
+  const shared = await loadSharedStoryScript();
   const messagesFor = async (
     action: "pub" | "lodge",
     waitCounter: number,
@@ -2434,11 +2434,11 @@ test("resolves Catalina's Lucia wait counter and calendar-day rollover", async (
     const save = Buffer.from(baseline);
     save[base + 8] = day;
     save.writeUInt16LE(waitCounter, base + 0x3a + 16 * 2);
-    const result = await queryScenario(
+    const result = await queryStoryScript(
       save,
       1,
       parseQueryAction(action),
-      scenario,
+      storyScript,
       shared,
     );
     return result.outcomes.flatMap((outcome) =>
@@ -2547,9 +2547,9 @@ async function storySave(
   return save;
 }
 
-test("forks the scenario C9 forced menu into its options", async () => {
+test("forks the story script C9 forced menu into its options", async () => {
   // João's Lisbon Church scene with flags 0 and 2 set reaches C9 01 0067.
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     await storySave(0, 0, 0, 0x5),
     1,
     parseQueryAction("church"),
@@ -2565,9 +2565,9 @@ test("forks the scenario C9 forced menu into its options", async () => {
   assert.ok(result.outcomes[0]!.effects.includes("add 1000 gold"));
 });
 
-test("applies scenario gold, party, and ship actions", async () => {
+test("applies story script gold, party, and ship actions", async () => {
   // Ernst's opening at Mercator's home uses E4, FB, F9, and FA.
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     await storySave(3, 33, 0, 0),
     1,
     parseQueryAction("special-building"),
@@ -2590,7 +2590,7 @@ test("resolves story-fleet orders over every sailor record", async () => {
   const affiliation = slotOffset(1) + 0x612 + 42 + 0x29;
   save[affiliation] = (save[affiliation]! & 0xf0) | 6;
   save = setFame(save, 1, 1, "piracy", 0, 1);
-  const result = await queryScenario(save, 1, parseQueryAction("harbor"));
+  const result = await queryStoryScript(save, 1, parseQueryAction("harbor"));
   assert.equal(result.outcomes.length, 1);
   const orders = result.outcomes[0]!.effects.filter((effect) =>
     effect.startsWith("set fleet"),
@@ -2629,7 +2629,7 @@ test("sets the opposing captain and leaves the post-battle fleet unknown", async
   // captain no longer commands a fleet, as after a victory.
   const save = await storySave(1, 0xff, 6, 0);
   save[slotOffset(1) + 0x31] = 1;
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     save,
     1,
     parseQueryAction("after-battle:60"),
@@ -2645,7 +2645,7 @@ test("reports F8 in a before-battle route as a cancelled battle", async () => {
   // which cancels the battle (MAIN.EXE 0x150FD, outcome code 8).
   const save = await storySave(5, 0xff, 2, 0);
   save[slotOffset(1) + 0x31] = 2;
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     save,
     1,
     parseQueryAction("before-battle:1"),
@@ -2671,20 +2671,20 @@ test("a protagonist battle cancellation skips the shared before-battle route", a
   // fleet 61 (sailor byte +0x24).
   save[slotOffset(1) + 0x612 + 42 + 0x24] = 61;
   const action = parseQueryAction("before-battle:1");
-  const shared = inspectSharedScenario(
+  const shared = inspectSharedStoryScript(
     save,
     1,
     action,
-    await loadSharedScenario(),
+    await loadSharedStoryScript(),
   );
   assert.equal(shared.route?.keyHex, "0xA1FF");
-  const result = await queryScenario(save, 1, action);
+  const result = await queryStoryScript(save, 1, action);
   assert.ok(
     result.outcomes.every((outcome) =>
       outcome.effects.some((effect) => /^cancel the battle/.test(effect)),
     ),
   );
-  assert.equal(result.sharedScenario.outcomes.length, 0);
+  assert.equal(result.sharedStoryScript.outcomes.length, 0);
   assert.ok(
     result.notes.some((note) => /shared before-battle route/.test(note)),
   );
@@ -2728,8 +2728,8 @@ async function visit(save: Buffer, ...values: string[]) {
     1,
     parsed.action,
     parsed.commands,
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
 }
 
@@ -2754,12 +2754,12 @@ test("parses a building visit as a command sequence", () => {
 
 test("resolves a one-command visit exactly like the single-command query", async () => {
   const save = await visitSave();
-  const single = await queryScenario(
+  const single = await queryStoryScript(
     save,
     1,
     parseQueryAction("pub:treat:10"),
-    await loadProtagonistScenario(1),
-    await loadSharedScenario(),
+    await loadProtagonistStoryScript(1),
+    await loadSharedStoryScript(),
   );
   assert.deepEqual(await visit(save, "pub:treat:10"), single);
   assert.equal(single.visit, undefined);

@@ -35,7 +35,7 @@ takeover.
 
 ## Guild assignments
 
-Four Guild assignments can award Trade Fame. The values below come from the shared `SNR0` scenario bytecode.
+Four Guild assignments can award Trade Fame. The values below come from the shared `SNR0` story script bytecode.
 
 | Assignment      | Rank band       | Deadline | Trade Fame |
 | --------------- | --------------- | -------: | ---------: |
@@ -72,7 +72,7 @@ to the Fame total, not to the size of the award.
 The full Fame award is made only on timely completion. A late Deliver Letter or Defeat Pirates pays half the gold and
 adds no Fame. A late Transport Goods or Buy Goods pays nothing and cuts the affected Fame to 80%, and a Transport Goods
 job that has expired when checked at its origin simply lapses without a penalty. See
-[Scenario 0](../scenarios/scenario-0-common-quests-and-royal-missions.md).
+[Story script 0](../storylines/common-quests-and-royal-missions.md).
 
 Giving up before the deadline generally leaves approximately 90% of the affected Fame, rounded down to a multiple of
 ten. For Transport Goods, the exact integer calculation is:
@@ -96,7 +96,7 @@ new Trade Fame = floor(floor(old Trade Fame / 10) × 5 / 10) × 10
 
 ## Story awards
 
-Ali receives the following one-time Trade Fame awards from his scenario:
+Ali receives the following one-time Trade Fame awards from his story script:
 
 | Story event                                     |   Trade Fame |
 | ----------------------------------------------- | -----------: |
@@ -112,8 +112,8 @@ The debt repayments are in `SNR6` section 1. The Pub (`0x085D`), Harbor (`0x0951
 Harbor, lending Pietro another 10,000 adds a further 500 (`0x0A47`).
 
 Pietro's repayment at Sakai and the later Venice Bank settlement depend on that choice: 1,000 each if Ali lent the
-money, 500 each if he refused. The Venice award reuses a value left in a scenario variable by the Sakai scene, so it is
-labelled Likely; see [Ali's scenario](../scenarios/scenario-6-ali-vezas.md).
+money, 500 each if he refused. The Venice award reuses a value left in a story script variable by the Sakai scene, so it is
+labelled Likely; see [Ali's storyline](../storylines/ali-vezas.md).
 
 Every repeatable and story award is limited so that Trade Fame cannot exceed 50,000.
 

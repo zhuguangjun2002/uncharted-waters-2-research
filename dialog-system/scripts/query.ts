@@ -40,11 +40,11 @@ import {
   townspersonLines,
 } from "./townspeople.js";
 import {
-  disassembleScenario,
+  disassembleStoryScript,
   type DialogueLine,
-  type DisassembledScenario,
-  type ScenarioInstruction,
-  type ScenarioRoute,
+  type DisassembledStoryScript,
+  type StoryScriptInstruction,
+  type StoryScriptRoute,
 } from "./snr.js";
 
 export const BUILDING_CONTEXTS = {
@@ -66,7 +66,7 @@ export const BUILDING_CONTEXTS = {
   "fortune-teller": 0x0b,
 } as const;
 
-export type ScenarioQueryAction =
+export type StoryScriptQueryAction =
   | {
       readonly type: "building";
       readonly context: number;
@@ -81,7 +81,7 @@ export type ScenarioQueryAction =
 
 export type QueryConfidence = "confirmed" | "decoded" | "ambiguous" | "none";
 
-export interface ScenarioQueryOutcome {
+export interface StoryScriptQueryOutcome {
   readonly confidence: Exclude<QueryConfidence, "none">;
   readonly probability: number;
   readonly dialogue: readonly DialogueLine[];
@@ -89,21 +89,21 @@ export interface ScenarioQueryOutcome {
   readonly effects: readonly string[];
 }
 
-export interface ScenarioQueryResult {
+export interface StoryScriptQueryResult {
   readonly confidence: QueryConfidence;
-  readonly scenarioId: number;
+  readonly storyScriptId: number;
   readonly protagonist: string;
   readonly section: number;
   readonly subsection: number;
   readonly flagsHex: string;
   readonly portId: number;
   readonly portName: string;
-  readonly action: ScenarioQueryAction;
+  readonly action: StoryScriptQueryAction;
   readonly buildingOpen?: boolean;
-  readonly route?: ScenarioRoute;
+  readonly route?: StoryScriptRoute;
   readonly routeTable: "primary" | `subsection-${number}`;
-  readonly outcomes: readonly ScenarioQueryOutcome[];
-  readonly sharedScenario: SharedScenarioStatus;
+  readonly outcomes: readonly StoryScriptQueryOutcome[];
+  readonly sharedStoryScript: SharedStoryScriptStatus;
   readonly ordinaryBuilding?: OrdinaryBuildingEntry;
   // Present only when a building visit runs more than one command.
   readonly visit?: readonly VisitStep[];
@@ -126,7 +126,7 @@ export interface VisitStep {
   readonly notes: readonly string[];
 }
 
-export interface SharedScenarioStatus {
+export interface SharedStoryScriptStatus {
   readonly section: number;
   readonly subsection: number;
   readonly executionSection: number;
@@ -143,9 +143,9 @@ export interface SharedScenarioStatus {
   readonly cachedMissionSection: number;
   readonly cachedMissionName?: string;
   readonly routeTable: "primary" | `subsection-${number}` | "unavailable";
-  readonly route?: ScenarioRoute;
+  readonly route?: StoryScriptRoute;
   readonly confidence: QueryConfidence;
-  readonly outcomes: readonly ScenarioQueryOutcome[];
+  readonly outcomes: readonly StoryScriptQueryOutcome[];
 }
 
 const PROTAGONISTS = [
@@ -161,11 +161,11 @@ const RUNTIME_CONFIRMED_FIRST_MESSAGES = new Set([
   2, 23, 62, 63, 227, 240, 269, 274, 282, 293, 332, 425, 429,
 ]);
 
-const SCENARIO_VARIABLES_START = 0x3a;
-const SCENARIO_VARIABLE_COUNT = 64;
+const STORY_SCRIPT_VARIABLES_START = 0x3a;
+const STORY_SCRIPT_VARIABLE_COUNT = 64;
 const CONTROL_VARIABLE = 63;
-const SHARED_SCENARIO_START = 0xba;
-const SHARED_VARIABLES_START = SHARED_SCENARIO_START + 0x0a;
+const SHARED_STORY_SCRIPT_START = 0xba;
+const SHARED_VARIABLES_START = SHARED_STORY_SCRIPT_START + 0x0a;
 const PLAYER_FLEET_TABLE = 0x1de0;
 const FLEET_RECORD_SIZE = 0x85;
 const FLEET_SHIP_SLOTS = 0x2b;
@@ -218,7 +218,7 @@ const DISCOVERY_WITHOUT_ARTICLE = new Set([
   0, 5, 8, 9, 16, 17, 21, 22, 23, 25, 26, 28, 33, 40, 44, 60, 72, 77, 89,
 ]);
 
-// Executable text shown by scenario actions such as `D9`.
+// Executable text shown by story script actions such as `D9`.
 export interface GeneralText {
   readonly messages: ReadonlyMap<number, string>;
   readonly discoveryNames: readonly string[];
@@ -253,7 +253,7 @@ export async function loadGeneralText(): Promise<GeneralText> {
 // dissolved when its flagship sank or lost its crew, when the protagonist won
 // a duel (code 6), or when the captain lacks sailor bit 0x20. A fled (2),
 // nightfall (1), or cancelled (8) opponent otherwise keeps it.
-function battleEnvironment(action: ScenarioQueryAction): {
+function battleEnvironment(action: StoryScriptQueryAction): {
   captain?: number;
   unknownAddresses?: ReadonlySet<number>;
 } {
@@ -376,7 +376,7 @@ interface ExecutionState {
   steps: number;
 }
 
-export function protagonistScenarioRandomSeed(
+export function protagonistStoryScriptRandomSeed(
   savedYear: number,
   savedMonth: number,
   savedDay: number,
@@ -391,7 +391,7 @@ export function protagonistScenarioRandomSeed(
   return ((dateProduct + savedDay + ticks) << 8) >>> 0;
 }
 
-export function sharedScenarioRandomSeed(
+export function sharedStoryScriptRandomSeed(
   savedYear: number,
   savedMonth: number,
   savedDay: number,
@@ -405,11 +405,12 @@ export function sharedScenarioRandomSeed(
   return ((dateProduct + savedDay) << 8) >>> 0;
 }
 
-export function nextScenarioRandom(
+export function nextStoryScriptRandom(
   state: number,
   bound: number,
 ): { state: number; result: number } {
-  if (bound <= 0) throw new Error(`Invalid scenario random bound: ${bound}`);
+  if (bound <= 0)
+    throw new Error(`Invalid story script random bound: ${bound}`);
   const nextState = (Math.imul(state, 0x5d58_8b65) + 1) >>> 0;
   return {
     state: nextState,
@@ -430,7 +431,7 @@ function integer(text: string, label: string): number {
   return value;
 }
 
-export function parseQueryAction(value: string): ScenarioQueryAction {
+export function parseQueryAction(value: string): StoryScriptQueryAction {
   const normalized = value.toLowerCase();
   const [rawBuildingName = "", ...commandPath] = value.split(":");
   const buildingName = rawBuildingName.toLowerCase();
@@ -481,7 +482,7 @@ function splitAssumption(value: string): {
 // Parses ACTION[:COMMAND...][@success|@failure] followed by the visit's
 // later commands. A later command may repeat the building name.
 export function parseQueryVisit(values: readonly string[]): {
-  action: ScenarioQueryAction;
+  action: StoryScriptQueryAction;
   commands: VisitCommand[];
 } {
   const [first, ...rest] = values;
@@ -520,7 +521,7 @@ export function parseQueryVisit(values: readonly string[]): {
 }
 
 function actionSelectorAndQualifier(
-  action: ScenarioQueryAction,
+  action: StoryScriptQueryAction,
   portId: number,
   voyageDay: number,
   fallbackPortCount = 100,
@@ -539,9 +540,9 @@ function actionSelectorAndQualifier(
 }
 
 function findRoute(
-  routes: readonly ScenarioRoute[],
+  routes: readonly StoryScriptRoute[],
   request: { selector: number; qualifier: number; fallbackSelector?: number },
-): ScenarioRoute | undefined {
+): StoryScriptRoute | undefined {
   const selectors = [request.selector, request.fallbackSelector].filter(
     (value): value is number => value !== undefined,
   );
@@ -600,7 +601,7 @@ export function isBuildingOpen(
 }
 
 function comparisonResult(
-  instruction: ScenarioInstruction,
+  instruction: StoryScriptInstruction,
   variables: ReadonlyMap<number, number>,
   variableNotEqual: ReadonlyMap<number, ReadonlySet<number>>,
 ): boolean | undefined {
@@ -636,7 +637,7 @@ function comparisonResult(
 
 function applyComparisonAssumption(
   state: ExecutionState,
-  instruction: ScenarioInstruction,
+  instruction: StoryScriptInstruction,
   result: boolean,
 ): void {
   const bytes = Buffer.from(instruction.rawHex, "hex");
@@ -688,15 +689,15 @@ function cloneState(state: ExecutionState): ExecutionState {
 }
 
 function presentDialogue(
-  scenario: DisassembledScenario,
+  storyScript: DisassembledStoryScript,
   state: ExecutionState,
-  instruction: ScenarioInstruction,
+  instruction: StoryScriptInstruction,
   bytes: Buffer,
 ): void {
   const presentation = state.presentation;
   if (!presentation || presentation.messageIndices.length === 0) return;
   const messageIndex = presentation.messageIndices.at(-1)!;
-  const message = scenario.messages[messageIndex];
+  const message = storyScript.messages[messageIndex];
   const speakerMessageIndex =
     presentation.messageIndices.length === 2
       ? presentation.messageIndices[0]
@@ -704,7 +705,7 @@ function presentDialogue(
   const speakerMessage =
     speakerMessageIndex === undefined
       ? undefined
-      : scenario.messages[speakerMessageIndex];
+      : storyScript.messages[speakerMessageIndex];
   if (!message || (speakerMessageIndex !== undefined && !speakerMessage))
     return;
 
@@ -748,7 +749,7 @@ function presentDialogue(
   });
 }
 
-function outcomeKey(outcome: ScenarioQueryOutcome): string {
+function outcomeKey(outcome: StoryScriptQueryOutcome): string {
   return JSON.stringify({
     dialogue: outcome.dialogue.map(
       (line) => line.generalMessageIndex ?? line.messageId,
@@ -768,9 +769,9 @@ function mergeConfidence(
 }
 
 function executeRoute(
-  scenario: DisassembledScenario,
+  storyScript: DisassembledStoryScript,
   sectionId: number,
-  route: ScenarioRoute,
+  route: StoryScriptRoute,
   initialFlags: number,
   initialVariables: ReadonlyMap<number, number>,
   portId: number,
@@ -788,8 +789,8 @@ function executeRoute(
     // Save addresses whose value depends on runtime state the save lacks.
     readonly unknownAddresses?: ReadonlySet<number>;
   },
-): { outcomes: ScenarioQueryOutcome[]; truncated: boolean } {
-  const section = scenario.sections[sectionId]!;
+): { outcomes: StoryScriptQueryOutcome[]; truncated: boolean } {
+  const section = storyScript.sections[sectionId]!;
   const instructions = new Map(
     section.instructions.map((instruction) => [
       instruction.offset,
@@ -813,7 +814,7 @@ function executeRoute(
       steps: 0,
     },
   ];
-  const rawOutcomes: ScenarioQueryOutcome[] = [];
+  const rawOutcomes: StoryScriptQueryOutcome[] = [];
   let truncated = false;
 
   const readByte = (
@@ -947,7 +948,7 @@ function executeRoute(
   const generalMessageLines = (
     state: ExecutionState,
     selector: number,
-    instruction: ScenarioInstruction,
+    instruction: StoryScriptInstruction,
   ): DialogueLine[] => {
     const variable = (index: number) => state.variables.get(index);
     const count = (index: number) => variable(index) ?? "?";
@@ -1080,7 +1081,7 @@ function executeRoute(
 
   const finish = (state: ExecutionState): void => {
     // The dispatcher zeroes variable 63 before each route. Its caller tests the
-    // final value to skip ordinary greetings and later scenario dispatches.
+    // final value to skip ordinary greetings and later story script dispatches.
     const control = state.variables.get(CONTROL_VARIABLE);
     if (control === undefined)
       state.uncertainties.push(
@@ -1093,7 +1094,7 @@ function executeRoute(
         state.uncertainties.length > 0
           ? "ambiguous"
           : firstMessage !== undefined &&
-              scenario.scenarioId === 1 &&
+              storyScript.storyScriptId === 1 &&
               RUNTIME_CONFIRMED_FIRST_MESSAGES.has(firstMessage)
             ? "confirmed"
             : "decoded",
@@ -1161,7 +1162,7 @@ function executeRoute(
       state.presentation.instructionOffsets.push(instruction.offset);
       state.presentation.rawParts.push(instruction.rawHex);
     } else if (instruction.opcode === 0xc7 || instruction.opcode === 0xe9) {
-      presentDialogue(scenario, state, instruction, bytes);
+      presentDialogue(storyScript, state, instruction, bytes);
       delete state.presentation;
     }
     if (instruction.opcode === 0xdc || instruction.opcode === 0xd0) {
@@ -1248,7 +1249,7 @@ function executeRoute(
         } else if (destinationMode === 2) {
           if (value === undefined)
             state.uncertainties.push(
-              `scenario flag ${bytes[1]} is written from an unknown value`,
+              `story script flag ${bytes[1]} is written from an unknown value`,
             );
           else state.flags = writeFlag(state.flags, bytes[1]!, value ? 1 : 0);
         }
@@ -1342,7 +1343,7 @@ function executeRoute(
         }
       }
     } else if (instruction.opcode === 0xd4) {
-      const message = scenario.messages[bytes.readUInt16BE(1)];
+      const message = storyScript.messages[bytes.readUInt16BE(1)];
       if (message) state.stringBuffer = message.body;
       else delete state.stringBuffer;
     } else if (instruction.opcode === 0xd1) {
@@ -1392,7 +1393,7 @@ function executeRoute(
         `start a pending ${shipModelName(state, type)} (ship type ${type}) in the player's fleet and clear this port's construction timer`,
       );
     } else if (instruction.opcode === 0xfa) {
-      const name = scenario.messages[bytes.readUInt16BE(2)]?.body ?? "?";
+      const name = storyScript.messages[bytes.readUInt16BE(2)]?.body ?? "?";
       state.effects.push(
         `commission the pending ship as "${name}" and clear this port's Shipyard order`,
       );
@@ -1429,7 +1430,7 @@ function executeRoute(
       state.effects.push(`start duel against sailor ${bytes[1]}`);
     else if (instruction.opcode === 0xcb)
       state.effects.push(
-        `show EVENT${scenario.scenarioId}.DAT record ${bytes[5]} at (${bytes.readUInt16BE(1)}, ${bytes.readUInt16BE(3)})`,
+        `show EVENT${storyScript.storyScriptId}.DAT record ${bytes[5]} at (${bytes.readUInt16BE(1)}, ${bytes.readUInt16BE(3)})`,
       );
     else if (instruction.opcode === 0xf0)
       state.effects.push("advance subsection when the interpreter returns");
@@ -1458,7 +1459,7 @@ function executeRoute(
     if (instruction.opcode === 0xc9) {
       // A forced menu built from the lines of an MES entry; the zero-based
       // selection is stored in the variable and cannot be cancelled.
-      const options = (scenario.messages[bytes.readUInt16BE(2)]?.body ?? "")
+      const options = (storyScript.messages[bytes.readUInt16BE(2)]?.body ?? "")
         .split("\n")
         .filter((option) => option.length > 0);
       const branches = options.map((_, index) =>
@@ -1482,7 +1483,7 @@ function executeRoute(
       const variable = bytes[1]!;
       const bound = bytes.readUInt16BE(2);
       if (bound > 0) {
-        const draw = nextScenarioRandom(state.randomState, bound);
+        const draw = nextStoryScriptRandom(state.randomState, bound);
         state.randomState = draw.state;
         state.variables.set(variable, draw.result);
         state.variableNotEqual.delete(variable);
@@ -1500,7 +1501,7 @@ function executeRoute(
       const checkpoint = state.variables.get(variable);
       if (checkpoint === undefined) {
         state.uncertainties.push(
-          `scenario RNG checkpoint variable ${variable} is unknown`,
+          `story script RNG checkpoint variable ${variable} is unknown`,
         );
       } else {
         state.randomState = (checkpoint << 8) >>> 0;
@@ -1513,10 +1514,10 @@ function executeRoute(
       const flag = bytes[1]!;
       const no = cloneState(state);
       no.flags = writeFlag(no.flags, flag, 0);
-      no.effects.push(`answer No (set scenario flag ${flag} to 0)`);
+      no.effects.push(`answer No (set story script flag ${flag} to 0)`);
       no.offset = instruction.endOffset;
       state.flags = writeFlag(state.flags, flag, 1);
-      state.effects.push(`answer Yes (set scenario flag ${flag} to 1)`);
+      state.effects.push(`answer Yes (set story script flag ${flag} to 1)`);
       state.offset = instruction.endOffset;
       pending.push(no, state);
       continue;
@@ -1563,7 +1564,7 @@ function executeRoute(
     pending.push(state);
   }
 
-  const unique = new Map<string, ScenarioQueryOutcome>();
+  const unique = new Map<string, StoryScriptQueryOutcome>();
   for (const outcome of rawOutcomes) {
     const key = outcomeKey(outcome);
     const existing = unique.get(key);
@@ -1576,18 +1577,18 @@ function executeRoute(
   return { outcomes: [...unique.values()], truncated };
 }
 
-export async function loadProtagonistScenario(
-  scenarioId: number,
-): Promise<DisassembledScenario> {
-  return disassembleScenario(
-    scenarioId,
-    await readFile(join(repoRoot, `raw/SNR${scenarioId}.DAT`)),
-    await readFile(join(repoRoot, `raw/SNR${scenarioId}.MES`)),
+export async function loadProtagonistStoryScript(
+  storyScriptId: number,
+): Promise<DisassembledStoryScript> {
+  return disassembleStoryScript(
+    storyScriptId,
+    await readFile(join(repoRoot, `raw/SNR${storyScriptId}.DAT`)),
+    await readFile(join(repoRoot, `raw/SNR${storyScriptId}.MES`)),
   );
 }
 
-export async function loadSharedScenario(): Promise<DisassembledScenario> {
-  return disassembleScenario(
+export async function loadSharedStoryScript(): Promise<DisassembledStoryScript> {
+  return disassembleStoryScript(
     0,
     await readFile(join(repoRoot, "raw/SNR0.DAT")),
     await readFile(join(repoRoot, "raw/SNR0.MES")),
@@ -1611,21 +1612,23 @@ function highestFame(fame: ReturnType<typeof inspectFame>): {
   return { category, value };
 }
 
-export function inspectSharedScenario(
+export function inspectSharedStoryScript(
   save: Buffer,
   slot: number,
-  action: ScenarioQueryAction,
-  scenario: DisassembledScenario,
+  action: StoryScriptQueryAction,
+  storyScript: DisassembledStoryScript,
   text?: GeneralText,
-): SharedScenarioStatus {
+): SharedStoryScriptStatus {
   validate(save);
-  if (scenario.scenarioId !== 0)
-    throw new Error(`Expected shared scenario 0, got ${scenario.scenarioId}.`);
+  if (storyScript.storyScriptId !== 0)
+    throw new Error(
+      `Expected shared story script 0, got ${storyScript.storyScriptId}.`,
+    );
   const base = slotOffset(slot);
   const protagonistId = inspectSlot(save, slot).protagonistId;
-  const section = save[base + SHARED_SCENARIO_START]!;
-  const subsection = save[base + SHARED_SCENARIO_START + 1]!;
-  const flags = save.readUInt32LE(base + SHARED_SCENARIO_START + 2);
+  const section = save[base + SHARED_STORY_SCRIPT_START]!;
+  const subsection = save[base + SHARED_STORY_SCRIPT_START + 1]!;
+  const flags = save.readUInt32LE(base + SHARED_STORY_SCRIPT_START + 2);
   const rank = inspectRank(save, slot, protagonistId);
   const maximum = highestFame(inspectFame(save, slot, protagonistId));
   const nextTitleThreshold = rank < 9 ? 500 * (rank + 1) ** 2 : undefined;
@@ -1675,12 +1678,12 @@ export function inspectSharedScenario(
   const executionFlags = consumesCachedRoyalMission
     ? writeFlag(writeFlag(flags, 17, 0), 18, 1)
     : flags;
-  const selectedSection = scenario.sections[executionSection];
+  const selectedSection = storyScript.sections[executionSection];
   const routes =
     executionSubsection === 0
       ? selectedSection?.routes
       : selectedSection?.entryRouteTables[executionSubsection - 1]?.routes;
-  const executionAction: ScenarioQueryAction =
+  const executionAction: StoryScriptQueryAction =
     palaceVisit && executionSection >= 6 && executionSubsection > 0
       ? { type: "building", context: 0x15, name: "palace-audience" }
       : action;
@@ -1697,7 +1700,7 @@ export function inspectSharedScenario(
       ? isBuildingOpen(action.context, ticks)
       : undefined;
   const variables = new Map(
-    Array.from({ length: SCENARIO_VARIABLE_COUNT }, (_, variable) => [
+    Array.from({ length: STORY_SCRIPT_VARIABLE_COUNT }, (_, variable) => [
       variable,
       save.readUInt16LE(base + SHARED_VARIABLES_START + variable * 2),
     ]),
@@ -1711,7 +1714,7 @@ export function inspectSharedScenario(
   const cargo = inspectPlayerCargo(save, slot, protagonistId);
   const execution = route
     ? executeRoute(
-        scenario,
+        storyScript,
         executionSection,
         route,
         executionFlags,
@@ -1721,7 +1724,7 @@ export function inspectSharedScenario(
         save[base + 8]!,
         save.subarray(base, base + SLOT_SIZE),
         protagonistId,
-        sharedScenarioRandomSeed(
+        sharedStoryScriptRandomSeed(
           save[base + 6]!,
           save[base + 7]!,
           save[base + 8]!,
@@ -1783,13 +1786,13 @@ export function inspectSharedScenario(
   };
 }
 
-export async function queryScenario(
+export async function queryStoryScript(
   save: Buffer,
   slot: number,
-  action: ScenarioQueryAction,
-  scenario?: DisassembledScenario,
-  sharedScenario?: DisassembledScenario,
-): Promise<ScenarioQueryResult> {
+  action: StoryScriptQueryAction,
+  storyScript?: DisassembledStoryScript,
+  sharedStoryScript?: DisassembledStoryScript,
+): Promise<StoryScriptQueryResult> {
   validate(save);
   const base = slotOffset(slot);
   const protagonistId = save[1 + (slot - 1) * 15 + 13]!;
@@ -1797,20 +1800,21 @@ export async function queryScenario(
     throw new Error(
       `Save slot ${slot} has unsupported protagonist ID ${protagonistId}.`,
     );
-  const scenarioId = protagonistId + 1;
-  const selectedScenario =
-    scenario ?? (await loadProtagonistScenario(scenarioId));
-  const selectedSharedScenario = sharedScenario ?? (await loadSharedScenario());
-  if (selectedScenario.scenarioId !== scenarioId)
+  const storyScriptId = protagonistId + 1;
+  const selectedStoryScript =
+    storyScript ?? (await loadProtagonistStoryScript(storyScriptId));
+  const selectedSharedStoryScript =
+    sharedStoryScript ?? (await loadSharedStoryScript());
+  if (selectedStoryScript.storyScriptId !== storyScriptId)
     throw new Error(
-      `Expected scenario ${scenarioId}, got ${selectedScenario.scenarioId}.`,
+      `Expected story script ${storyScriptId}, got ${selectedStoryScript.storyScriptId}.`,
     );
   const sectionId = save[base + 0x30]!;
   const subsection = save[base + 0x31]!;
-  const section = selectedScenario.sections[sectionId];
+  const section = selectedStoryScript.sections[sectionId];
   if (!section)
     throw new Error(
-      `Save selects missing scenario ${scenarioId} section ${sectionId}.`,
+      `Save selects missing story script ${storyScriptId} section ${sectionId}.`,
     );
   const routeTable =
     subsection === 0
@@ -1818,7 +1822,7 @@ export async function queryScenario(
       : section.entryRouteTables[subsection - 1]?.routes;
   if (!routeTable)
     throw new Error(
-      `Save selects missing scenario ${scenarioId} section ${sectionId} subsection ${subsection}.`,
+      `Save selects missing story script ${storyScriptId} section ${sectionId} subsection ${subsection}.`,
     );
 
   const slotInfo = inspectSlot(save, slot);
@@ -1833,9 +1837,9 @@ export async function queryScenario(
   const route = findRoute(routeTable, selector);
   const flags = save.readUInt32LE(base + 0x32);
   const variables = new Map(
-    Array.from({ length: SCENARIO_VARIABLE_COUNT }, (_, variable) => [
+    Array.from({ length: STORY_SCRIPT_VARIABLE_COUNT }, (_, variable) => [
       variable,
-      save.readUInt16LE(base + SCENARIO_VARIABLES_START + variable * 2),
+      save.readUInt16LE(base + STORY_SCRIPT_VARIABLES_START + variable * 2),
     ]),
   );
   const battle = battleEnvironment(action);
@@ -1848,17 +1852,17 @@ export async function queryScenario(
         ]
       : [];
   const generalText = await loadGeneralText();
-  const shared = inspectSharedScenario(
+  const shared = inspectSharedStoryScript(
     save,
     slot,
     action,
-    selectedSharedScenario,
+    selectedSharedStoryScript,
     generalText,
   );
   const ordinaryData =
     action.type === "building" ? await loadOrdinaryDialogueData() : undefined;
   const inspectOrdinaryBuilding = (
-    protagonistOutcomes: readonly ScenarioQueryOutcome[],
+    protagonistOutcomes: readonly StoryScriptQueryOutcome[],
   ): OrdinaryBuildingEntry | undefined =>
     action.type === "building" && ordinaryData
       ? ordinaryBuildingEntry(
@@ -1880,10 +1884,10 @@ export async function queryScenario(
   ];
   if (buildingOpen === false)
     notes.push(
-      "The building is closed at the saved time, so its matched scenario route cannot currently be triggered.",
+      "The building is closed at the saved time, so its matched story script route cannot currently be triggered.",
     );
   if (
-    scenarioId === 1 &&
+    storyScriptId === 1 &&
     sectionId === 1 &&
     subsection > 0 &&
     fame.adventure < 2_000
@@ -1894,7 +1898,7 @@ export async function queryScenario(
   if (!route) {
     const ordinaryBuilding = inspectOrdinaryBuilding([]);
     const joaoPubNeedsHarborVisit =
-      scenarioId === 1 &&
+      storyScriptId === 1 &&
       sectionId === 1 &&
       subsection === 0 &&
       action.type === "building" &&
@@ -1908,7 +1912,7 @@ export async function queryScenario(
               ordinaryBuilding?.confidence ?? "none",
               ordinaryBuilding?.command?.confidence ?? "none",
             ),
-      scenarioId,
+      storyScriptId,
       protagonist: PROTAGONISTS[protagonistId]!,
       section: sectionId,
       subsection,
@@ -1919,7 +1923,7 @@ export async function queryScenario(
       ...(buildingOpen === undefined ? {} : { buildingOpen }),
       routeTable: subsection === 0 ? "primary" : `subsection-${subsection}`,
       outcomes: [],
-      sharedScenario: shared,
+      sharedStoryScript: shared,
       ...(ordinaryBuilding ? { ordinaryBuilding } : {}),
       notes: [
         ...notes,
@@ -1929,7 +1933,7 @@ export async function queryScenario(
               "The arrival time does not advance the subsection; only the Harbor route does, so entering the Pub first leaves the save in subsection 0.",
             ]
           : []),
-        "No matching protagonist-scenario route was found.",
+        "No matching protagonist-story-script route was found.",
       ],
     };
   }
@@ -1958,7 +1962,7 @@ export async function queryScenario(
   const execution = sharedSkipsProtagonist
     ? { outcomes: [], truncated: false }
     : executeRoute(
-        selectedScenario,
+        selectedStoryScript,
         sectionId,
         route,
         flags,
@@ -1968,7 +1972,7 @@ export async function queryScenario(
         save[base + 8]!,
         save.subarray(base, base + SLOT_SIZE),
         protagonistId,
-        protagonistScenarioRandomSeed(
+        protagonistStoryScriptRandomSeed(
           save[base + 6]!,
           save[base + 7]!,
           save[base + 8]!,
@@ -1999,7 +2003,7 @@ export async function queryScenario(
   );
   if (
     outcomesWithDialogue.length === 0 &&
-    scenarioId === 1 &&
+    storyScriptId === 1 &&
     sectionId === 1 &&
     subsection === 1 &&
     action.type === "building" &&
@@ -2016,7 +2020,7 @@ export async function queryScenario(
   }
   if (
     outcomesWithDialogue.length === 0 &&
-    scenarioId === 5 &&
+    storyScriptId === 5 &&
     sectionId === 1 &&
     action.type === "building" &&
     action.context === BUILDING_CONTEXTS.pub
@@ -2037,9 +2041,9 @@ export async function queryScenario(
   }
   const availableOutcomes = buildingOpen === false ? [] : outcomesWithDialogue;
   // A protagonist before-battle route that cancels the battle makes
-  // MAIN.EXE skip the shared scenario's before-battle route (0x150FD jumps
+  // MAIN.EXE skip the shared story script's before-battle route (0x150FD jumps
   // past its dispatch at 0x15107).
-  const cancels = (outcome: ScenarioQueryOutcome) =>
+  const cancels = (outcome: StoryScriptQueryOutcome) =>
     outcome.effects.some((effect) => effect.startsWith("cancel the battle"));
   const cancelling =
     action.type === "before-battle"
@@ -2075,7 +2079,7 @@ export async function queryScenario(
   );
   return {
     confidence,
-    scenarioId,
+    storyScriptId,
     protagonist: PROTAGONISTS[protagonistId]!,
     section: sectionId,
     subsection,
@@ -2087,7 +2091,7 @@ export async function queryScenario(
     route,
     routeTable: subsection === 0 ? "primary" : `subsection-${subsection}`,
     outcomes: availableOutcomes,
-    sharedScenario: sharedStatus,
+    sharedStoryScript: sharedStatus,
     ...(ordinaryBuilding ? { ordinaryBuilding } : {}),
     notes,
   };
@@ -2104,7 +2108,7 @@ function percent(probability: number): string {
 const MENU_RETURN_EFFECT = /^(?:return|decline)\b/;
 
 // Runs a building visit as a sequence of ordinary commands. The first
-// command is resolved exactly as queryScenario resolves a single command
+// command is resolved exactly as queryStoryScript resolves a single command
 // path; each later command sees a working copy of the save with the earlier
 // commands' modeled writes applied, plus the unsaved per-visit state
 // (Pub enthusiasm, the Pray guard, the cartographer's Report). Random
@@ -2113,23 +2117,23 @@ const MENU_RETURN_EFFECT = /^(?:return|decline)\b/;
 export async function queryVisit(
   save: Buffer,
   slot: number,
-  action: ScenarioQueryAction,
+  action: StoryScriptQueryAction,
   commands: readonly VisitCommand[],
-  scenario?: DisassembledScenario,
-  sharedScenario?: DisassembledScenario,
-): Promise<ScenarioQueryResult> {
+  storyScript?: DisassembledStoryScript,
+  sharedStoryScript?: DisassembledStoryScript,
+): Promise<StoryScriptQueryResult> {
   const first = commands[0];
   if (action.type !== "building") {
     if (commands.length > 0)
       throw new Error("Only a building action accepts a command sequence.");
-    return queryScenario(save, slot, action, scenario, sharedScenario);
+    return queryStoryScript(save, slot, action, storyScript, sharedStoryScript);
   }
-  const result = await queryScenario(
+  const result = await queryStoryScript(
     save,
     slot,
     first ? { ...action, commandPath: first.path } : action,
-    scenario,
-    sharedScenario,
+    storyScript,
+    sharedStoryScript,
   );
   if (commands.length <= 1) return result;
 
@@ -2149,12 +2153,12 @@ export async function queryVisit(
       "Ordinary entry is conditional; later commands assume the menu was reached.",
     );
   if (
-    [...result.outcomes, ...result.sharedScenario.outcomes].some(
+    [...result.outcomes, ...result.sharedStoryScript.outcomes].some(
       (outcome) => outcome.effects.length > 0,
     )
   )
     carried.push(
-      "Story and shared-scenario effects at entry are not applied to the working save.",
+      "Story and shared-story-script effects at entry are not applied to the working save.",
     );
 
   const steps = commands.map((visitCommand, index): VisitStep => {
@@ -2283,7 +2287,7 @@ export async function queryVisit(
   };
 }
 
-function formatAction(action: ScenarioQueryAction): string {
+function formatAction(action: StoryScriptQueryAction): string {
   if (action.type === "building")
     return `${action.name}${action.commandPath ? `:${action.commandPath.join(":")}` : ""} (context ${hex(action.context, 2)})`;
   if (action.type === "at-sea") return "at-sea day event";
@@ -2318,10 +2322,10 @@ function formatOrdinaryCommand(
   return lines;
 }
 
-export function formatQueryResult(result: ScenarioQueryResult): string {
-  const shared = result.sharedScenario;
+export function formatQueryResult(result: StoryScriptQueryResult): string {
+  const shared = result.sharedStoryScript;
   const lines = [
-    `Scenario ${result.scenarioId}: ${result.protagonist}`,
+    `Story script ${result.storyScriptId}: ${result.protagonist}`,
     `Save state: section ${result.section}, subsection ${result.subsection}, flags ${result.flagsHex}`,
     `Location: ${result.portName} (${result.portId}); action: ${formatAction(result.action)}`,
     ...(result.visit
@@ -2367,7 +2371,7 @@ export function formatQueryResult(result: ScenarioQueryResult): string {
   for (const [index, outcome] of shared.outcomes.entries()) {
     lines.push(`Shared outcome ${index + 1} [${outcome.confidence}]`);
     if (outcome.dialogue.length === 0)
-      lines.push("  No shared-scenario dialogue.");
+      lines.push("  No shared-story-script dialogue.");
     for (const line of outcome.dialogue)
       lines.push(
         `  ${hex(line.offset)} · ${line.generalMessageIndex === undefined ? `message ${line.messageId}` : `general message ${line.generalMessageIndex}`}${line.presentation === "choice-prompt" ? ` · choice → flag ${line.choiceFlag}` : ""} · ${line.speakerLabel ?? (line.characterId !== undefined ? `Character ${line.characterId}` : line.characterVariable !== undefined ? `Character from variable ${line.characterVariable}` : line.position === 0 ? "Building speaker" : "Narration")}: ${line.body}`,
@@ -2441,7 +2445,7 @@ export function formatQueryResult(result: ScenarioQueryResult): string {
   return `${lines.join("\n")}\n`;
 }
 
-const help = `Query story dialogue and shared scenario state from a UW2 DOS save
+const help = `Query story dialogue and shared story script state from a UW2 DOS save
 
 pnpm run query-dialog -- FILE SLOT ACTION[:COMMAND[:SELECTION]] [COMMAND...]
 
@@ -2450,8 +2454,8 @@ Actions:
   bank, item-shop, church, house-of-fortune, fortune-teller
   context:ID                  raw building/context qualifier
   at-sea                     uses the saved voyage-day counter
-  before-battle:CAPTAIN_ID   scenario hook before naval combat
-  after-battle:CAPTAIN_ID    scenario hook after naval combat
+  before-battle:CAPTAIN_ID   story script hook before naval combat
+  after-battle:CAPTAIN_ID    story script hook after naval combat
   townsperson:NAME           line shown when walking into a townsperson:
                              market-woman, pub-man, shipyard-woman, lodge-man,
                              waving-man, dog, guard, or old-man

@@ -16,7 +16,7 @@ the combatants' preceding moves all affect the damage actually applied.
 Duels can begin in two ways:
 
 - during a naval battle, when the flagships are adjacent; and
-- at five fixed points in the protagonist scenarios.
+- at five fixed points in the protagonist story scripts.
 
 There is no duel in an ordinary Pub or Lodge visit. The menus for a sailor
 met there carry a **Duel** label in `MENU.DAT` (entries 3 and 12), but the
@@ -59,17 +59,17 @@ byte `+0x1B`.
 
 ## Scripted duels
 
-The protagonist scenario bytecode contains exactly five `E8 <sailor ID>` duel
+The protagonist story script bytecode contains exactly five `E8 <sailor ID>` duel
 instructions. No scripted duel occurs in Ernst's, Pietro's, or Ali's story, or
 in the shared quest script.
 
-| Protagonist | Trigger                                                                | Opponent used by the duel engine                             | Scenario instruction |
-| ----------- | ---------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------: |
-| João        | The Shipyard confrontation while looking for Domingo                   | Antonio Khan, sailor 60                                      |    `SNR1.DAT 0x0CA6` |
-| João        | The confrontation at the Franco home before Duke Franco's trial        | sailor 60, although the scene presents Khan's pirate men     |    `SNR1.DAT 0x0FFF` |
-| João        | The South American Pub rescue of Lucia                                 | sailor 60, temporarily renamed and redrawn as Pirate Rudolph |    `SNR1.DAT 0x32F4` |
-| Catalina    | Returning to the successful South American Pub while looking for Lucia | sailor 60, temporarily renamed and redrawn as Pirate Rudolph |    `SNR2.DAT 0x2965` |
-| Otto        | Meeting Matthew in the London Pub near the beginning of the story      | Matthew Loy, sailor 75                                       |    `SNR3.DAT 0x0284` |
+| Protagonist | Trigger                                                                | Opponent used by the duel engine                             | Story script instruction |
+| ----------- | ---------------------------------------------------------------------- | ------------------------------------------------------------ | -----------------------: |
+| João        | The Shipyard confrontation while looking for Domingo                   | Antonio Khan, sailor 60                                      |        `SNR1.DAT 0x0CA6` |
+| João        | The confrontation at the Franco home before Duke Franco's trial        | sailor 60, although the scene presents Khan's pirate men     |        `SNR1.DAT 0x0FFF` |
+| João        | The South American Pub rescue of Lucia                                 | sailor 60, temporarily renamed and redrawn as Pirate Rudolph |        `SNR1.DAT 0x32F4` |
+| Catalina    | Returning to the successful South American Pub while looking for Lucia | sailor 60, temporarily renamed and redrawn as Pirate Rudolph |        `SNR2.DAT 0x2965` |
+| Otto        | Meeting Matthew in the London Pub near the beginning of the story      | Matthew Loy, sailor 75                                       |        `SNR3.DAT 0x0284` |
 
 João's and Catalina's Rudolph encounters change sailor 60's displayed name
 and portrait (`SNR2.DAT 0x2947–0x2962` for Catalina) but do not replace his
@@ -287,15 +287,15 @@ fresh roll `r = random(10)`; moves are not drawn from a finite hand and do not
 run out. The move is 0 (Thrust or Parry) when `r < low`, 2 (Strike or Dodge)
 when `r > high`, and 1 otherwise:
 
-| Choice                      | `low` | `high` |
-| --------------------------- | ----: | -----: |
-| Attack, fencing sword       |     6 |      7 |
-| Attack, curved sword        |     2 |      7 |
-| Attack, heavy sword         |     2 |      3 |
-| Attack, straight or none    |     3 |      6 |
-| Defense, armor 60 or more   |     6 |      7 |
-| Defense, armor 20–59        |     2 |      7 |
-| Defense, armor below 20     |     2 |      3 |
+| Choice                    | `low` | `high` |
+| ------------------------- | ----: | -----: |
+| Attack, fencing sword     |     6 |      7 |
+| Attack, curved sword      |     2 |      7 |
+| Attack, heavy sword       |     2 |      3 |
+| Attack, straight or none  |     3 |      6 |
+| Defense, armor 60 or more |     6 |      7 |
+| Defense, armor 20–59      |     2 |      7 |
+| Defense, armor below 20   |     2 |      3 |
 
 Attack probabilities depend on weapon family:
 
@@ -328,18 +328,18 @@ The duel runs at `0x17DD4`. The screen (`0x17A4E`) is `GRAPH.DAT` record 23
 at (0, 0), with record 24 at (80, 168) when the duel is in port (`DS:0x0E32`
 is not `0xFF`). Its colours are the battle palette's entries 0–7.
 
-| Element            | Position                                   | Code                       |
-| ------------------ | ------------------------------------------ | -------------------------- |
-| Names, `%12s %s`   | opponent (96, 24), protagonist (336, 24)   | `0x17A4E`                  |
-| Portraits          | opponent (96, 56), protagonist (480, 56)   | `0:7A5A`                   |
-| Opponent's weapon and armor, `%s` | (200, 56), (200, 80)        | `0x17A4E`                  |
-| Protagonist's weapon and armor, `%14s` | (328, 56), (328, 80)   | `0x17A4E`                  |
-| Turn box           | cleared at (208, 112), 224 × 48, colour 7; text from (224, 128), columns 28–53 | `0x166CC` |
-| Balance numbers, `%3d   ` | opponent's points (184, 360), protagonist's (408, 360) | `0x168DF` |
-| Damage, `-%d` in colour 2 | (208, 360) on the opponent's side, (432, 360) on the protagonist's | `0x1721A` |
-| Move picker        | window (560, 240), 80 × 96, rows 24 pixels apart | `0x167EB`, `0x16833` → `0x194DE` |
+| Element                                | Position                                                                       | Code                             |
+| -------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------- |
+| Names, `%12s %s`                       | opponent (96, 24), protagonist (336, 24)                                       | `0x17A4E`                        |
+| Portraits                              | opponent (96, 56), protagonist (480, 56)                                       | `0:7A5A`                         |
+| Opponent's weapon and armor, `%s`      | (200, 56), (200, 80)                                                           | `0x17A4E`                        |
+| Protagonist's weapon and armor, `%14s` | (328, 56), (328, 80)                                                           | `0x17A4E`                        |
+| Turn box                               | cleared at (208, 112), 224 × 48, colour 7; text from (224, 128), columns 28–53 | `0x166CC`                        |
+| Balance numbers, `%3d   `              | opponent's points (184, 360), protagonist's (408, 360)                         | `0x168DF`                        |
+| Damage, `-%d` in colour 2              | (208, 360) on the opponent's side, (432, 360) on the protagonist's             | `0x1721A`                        |
+| Move picker                            | window (560, 240), 80 × 96, rows 24 pixels apart                               | `0x167EB`, `0x16833` → `0x194DE` |
 
-The turn box shows `DS:0xA4B4`, "Turn  %2d  :  Attack", or message 1376 with
+The turn box shows `DS:0xA4B4`, "Turn %2d : Attack", or message 1376 with
 "Defense"; the colon is a two-byte Shift-JIS character. The picker cannot be
 cancelled.
 
@@ -396,6 +396,7 @@ Timings are in timer units of `0:57BE`.
    | Dodge  | 06 17 27 28 28 21 |
 
    On a hit, from the fourth frame the defender shows idle frame 2, 8 rows up.
+
 4. **A hit (`0x173F9`).** The challenger's hits add `min(damage, 200 − balance)`
    to the balance `DS:0xA0A4` (the challenger's points); the other side's
    subtract `min(damage, balance)`. The window then steps a cell at a time to

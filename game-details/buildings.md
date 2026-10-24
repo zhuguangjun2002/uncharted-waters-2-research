@@ -169,8 +169,7 @@ occupy `MAIN.EXE 0x33354–0x3351A`.
 
 ### Lodge command dialogue
 
-The Lodge handler begins at `MAIN.EXE 0x2EB43`. It shows the greeting (raw
-66) unless a story route took over the building (`DS:0xF6A` or `DS:0xEE0`
+The Lodge handler begins at `MAIN.EXE 0x2EB43`. It shows the greeting (raw 66) unless a story route took over the building (`DS:0xF6A` or `DS:0xEE0`
 nonzero), picks the face of the townsperson who may answer **Gossip**
 (`DS:0xC206 = random(0x3FFF) | 0xC000`, `0x2EB63–0x2EB6E`), and then loops on
 `MENU.DAT` entry 4, **Check In**, **Gossip**, and **Port Info**, at column 60,
@@ -512,27 +511,27 @@ that position. Item IDs are zero-based.
 
 **Buy** uses these `MESSAGE.DAT` raw indices:
 
-| Condition or stage              | Raw index | Result                                                                                                                                     |
-| ------------------------------- | --------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| No gold                         |       236 | “It seems you have no gold.” The command ends.                                                                                             |
-| All 20 inventory slots occupied |       237 | The command ends.                                                                                                                          |
-| Item selection before a purchase |       238 | “I'm sure you'll find something you like.” Shown again after a refusal or a refused purchase.                                             |
-| Item selection after a purchase  |       242 | “Are you interested in anything else?” The flag at `[bp − 0xC]` is cleared only by a completed purchase (`0x2F9D4`, `0x2FAE3`).          |
-| Duplicate restricted item       |       332 | “You already have one.” The executable applies this only to item types whose low type nibble is below 7.                                   |
-| Selected item                   |       240 | Supplies the item name and its price in gold, then asks for confirmation.                                                                  |
-| Insufficient gold               |       239 | The purchase is not performed.                                                                                                             |
-| Confirmed purchase              |         — | Deducts the price, puts the item in the first empty inventory slot, then repeats with the “interested in anything else?” selection prompt. |
+| Condition or stage               | Raw index | Result                                                                                                                                     |
+| -------------------------------- | --------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| No gold                          |       236 | “It seems you have no gold.” The command ends.                                                                                             |
+| All 20 inventory slots occupied  |       237 | The command ends.                                                                                                                          |
+| Item selection before a purchase |       238 | “I'm sure you'll find something you like.” Shown again after a refusal or a refused purchase.                                              |
+| Item selection after a purchase  |       242 | “Are you interested in anything else?” The flag at `[bp − 0xC]` is cleared only by a completed purchase (`0x2F9D4`, `0x2FAE3`).            |
+| Duplicate restricted item        |       332 | “You already have one.” The executable applies this only to item types whose low type nibble is below 7.                                   |
+| Selected item                    |       240 | Supplies the item name and its price in gold, then asks for confirmation.                                                                  |
+| Insufficient gold                |       239 | The purchase is not performed.                                                                                                             |
+| Confirmed purchase               |         — | Deducts the price, puts the item in the first empty inventory slot, then repeats with the “interested in anything else?” selection prompt. |
 
 **Sell** uses this sequence:
 
-| Condition or stage            | Raw index | Result                                                                                                                     |
-| ----------------------------- | --------: | -------------------------------------------------------------------------------------------------------------------------- |
-| No carried items              |       243 | “You don't have any items.” The command ends.                                                                              |
-| Item selection before a sale  |       244 | “What would you like to sell?” Shown again after a refusal, an equipped item or an unaccepted item.                        |
-| Item selection after a sale   |       248 | “What else can you sell me?” The flag at `[bp − 8]` is cleared only by a completed sale (`0x2FB23`, `0x2FC72`).            |
-| Item is currently equipped    |       333 | It cannot be sold.                                                                                                         |
-| Item is not accepted by shops |       929 | “Sorry, but I can't buy this item.” Its stored byte `+0x14` is zero, or its initial offer (below) is zero.                 |
-| Initial offer                 |       245 | Supplies the item name and the base sale price. Accepting sells immediately.                                               |
+| Condition or stage            | Raw index | Result                                                                                                                                                                          |
+| ----------------------------- | --------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No carried items              |       243 | “You don't have any items.” The command ends.                                                                                                                                   |
+| Item selection before a sale  |       244 | “What would you like to sell?” Shown again after a refusal, an equipped item or an unaccepted item.                                                                             |
+| Item selection after a sale   |       248 | “What else can you sell me?” The flag at `[bp − 8]` is cleared only by a completed sale (`0x2FB23`, `0x2FC72`).                                                                 |
+| Item is currently equipped    |       333 | It cannot be sold.                                                                                                                                                              |
+| Item is not accepted by shops |       929 | “Sorry, but I can't buy this item.” Its stored byte `+0x14` is zero, or its initial offer (below) is zero.                                                                      |
+| Initial offer                 |       245 | Supplies the item name and the base sale price. Accepting sells immediately.                                                                                                    |
 | Successful counteroffer       |       246 | Rejecting the initial offer performs a Luck-based roll. Success produces a higher offer; failure returns to the item list. Rejecting the higher offer also returns to the list. |
 
 Both commands check their exits at the start of every round, not only once:
@@ -563,14 +562,14 @@ the equipped (333) and accepted (929) checks (`0x2FB57`). The Info menu draws
 it in a window at column 12, y 128, 48 columns by 176 pixels
 (`0x2F347` → `0:0x721A`) with the in-use flag set (`0x2F92E`).
 
-| Element                          | Place                                   | Source                                                                                     |
-| -------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Name and type                    | column 16, y 144                        | `DS:0xB676`, `ESC C1 %s ESC C0 (%s)`: the name in colour 1, the type name from `DS:0x0AD2` |
-| In use                           | after the type                          | `DS:0xB684`, `ESC C5 In Use ESC C0`, only when the caller asks and flag `0x10` is set      |
-| Picture                          | (128, 192)                              | `0:0x7A6D` with picture byte `+0x11` + 0x63                                                |
-| Attack (types 0–3)               | column 16, y 168                        | message 1371, “Attack”, two spaces, and the grade in colour 2                               |
-| Defense (type 6)                 | column 16, y 168                        | message 1372, “Defense”, a space, and the grade in colour 2                                  |
-| Description                      | columns 26–56 from y 176, 16 pixels a line | the item's 172-byte text record (`0xB9A`, `FC4:0x5E4E`), line height `DS:0x87F6` = 16     |
+| Element            | Place                                      | Source                                                                                     |
+| ------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Name and type      | column 16, y 144                           | `DS:0xB676`, `ESC C1 %s ESC C0 (%s)`: the name in colour 1, the type name from `DS:0x0AD2` |
+| In use             | after the type                             | `DS:0xB684`, `ESC C5 In Use ESC C0`, only when the caller asks and flag `0x10` is set      |
+| Picture            | (128, 192)                                 | `0:0x7A6D` with picture byte `+0x11` + 0x63                                                |
+| Attack (types 0–3) | column 16, y 168                           | message 1371, “Attack”, two spaces, and the grade in colour 2                              |
+| Defense (type 6)   | column 16, y 168                           | message 1372, “Defense”, a space, and the grade in colour 2                                |
+| Description        | columns 26–56 from y 176, 16 pixels a line | the item's 172-byte text record (`0xB9A`, `FC4:0x5E4E`), line height `DS:0x87F6` = 16      |
 
 The text margins are columns 14–58 while the name is written (`0x2F234`) and
 26–56 for the description (`0x2F318–0x2F327`); the line height returns to 18
@@ -790,18 +789,18 @@ Each entry's hit box is x `128 + 176 × (i & 1)` to 160 pixels further,
 box after them. The parchment and list are drawn again at the start of
 every round. Choosing one follows this dialogue:
 
-| Stage or condition               | Raw index | Continuation                                                                              |
-| -------------------------------- | --------: | ----------------------------------------------------------------------------------------- |
-| Gold below half the price        |        22 | Spoken by the crew spokesman; the purchase is not performed.                              |
-| Mate's price assessment          |     23–25 | Classifies the price as a bargain, expensive, or acceptable.                              |
-| Ordinary price confirmation      |       150 | Supplies the goods name and per-lot price, as a yes/no.                                   |
-| Counteroffer prompt              |         6 | Supplies the asked price `P`; the offer may be 0–`P`.                                     |
-| Offer below `T`, `T − F` ≤ 1     |        11 | Rejects the offer; the prompt repeats.                                                    |
-| Offer below `T` otherwise        |        12 | Names a higher price `C`; the prompt repeats unless 851 follows.                          |
-| Negotiation or Accounting        |       851 | Spoken for the buyer with `F`.                                                            |
-| Seller yields                    |       852 | Sells at `F`.                                                                             |
-| Offer of at least `T`            |        10 | Sells at the offered price.                                                               |
-| Quantity prompt                  |         9 | Supplies the goods name; the input is limited by cargo room and gold at the agreed price. |
+| Stage or condition           | Raw index | Continuation                                                                              |
+| ---------------------------- | --------: | ----------------------------------------------------------------------------------------- |
+| Gold below half the price    |        22 | Spoken by the crew spokesman; the purchase is not performed.                              |
+| Mate's price assessment      |     23–25 | Classifies the price as a bargain, expensive, or acceptable.                              |
+| Ordinary price confirmation  |       150 | Supplies the goods name and per-lot price, as a yes/no.                                   |
+| Counteroffer prompt          |         6 | Supplies the asked price `P`; the offer may be 0–`P`.                                     |
+| Offer below `T`, `T − F` ≤ 1 |        11 | Rejects the offer; the prompt repeats.                                                    |
+| Offer below `T` otherwise    |        12 | Names a higher price `C`; the prompt repeats unless 851 follows.                          |
+| Negotiation or Accounting    |       851 | Spoken for the buyer with `F`.                                                            |
+| Seller yields                |       852 | Sells at `F`.                                                                             |
+| Offer of at least `T`        |        10 | Sells at the offered price.                                                               |
+| Quantity prompt              |         9 | Supplies the goods name; the input is limited by cargo room and gold at the agreed price. |
 
 Before the list opens, and again after every round that reaches the price
 question (`0x2A6CA`), a pre-check at `0x29E0F` can end the command. With no
@@ -986,7 +985,7 @@ Industry = min(1000, Industry + floor(Shipyard investment / 300))
 It then clears both accumulated words. The routine (`0x1CB4E`) runs for every
 port at the end of each month (`0x1B306` → `0x1E16D`), just before the monthly
 Guild Profit refresh. It is the only executable writer of Economy and
-Industry, and the only scenario reference to this record group (`SNR0 0x09D2`)
+Industry, and the only story script reference to this record group (`SNR0 0x09D2`)
 reads a shop-item byte, so a port's Economy and Industry never fall; they only
 rise, to at most 1,000.
 
@@ -1140,15 +1139,15 @@ left (`0x2D51F–0x2D524` go back to the town's). It draws the parchment,
 under it, so the windows that follow open over it and it stays behind the list
 until the Pub redraws its backdrop after the command (`FC4:0xB5B6`). On it:
 
-| Item                                   | Place              | Source                                                  |
-| -------------------------------------- | ------------------ | ------------------------------------------------------- |
-| The ship's picture                     | column 16, y 160   | `0:0x7DE5` with the ship type                           |
-| The ship's name, in colour 1           | column 42, y 144   | `DS:0xB4EA`, `ESC C1 %s ESC C0`                         |
-| “Captain    %s” (raw 1396)             | column 34, y 162   | the captain's record (`0:0x5952`), so the first name only |
-| “Navigation  %3d” (raw 1397)           | column 34, y 178   | floor(supply `+0x09` × crew / 100)                      |
-| “Lookout     %3d” (raw 1398)           | column 34, y 194   | floor(supply `+0x08` × crew / 100)                      |
-| “Combat      %3d” (raw 1399)           | column 34, y 210   | crew − Navigation − Lookout                             |
-| “Min Crew    %3d” (raw 1400)           | column 34, y 226   | the model's minimum crew (model `+0x05`)                |
+| Item                         | Place            | Source                                                    |
+| ---------------------------- | ---------------- | --------------------------------------------------------- |
+| The ship's picture           | column 16, y 160 | `0:0x7DE5` with the ship type                             |
+| The ship's name, in colour 1 | column 42, y 144 | `DS:0xB4EA`, `ESC C1 %s ESC C0`                           |
+| “Captain %s” (raw 1396)      | column 34, y 162 | the captain's record (`0:0x5952`), so the first name only |
+| “Navigation %3d” (raw 1397)  | column 34, y 178 | floor(supply `+0x09` × crew / 100)                        |
+| “Lookout %3d” (raw 1398)     | column 34, y 194 | floor(supply `+0x08` × crew / 100)                        |
+| “Combat %3d” (raw 1399)      | column 34, y 210 | crew − Navigation − Lookout                               |
+| “Min Crew %3d” (raw 1400)    | column 34, y 226 | the model's minimum crew (model `+0x05`)                  |
 
 The text margins are columns 34 and 53 (`DS:0x87F8` = 0x22, `DS:0x87FA` =
 0x35), so the message wait's caret after the card is at column 43, y 250.
@@ -1202,7 +1201,7 @@ order:
    `500 × (rank + 1)²`, a rank of at most 8, and an affiliation other than the
    Pirates. Once armed, every later Treat repeats the announcement until the
    audience begins. See
-   [the shared-scenario overview](scenarios/scenario-0-common-quests-and-royal-missions.md#the-invitation)
+   [the shared-story-script overview](storylines/common-quests-and-royal-missions.md#the-invitation)
    for the full rule.
 3. **A nation after the player** (`0x2BBD5–0x2BC5D`): when `random(200)` is
    below the protagonist's Luck (sailor byte `+0x1B`), the seven nation
@@ -1241,7 +1240,7 @@ order:
      “You might want to visit there someday.” for a port without one. The
      port is not marked known. If all ten tries fail, nothing is said.
 
-This command has no scenario-dispatch call, and it returns to the Pub menu
+This command has no story-script-dispatch call, and it returns to the Pub menu
 afterward.
 
 The port's Pub drink byte selects one of 14 specialties and its price. It is
@@ -1399,8 +1398,8 @@ is opened (`0:0x7BCD`, portrait `0x61` + record index) and afterwards it is
 taken off (`0:0x7690`, `0x2D1E5–0x2D239`). **Ask Info** (`0x2D090`) prints
 raw 398 in that panel and then loops on `MENU.DAT` 13 at column 60, y 104
 until it is cancelled; its first item is masked (`DS:0xA554 = 1`) unless the
-shared scenario's section and subsection (`DS:0xEE2`, `DS:0xEE3`) are both
-set (`0x2D0B0–0x2D0BE`). Its handlers are `0x2CD38` (scenario hints) and
+shared story script's section and subsection (`DS:0xEE2`, `DS:0xEE3`) are both
+set (`0x2D0B0–0x2D0BE`). Its handlers are `0x2CD38` (story script hints) and
 `0x2D06C` (Port Info: raw 642 + port with more than 80 favor, else 403):
 
 - **Tell Stories** selects a discovery and uses raw indices 312–320 for the
@@ -1865,7 +1864,7 @@ The Guild main handler begins at `MAIN.EXE 0x332E3`. It displays raw index 85,
 Info**. Both commands return to this menu; leaving the menu returns outside
 without a farewell.
 
-**Job Assignment** begins at `0x32E70`. When the shared scenario is idle, its
+**Job Assignment** begins at `0x32E70`. When the shared story script is idle, its
 ordinary Guild-entry route prepares three selectable rows. Each row contains
 one of the five common assignment families:
 
@@ -1886,7 +1885,7 @@ Selecting a row stores `selector + 1` as the subsection of shared section 0,
 copies the row's RNG checkpoint into shared variable 8, and dispatches SNR0
 with the current port and Guild qualifier `0x06`. The Old
 Guild Worker then makes the mission-specific offer. Rejecting it leaves the
-shared scenario idle and returns to the same three-row list. Accepting changes
+shared story script idle and returns to the same three-row list. Accepting changes
 the shared section and returns to the Guild's main menu. Cancelling the list
 also returns to the main menu.
 
@@ -1918,7 +1917,7 @@ index 932 names the Governor-General of Italy or Holland.
 
 The assignment families, deadlines, rewards, progress interactions, and
 failure effects are documented in
-[the shared-scenario overview](scenarios/scenario-0-common-quests-and-royal-missions.md).
+[the shared-story-script overview](storylines/common-quests-and-royal-missions.md).
 
 **Country Info** begins at `0x331DE`. It asks which country to inspect with
 raw index 162 and offers Portugal, Spain, Turkey, England, Italy, and Holland
@@ -2150,7 +2149,7 @@ the corresponding global event bit is armed.
 
 The special-residence dispatcher at `0x342C7` resolves the current port's
 ordinary occupant before calling a collector, cartographer, or skill-teacher
-handler. Story occupants are supplied by earlier scenario routes. All of them
+handler. Story occupants are supplied by earlier story script routes. All of them
 share the same residence portrait, but their commands and state are separate.
 
 A collector opens **Contract**, **Discovery**, and **Rumor** through the main
@@ -2246,7 +2245,7 @@ Map (89) it still charges 20,000 and analyzes item `0xFF`. That item's link
 byte lies at `DS:0x9556`, beyond the item table; nothing writes it and it is 0
 in the executable image, so the result is always discovery 0.
 
-The Old Map is not otherwise usable. No scenario script or executable path
+The Old Map is not otherwise usable. No story script or executable path
 places item 89 or its treasure, the Treasure Chest (99), in the inventory; the
 only reference to item 89 is the menu test above. The royal special search
 chooses its treasure from items 90–96 only, and the Treasure Chest's discovery
@@ -2280,7 +2279,7 @@ Their exact ability requirements are:
 | Dr. Wolf          | Gunnery              | Leadership 75, Knowledge 65, Courage 80   |
 
 The other ID 7 locations are story residences. They do not expose a standing
-business menu: an applicable scenario route supplies the named occupant's
+business menu: an applicable story script route supplies the named occupant's
 conversation, while the ordinary fallback says, “Commodore, this building is
 locked.”
 
@@ -2301,16 +2300,16 @@ Building entry and menu commands are separate dispatch points:
   entry alone. A hostile Palace reception is an earlier entry check and can
   eject the player before the menu or audience action becomes available.
 
-The command-to-scenario mapping is narrower than the visible menus suggest.
-After a job is chosen, `Job Assignment` invokes shared scenario context
-`current port + 0x06`, reusing the Guild qualifier. `Treat` invokes no scenario
+The command-to-story-script mapping is narrower than the visible menus suggest.
+After a job is chosen, `Job Assignment` invokes shared story script context
+`current port + 0x06`, reusing the Guild qualifier. `Treat` invokes no story script
 route; its invitation behavior is implemented directly in the executable.
 `Meet Ruler` dispatches shared Palace context `0x05`, followed by protagonist
-and shared audience context `0x15`. No other menu command has a scenario
+and shared audience context `0x15`. No other menu command has a story script
 matcher or dispatcher call site.
 
-For the ordinary buildings eligible for hostile-country encounters, scenario
-entry hooks run first. The dispatcher calls shared and protagonist scenario
+For the ordinary buildings eligible for hostile-country encounters, story script
+entry hooks run first. The dispatcher calls shared and protagonist story script
 matching at `MAIN.EXE 0x20A1B–0x20A4C`, evaluates their returned menu-control
 values, and reaches the hostile path at `0x20A70` only if interaction may
 continue. An `F8` result therefore normally prevents the later hostile check.
@@ -2360,11 +2359,11 @@ story routes (`0x209F7`, `0x20A08`, `0x20A21`). It is called again on the way
 back from screens that replace the view: leaving Supply (`0x2DD55`) and Moor
 (`0x2E3AE`), a declined or failed departure (`0x2D814`), and naming a
 purchased ship (`0x31798`, `0x31A64`, after the naming screen `0x253B2`); and
-after a scenario duel (`0x37ED2`). Leaving a building has no fade: the town is
+after a story script duel (`0x37ED2`). Leaving a building has no fade: the town is
 drawn again (`0x20418`) and the town loop's fade-in (`0x2049B`) goes to the
 palette already showing. Gambling fades out and in around its own picture
 (`0x2D2BC`, `0x2D2CC`) and around the return to the Pub (`0x2D30F`–`0x2D327`).
-Scenario opcodes do not fade: `C4` only closes the panels (`0x378AD`), and
+Story script opcodes do not fade: `C4` only closes the panels (`0x378AD`), and
 the interpreter's only palette call besides `E8`'s redraw is `F4`'s ending
 (`0x38ED2`).
 
@@ -2403,23 +2402,23 @@ Entering a building (`0x209F7` → `0:0x8D4E`) clears the screen, draws the
 backdrop, and draws only the vendor image at (104, 16), record building ID + 6
 or 20 for a Mosque (`0xE37B`, `0xE370`). The text window beside it is not
 part of that picture: each building's handler opens it when it greets, after
-the scenario routes have run (`0x20A1B–0x20A4C`). A story scene played on
+the story script routes have run (`0x20A1B–0x20A4C`). A story scene played on
 entry, such as João's first visit to the Lisbon residence, therefore shows
 the vendor image alone until the vendor speaks.
 
 The vendor image occupies the upper dialogue panel. A story character can
-visually cover that presentation with an upper scenario panel, but the vendor
+visually cover that presentation with an upper story script panel, but the vendor
 and story portrait are not displayed there simultaneously. The lower dialogue
 panel is used by story characters, not by an ordinary vendor. Dialogue does
 not need to alternate between the panels; several consecutive lines can remain
 in the lower panel.
 
-Scenario position 0 reuses the building-supplied speaker rather than selecting
-a portrait through the scenario's `CC` instruction. In a Pub search scene, for
+Story script position 0 reuses the building-supplied speaker rather than selecting
+a portrait through the story script's `CC` instruction. In a Pub search scene, for
 example, the bartender's replies appear in the existing upper vendor panel
-while Andreas remains visible in a lower scenario panel. Advancing a line
-clears its text but leaves its panel and portrait in place. The `C4` scenario
-action is stronger: it closes both scenario panels and exposes the ordinary
+while Andreas remains visible in a lower story script panel. Advancing a line
+clears its text but leaves its panel and portrait in place. The `C4` story script
+action is stronger: it closes both story script panels and exposes the ordinary
 vendor presentation underneath.
 
 Named ordinary speakers use a third panel. A ruler during Meet Ruler and its
@@ -2428,7 +2427,7 @@ Pub attendant such as Carlotta, and the crew spokesman appear in a lower,
 centered panel with their own face, while the vendor image stays in the upper
 panel. Rulers and attendants carry a `|name|` plate; the crew spokesman's line
 has none. This panel is drawn by the executable's named-face routine
-(`0:7BCD`), not by the scenario's position 1 or 2 panels.
+(`0:7BCD`), not by the story script's position 1 or 2 panels.
 
 Portrait artwork and speaker identity are separate for ID 7. Collectors,
 cartographers, teachers, and named story occupants all retain residence image 13. The current occupant—Mercator, Gerard de Jode, Olives, Dr. Wolf, or another
@@ -2482,7 +2481,7 @@ Sail action does not add another tick. Going ashore is separate and advances
 the clock by one 20-minute tick.
 
 This uses the executable's general gameplay RNG at `MAIN.EXE 0x0A198`, not the
-scenario RNG used by `EB`. The general generator advances a persistent
+story script RNG used by `EB`. The general generator advances a persistent
 in-memory state whenever gameplay calls it:
 
 ```text
@@ -2576,17 +2575,17 @@ special-residence interior and vendor portrait.
 
 ### Story residences
 
-A scenario route whose key is the port ID followed by qualifier `07` targets
+A story script route whose key is the port ID followed by qualifier `07` targets
 that port's residence. Only five of the eleven story residences have such
 routes, and `SNR0.DAT` (guild jobs and royal missions) has none:
 
-| Port (ID)    | Occupant                               | Stories                                                                                                                                                                                                                                        | Routes                                         |
-| ------------ | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Seville (1)  | Naval headquarters, Commander Ezequiel | [Catalina, section 0](scenarios/scenario-2-catalina-erantzo.md#section-0-michaels-death-and-the-mutiny); [Otto, section 5](scenarios/scenario-3-otto-baynes.md#section-5-ezequiel-and-the-bordeaux-appointment-30000-fame)                     | `0x0107` in `SNR2.DAT` and `SNR3.DAT`          |
-| Istanbul (2) | An empty house, owned by Howell        | [Ali, every section](scenarios/scenario-6-ali-vezas.md#section-5-sapha-rustem-and-the-house): the house is for sale, Howell owns it, and after the purchase it is Ali's home                                                                   | 18 × `0x0207` in `SNR6.DAT`                    |
-| Massawa (74) | Lord Taphali and Meconbe               | [João, section 3](scenarios/scenario-1-joao-franco.md#section-3-massawa-and-poseidons-staff-16000-fame); [Catalina, section 6](scenarios/scenario-2-catalina-erantzo.md#section-6-massawa-and-the-turkish-fleet-15000-fame); Pietro, section 2 | `0x4A07` in `SNR1.DAT`, `SNR2.DAT`, `SNR5.DAT` |
-| Changan (97) | Paula's family home                    | [Ernst, section 4](scenarios/scenario-4-ernst-von-bohr.md#section-4-zipangu-and-paulas-home-40000-fame) (his ending)                                                                                                                           | `0x6107` in `SNR4.DAT`                         |
-| Sakai (98)   | Brother Enrico                         | [João, section 5](scenarios/scenario-1-joao-franco.md#section-5-neo-atlantis-40000-fame)                                                                                                                                                       | `0x6207` in `SNR1.DAT`                         |
+| Port (ID)    | Occupant                               | Stories                                                                                                                                                                                                                    | Routes                                         |
+| ------------ | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Seville (1)  | Naval headquarters, Commander Ezequiel | [Catalina, section 0](storylines/catalina-erantzo.md#section-0-michaels-death-and-the-mutiny); [Otto, section 5](storylines/otto-baynes.md#section-5-ezequiel-and-the-bordeaux-appointment-30000-fame)                     | `0x0107` in `SNR2.DAT` and `SNR3.DAT`          |
+| Istanbul (2) | An empty house, owned by Howell        | [Ali, every section](storylines/ali-vezas.md#section-5-sapha-rustem-and-the-house): the house is for sale, Howell owns it, and after the purchase it is Ali's home                                                         | 18 × `0x0207` in `SNR6.DAT`                    |
+| Massawa (74) | Lord Taphali and Meconbe               | [João, section 3](storylines/joao-franco.md#section-3-massawa-and-poseidons-staff-16000-fame); [Catalina, section 6](storylines/catalina-erantzo.md#section-6-massawa-and-the-turkish-fleet-15000-fame); Pietro, section 2 | `0x4A07` in `SNR1.DAT`, `SNR2.DAT`, `SNR5.DAT` |
+| Changan (97) | Paula's family home                    | [Ernst, section 4](storylines/ernst-von-bohr.md#section-4-zipangu-and-paulas-home-40000-fame) (his ending)                                                                                                                 | `0x6107` in `SNR4.DAT`                         |
+| Sakai (98)   | Brother Enrico                         | [João, section 5](storylines/joao-franco.md#section-5-neo-atlantis-40000-fame)                                                                                                                                             | `0x6207` in `SNR1.DAT`                         |
 
 Entering a residence runs the same route matchers as any other building
 (`0x20A1B`, `0x20A39`), with the residence as building 7. They scan the table

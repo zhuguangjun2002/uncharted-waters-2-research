@@ -3,12 +3,12 @@ import { join } from "node:path";
 
 import type {
   DialogueLine,
-  DisassembledScenario,
-  ScenarioRoute,
-  ScenarioSection,
+  DisassembledStoryScript,
+  StoryScriptRoute,
+  StoryScriptSection,
 } from "./snr.js";
 
-const SCENARIO_NAMES = [
+const STORY_SCRIPT_NAMES = [
   "Common quests and royal missions",
   "João Franco",
   "Catalina Erantzo",
@@ -52,7 +52,7 @@ function csv(value: string | number | undefined): string {
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
-function routeMeaning(route: ScenarioRoute): string {
+function routeMeaning(route: StoryScriptRoute): string {
   if (route.selector <= 0x63) {
     const port = KNOWN_PORTS.get(route.selector) ?? `port ${route.selector}`;
     const context =
@@ -81,7 +81,7 @@ function lineSpeaker(line: DialogueLine): string {
   return line.position === 0 ? "Building speaker" : "Narration";
 }
 
-function renderSectionMarkdown(section: ScenarioSection): string[] {
+function renderSectionMarkdown(section: StoryScriptSection): string[] {
   const lines = [
     `## Section ${section.id}`,
     "",
@@ -139,7 +139,7 @@ function renderSectionMarkdown(section: ScenarioSection): string[] {
 
   if (section.booleanStateWrites.length > 0) {
     lines.push(
-      "### Scenario flag writes",
+      "### Story script flag writes",
       "",
       "| Offset | Flag | Value |",
       "| ---: | ---: | ---: |",
@@ -210,7 +210,7 @@ function renderSectionMarkdown(section: ScenarioSection): string[] {
   if (section.stateBranchCandidates.length > 0) {
     lines.push(
       "<details>",
-      `<summary>${section.stateBranchCandidates.length} scenario-flag branches</summary>`,
+      `<summary>${section.stateBranchCandidates.length} story-script-flag branches</summary>`,
       "",
       "| Offset | Opcode | Flag | Destination |",
       "| ---: | --- | ---: | ---: |",
@@ -243,45 +243,47 @@ function renderSectionMarkdown(section: ScenarioSection): string[] {
   return lines;
 }
 
-function renderMarkdown(scenario: DisassembledScenario): string {
-  const name = SCENARIO_NAMES[scenario.scenarioId] ?? "Unknown";
+function renderMarkdown(storyScript: DisassembledStoryScript): string {
+  const name = STORY_SCRIPT_NAMES[storyScript.storyScriptId] ?? "Unknown";
   return `${[
-    `# Scenario ${scenario.scenarioId}: ${name}`,
+    `# Story script ${storyScript.storyScriptId}: ${name}`,
     "",
-    "> This is a structural view of compiled scenario data. File order is not",
+    "> This is a structural view of compiled story script data. File order is not",
     "> necessarily runtime order, and candidate conditions are not fully decoded.",
     "",
-    `Messages: ${scenario.messages.length}; sections: ${scenario.sections.length}.`,
+    `Messages: ${storyScript.messages.length}; sections: ${storyScript.sections.length}.`,
     "",
-    "Exact bytes and all extracted fields remain available in `../scenarios.json`.",
+    "Exact bytes and all extracted fields remain available in `../story-scripts.json`.",
     "",
-    ...scenario.sections.flatMap((section) => renderSectionMarkdown(section)),
+    ...storyScript.sections.flatMap((section) =>
+      renderSectionMarkdown(section),
+    ),
   ].join("\n")}\n`;
 }
 
-function renderIndex(scenarios: readonly DisassembledScenario[]): string {
+function renderIndex(storyScripts: readonly DisassembledStoryScript[]): string {
   return `${[
-    "# Readable scenario views",
+    "# Readable story script views",
     "",
-    "These files are generated from `scenarios.json`. Markdown files contain",
+    "These files are generated from `story-scripts.json`. Markdown files contain",
     "searchable transcripts and evidence tables. `dialogue-lines.csv` contains",
     "one row per dialogue occurrence.",
     "`instructions.csv` contains the reachable sequential VM decode, while",
     "`control-flow.csv` contains its fallthrough and branch edges.",
     "",
-    ...scenarios.map((scenario) => {
-      const id = scenario.scenarioId;
-      const name = SCENARIO_NAMES[id] ?? "Unknown";
-      return `- Scenario ${id}, ${name}: [structural transcript](./scenario-${id}.md)`;
+    ...storyScripts.map((storyScript) => {
+      const id = storyScript.storyScriptId;
+      const name = STORY_SCRIPT_NAMES[id] ?? "Unknown";
+      return `- Story script ${id}, ${name}: [structural transcript](./story-script-${id}.md)`;
     }),
   ].join("\n")}\n`;
 }
 
-function renderCsv(scenarios: readonly DisassembledScenario[]): string {
+function renderCsv(storyScripts: readonly DisassembledStoryScript[]): string {
   const rows: (string | number | undefined)[][] = [
     [
-      "scenarioId",
-      "scenarioName",
+      "storyScriptId",
+      "storyScriptName",
       "sectionId",
       "runOffset",
       "lineOffset",
@@ -298,13 +300,13 @@ function renderCsv(scenarios: readonly DisassembledScenario[]): string {
       "rawHex",
     ],
   ];
-  for (const scenario of scenarios)
-    for (const section of scenario.sections)
+  for (const storyScript of storyScripts)
+    for (const section of storyScript.sections)
       for (const run of section.dialogueRuns)
         for (const line of run.lines)
           rows.push([
-            scenario.scenarioId,
-            SCENARIO_NAMES[scenario.scenarioId],
+            storyScript.storyScriptId,
+            STORY_SCRIPT_NAMES[storyScript.storyScriptId],
             section.id,
             run.offset,
             line.offset,
@@ -326,11 +328,11 @@ function renderCsv(scenarios: readonly DisassembledScenario[]): string {
 }
 
 function renderInstructionCsv(
-  scenarios: readonly DisassembledScenario[],
+  storyScripts: readonly DisassembledStoryScript[],
 ): string {
   const rows: (string | number | undefined)[][] = [
     [
-      "scenarioId",
+      "storyScriptId",
       "sectionId",
       "offset",
       "endOffset",
@@ -343,11 +345,11 @@ function renderInstructionCsv(
       "rawHex",
     ],
   ];
-  for (const scenario of scenarios)
-    for (const section of scenario.sections)
+  for (const storyScript of storyScripts)
+    for (const section of storyScript.sections)
       for (const instruction of section.instructions)
         rows.push([
-          scenario.scenarioId,
+          storyScript.storyScriptId,
           section.id,
           instruction.offset,
           instruction.endOffset,
@@ -363,16 +365,16 @@ function renderInstructionCsv(
 }
 
 function renderControlFlowCsv(
-  scenarios: readonly DisassembledScenario[],
+  storyScripts: readonly DisassembledStoryScript[],
 ): string {
   const rows: (string | number | undefined)[][] = [
-    ["scenarioId", "sectionId", "from", "to", "type"],
+    ["storyScriptId", "sectionId", "from", "to", "type"],
   ];
-  for (const scenario of scenarios)
-    for (const section of scenario.sections)
+  for (const storyScript of storyScripts)
+    for (const section of storyScript.sections)
       for (const edge of section.controlFlowEdges)
         rows.push([
-          scenario.scenarioId,
+          storyScript.storyScriptId,
           section.id,
           edge.from,
           edge.to,
@@ -383,26 +385,26 @@ function renderControlFlowCsv(
 
 export async function writeReadableFormats(
   output: string,
-  scenarios: readonly DisassembledScenario[],
+  storyScripts: readonly DisassembledStoryScript[],
 ): Promise<void> {
   const readable = join(output, "readable");
   await rm(readable, { recursive: true, force: true });
   await mkdir(readable, { recursive: true });
   await Promise.all([
-    writeFile(join(readable, "README.md"), renderIndex(scenarios)),
-    writeFile(join(readable, "dialogue-lines.csv"), renderCsv(scenarios)),
+    writeFile(join(readable, "README.md"), renderIndex(storyScripts)),
+    writeFile(join(readable, "dialogue-lines.csv"), renderCsv(storyScripts)),
     writeFile(
       join(readable, "instructions.csv"),
-      renderInstructionCsv(scenarios),
+      renderInstructionCsv(storyScripts),
     ),
     writeFile(
       join(readable, "control-flow.csv"),
-      renderControlFlowCsv(scenarios),
+      renderControlFlowCsv(storyScripts),
     ),
-    ...scenarios.map((scenario) =>
+    ...storyScripts.map((storyScript) =>
       writeFile(
-        join(readable, `scenario-${scenario.scenarioId}.md`),
-        renderMarkdown(scenario),
+        join(readable, `story-script-${storyScript.storyScriptId}.md`),
+        renderMarkdown(storyScript),
       ),
     ),
   ]);

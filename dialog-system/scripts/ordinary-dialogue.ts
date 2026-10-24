@@ -243,7 +243,7 @@ const ITEM_PRICE_UNITS = 18;
 const ITEM_APPEAL = 20;
 const ITEM_TYPE_FLAGS = 21;
 const ITEM_EQUIPPED = 0x10;
-const SHARED_SCENARIO_START = 0xba;
+const SHARED_STORY_SCRIPT_START = 0xba;
 const SHARED_VARIABLES_START = 0xc4;
 const NATION_RECORDS = 0x04d6;
 const NATION_RECORD_SIZE = 0x20;
@@ -2672,7 +2672,7 @@ function patronAssignmentCommand(
   data: OrdinaryDialogueData,
 ): OrdinaryCommandResult | undefined {
   const base = slotOffset(slot);
-  if (save[base + SHARED_SCENARIO_START] === 0) return undefined;
+  if (save[base + SHARED_STORY_SCRIPT_START] === 0) return undefined;
   const sharedVariable = (index: number) =>
     save.readUInt16LE(base + SHARED_VARIABLES_START + index * 2);
   const mission = sharedVariable(6);
@@ -3262,7 +3262,7 @@ function pubTreatCommand(
   const base = slotOffset(slot);
   const sharedFlags = save.readUInt32LE(base + 0xbc);
   const invitation =
-    save[base + SHARED_SCENARIO_START] === 0 &&
+    save[base + SHARED_STORY_SCRIPT_START] === 0 &&
     (sharedFlags & ((1 << 16) | (1 << 17))) !== 0 &&
     (sharedFlags & (1 << 18)) === 0;
   const protagonist = base + SAILOR_TABLE + protagonistId * SAILOR_RECORD_SIZE;
@@ -3308,7 +3308,9 @@ function pubTreatCommand(
         `deduct ${amount * specialty.price} gold`,
         `set the current Pub enthusiasm from ${oldAtmosphere} to ${nextAtmosphere}`,
         ...(invitation
-          ? ["announce the ruler's invitation and set shared scenario flag 17"]
+          ? [
+              "announce the ruler's invitation and set shared story script flag 17",
+            ]
           : []),
       ],
       uncertainties: invitation
@@ -6837,7 +6839,7 @@ function palaceDefectCommand(
   const sailor = base + SAILOR_TABLE + protagonistId * SAILOR_RECORD_SIZE;
   const former = save[sailor + SAILOR_AFFILIATION]! & 7;
   const flags = save.readUInt32LE(base + 0xbc);
-  const section = save[base + SHARED_SCENARIO_START]!;
+  const section = save[base + SHARED_STORY_SCRIPT_START]!;
   const royalMission =
     section !== 0 &&
     section !== 0xff &&
@@ -7125,7 +7127,7 @@ function guildJobCommand(
   data: OrdinaryDialogueData,
 ): OrdinaryCommandResult {
   const base = slotOffset(slot);
-  const section = save[base + SHARED_SCENARIO_START]!;
+  const section = save[base + SHARED_STORY_SCRIPT_START]!;
   const sharedVariable = (index: number) =>
     save.readUInt16LE(base + SHARED_VARIABLES_START + index * 2);
   const menu = ["Job Assignment", "Country Info"];
@@ -7163,7 +7165,7 @@ function guildJobCommand(
   }
   // MAIN.EXE 0x32ED8: an armed royal invitation (shared flags 16 and 17) is
   // mentioned instead of the job list for the six nations.
-  const sharedFlags = save.readUInt32LE(base + SHARED_SCENARIO_START + 2);
+  const sharedFlags = save.readUInt32LE(base + SHARED_STORY_SCRIPT_START + 2);
   if ((sharedFlags & 0x30000) === 0x30000) {
     const affiliation =
       save[
@@ -7215,11 +7217,11 @@ function guildJobCommand(
     effects: [
       `select row ${row + 1}: ${GUILD_ASSIGNMENTS[selector]}`,
       `copy shared variable ${3 + row} to variable 8`,
-      `dispatch the Old Guild Worker's shared-scenario offer from section 0, subsection ${selector + 1}`,
+      `dispatch the Old Guild Worker's shared-story-script offer from section 0, subsection ${selector + 1}`,
     ],
     uncertainties: [],
     notes: [
-      "The mission-specific offer is scenario dialogue; the command resolver identifies its exact shared route table rather than duplicating that transcript as ordinary dialogue.",
+      "The mission-specific offer is story script dialogue; the command resolver identifies its exact shared route table rather than duplicating that transcript as ordinary dialogue.",
     ],
   });
 }

@@ -1,6 +1,6 @@
-# Scenario 5: Pietro Conti
+# Pietro Conti's storyline
 
-Scenario 5 (`SNR5`) is Pietro's character story. It opens in Genoa, where
+Story script 5 (`SNR5`) holds Pietro's storyline. It opens in Genoa, where
 Pietro is hounded by the creditors of his father's debts until his friend Camillo
 arrives with a ship and news of a sponsor: Duchess Franco of Lisbon. After the
 sponsorship, the story has three further sections. The first is gated by
@@ -12,13 +12,13 @@ no scripted naval battles, duels, voyage-day events, or clock and calendar
 gates. Its one recurring penalty is Butler Marco's reaction when Pietro holds
 another collector's contract.
 
-This document describes the scenario from the player's point of view. It is
+This document describes the storyline from the player's point of view. It is
 based on the decoded `SNR5.DAT` route tables and dialogue and on the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md).
-Where a condition is evaluated by `MAIN.EXE` rather than by the scenario
+Where a condition is evaluated by `MAIN.EXE` rather than by the story script
 bytecode, the text cites the executable routine.
 
-Evidence labels have the meanings defined in [the scenario README](./README.md).
+Evidence labels have the meanings defined in [the storylines README](./README.md).
 Unless a statement is labeled otherwise, it is **decoded**.
 
 ## Story and threshold map
@@ -45,7 +45,7 @@ The gate is only one part of each trigger:
   (`0x1053`), Lisbon included.
 
 No route in `SNR5.DAT` uses the at-sea selector `0xA0` or the before- and
-after-battle selectors `0xA1`/`0xA2`. Scenario services which are not
+after-battle selectors `0xA1`/`0xA2`. Story script services which are not
 mentioned below normally retain their ordinary game behavior. The tables
 describe the extra story behavior layered onto them.
 
@@ -54,7 +54,7 @@ Routes in each table are tried in file order and the first match wins
 wildcard `0x4AFF` takes precedence over the any-port Harbor route `0xA303`
 listed after it.
 
-Randomized destinations use the scenario `EB` roll. As described in the
+Randomized destinations use the story script `EB` roll. As described in the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md),
 its seed is rebuilt before every protagonist dispatch from the date, the
 time of day, and Pietro's Navigation level and experience, so a given game
@@ -243,7 +243,7 @@ Medallion (`0x3A2E1–0x3A308`), and sets the site's dug-up flag `0x10`
 The Medallion Map is an ordinary treasure map (items 80–88 share item category
 `0x0C`). The cartographer's **Locate** command, which scans the inventory for
 items 80–88, and the map's own use can reveal the site, as in the
-[royal special search](./scenario-0-royal-missions.md#special-search-section-11).
+[royal special search](./royal-missions.md#special-search-section-11).
 
 ### Showing Camillo
 
@@ -274,7 +274,7 @@ anywhere else changes nothing until the Franco home is visited.
 
 ### The legend trail
 
-The next subsection (table `0x0A06`) uses three scenario variables:
+The next subsection (table `0x0A06`) uses three story script variables:
 
 | Variable | Meaning                                   | Possible values                                                                                       |
 | -------: | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -366,7 +366,7 @@ After the map is handed over, the subsection's table (`0x0CEF`) adds Massawa
 | Second Japanese port | Visit the **Harbor** in the other Japanese port.                               | Ernst von Bohr suggests South America, near the equator, 50–70°W (messages 261–271). The Raul threshold is rolled and the subsection advances.                   |
 
 Revisiting the first Japanese Harbor does nothing. Both ports are required, in
-either order. The scenario does not change either port's discovery status, so
+either order. The story script does not change either port's discovery status, so
 Sakai and Nagasaki are discovered normally.
 
 The Ernst scene rolls variable 16 as `42 + random(15)` and rerolls while the
@@ -461,7 +461,7 @@ The section advance after it is never reached, because `F4` exits the program.
 
 ## Engine notes
 
-These executable details, decoded outside the scenario program, explain behavior described above.
+These executable details, decoded outside the story script program, explain behavior described above.
 
 - **The discovery scans cannot fail in unedited play, and hang otherwise.**
   The Medallion and Staff scans have no upper bound.[^treasure-scan] A match

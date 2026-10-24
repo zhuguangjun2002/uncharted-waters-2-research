@@ -134,15 +134,15 @@ under the battle palette, so its index-10 and index-13 pixels show
 The flagship panel (`0x117E1`) always shows the player's flagship, colour 0 on
 colour 7, and is redrawn after every ship's turn (`0x151C9`):
 
-| y   | x              | Value                                  |
-| --- | -------------- | -------------------------------------- |
-| 216 | centred on 560 | Ship name, colour 1                    |
-| 232 | 560            | Crew / crew bunks                      |
-| 248 | 560            | Durability / maximum durability        |
-| 264 | 560            | Tacking / model Tacking                |
-| 280 | 560            | Power / model Power                    |
-| 296 | 448, 472       | Clock: tick / 3, (tick mod 3) × 20     |
-| 296 | 592            | Shots remaining                        |
+| y   | x              | Value                              |
+| --- | -------------- | ---------------------------------- |
+| 216 | centred on 560 | Ship name, colour 1                |
+| 232 | 560            | Crew / crew bunks                  |
+| 248 | 560            | Durability / maximum durability    |
+| 264 | 560            | Tacking / model Tacking            |
+| 280 | 560            | Power / model Power                |
+| 296 | 448, 472       | Clock: tick / 3, (tick mod 3) × 20 |
+| 296 | 592            | Shots remaining                    |
 
 The battle palette is `DS:0xA0F0` (stored blue, red, green, 0–15), faded in
 one level per timer unit (`0x111BE`, `0xEDD7`) at the start, after an Info
@@ -177,13 +177,13 @@ one hex per axis, 4 timer units per step, after each of the player's moves
 
 All markers are 32 × 32 stencils drawn at a hex (`0x11203`):
 
-| Kind       | Shape                                     | Colour            | Meaning                       |
-| ---------- | ----------------------------------------- | ----------------- | ----------------------------- |
-| 1          | `DATA1.014 0x3820`, bracketed cross       | `cx` on entry     | Next step                     |
-| 2          | `DATA1.014 0x3820`                        | 4                 | Reachable, or selectable ship |
-| 3          | `DATA1.014 0x38A0`, circled cross         | 6                 | Target in gun range           |
-| 4          | `DATA1.014 0x3920`, sword                 | 3                 | Adjacent target (boarding)    |
-| `0x80 + f` | `HDAT.PUT 0x6B40 + 0x80 × f`, arrow       | 4                 | A plotted step facing `f`     |
+| Kind       | Shape                               | Colour        | Meaning                       |
+| ---------- | ----------------------------------- | ------------- | ----------------------------- |
+| 1          | `DATA1.014 0x3820`, bracketed cross | `cx` on entry | Next step                     |
+| 2          | `DATA1.014 0x3820`                  | 4             | Reachable, or selectable ship |
+| 3          | `DATA1.014 0x38A0`, circled cross   | 6             | Target in gun range           |
+| 4          | `DATA1.014 0x3920`, sword           | 3             | Adjacent target (boarding)    |
+| `0x80 + f` | `HDAT.PUT 0x6B40 + 0x80 × f`, arrow | 4             | A plotted step facing `f`     |
 
 Kind 1 takes its colour from `cx` (`0x11262`, blit mode `cx | 0x400` at
 `0x112B1`). The plotter (`0xFB7A`) does not set it for the call at `0xFC0A`:
@@ -233,8 +233,7 @@ list windows drag as in port; the Plan and Order windows use the grid picker
 | Item    | `0x10BEA` | `FC4:0x335C` returns 0                    |
 | Escape  | `0x10BF2` | the flagship is not on an edge (`0xEFBB`) |
 
-**Move** (`0xFD11`) marks the reachable hexes (`0x12FE1`) and shows message
-767. Each pick of a marked neighbour ahead or 60° to either side adds a step,
+**Move** (`0xFD11`) marks the reachable hexes (`0x12FE1`) and shows message 767. Each pick of a marked neighbour ahead or 60° to either side adds a step,
 picking the course's end removes one, and cancelling finishes; after 10 steps,
 or as soon as no hex is left in reach from the course's end (the marker
 routine `0xFB7A` returns 0, `0xFD6D–0xFD74`), it finishes at once. “Is it OK to follow this course?” (768) confirms; No
@@ -274,15 +273,15 @@ disables Other Ships when no ship of another side is in view with crew and
 durability and not left, and the Order List when no ship of the player's side
 after the flagship has them (`DS:0xA554` bits `0x20` and `0x40`).
 
-| Entry       | Routine   | Shows                                                                                                                              |
-| ----------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Own Fleet   | `0x1020B` | the port's Fleet Info screen `FC4:0xD221` for the player's fleet, with a fade out and back in (`0x101A9`)                           |
-| Own Mates   | `0x10213` | the mate list (type 6), then the Mate Info card `FC4:0xC8D5` (mode 1) at column 6 (x 48; in port column 15); the card never waits, and the list opens again over it at once until it is cancelled (`0x1021E–0x10243`) |
-| Own Ships   | `0x10248` | a list (type 0) of the player's ships whose left bit `+0x0C & 0x40` is clear, crewless ones included (`0x10252–0x1026F`, no crew or durability test), then Ship Info `FC4:0xC1D5` at column 6, with the Info palette `DS:0xAB6E` and the message wait; the list opens again after each card until it is cancelled (`0x102C0` → `0x10271`) |
-| Other Fleet | `0x102C5` | the Fleet Info screen of a commander of any other side, allies included; with one, at once (`0x102F8`), else after a list (type 6) that opens again after each screen until it is cancelled (`0x10307–0x10327`) |
-| Other Mates | `0x1032C` | the same commanders' Mate Info card (mode 0): with one, the card and the message wait (`0x10364–0x10371`); else the list (type 6) and cards that do not wait, the list reopening over each until it is cancelled (`0x10379–0x1039F`) |
+| Entry       | Routine   | Shows                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Own Fleet   | `0x1020B` | the port's Fleet Info screen `FC4:0xD221` for the player's fleet, with a fade out and back in (`0x101A9`)                                                                                                                                                                                                                                                                                                                         |
+| Own Mates   | `0x10213` | the mate list (type 6), then the Mate Info card `FC4:0xC8D5` (mode 1) at column 6 (x 48; in port column 15); the card never waits, and the list opens again over it at once until it is cancelled (`0x1021E–0x10243`)                                                                                                                                                                                                             |
+| Own Ships   | `0x10248` | a list (type 0) of the player's ships whose left bit `+0x0C & 0x40` is clear, crewless ones included (`0x10252–0x1026F`, no crew or durability test), then Ship Info `FC4:0xC1D5` at column 6, with the Info palette `DS:0xAB6E` and the message wait; the list opens again after each card until it is cancelled (`0x102C0` → `0x10271`)                                                                                         |
+| Other Fleet | `0x102C5` | the Fleet Info screen of a commander of any other side, allies included; with one, at once (`0x102F8`), else after a list (type 6) that opens again after each screen until it is cancelled (`0x10307–0x10327`)                                                                                                                                                                                                                   |
+| Other Mates | `0x1032C` | the same commanders' Mate Info card (mode 0): with one, the card and the message wait (`0x10364–0x10371`); else the list (type 6) and cards that do not wait, the list reopening over each until it is cancelled (`0x10379–0x1039F`)                                                                                                                                                                                              |
 | Other Ships | `0x103A4` | every ship of the other sides in view, not left, marked with kind 2 (`0xFAE6`, which tests only the left bit `+0x0C & 0x40` and the view, so sunk and crewless ships' hexes are marked too; none, and nothing happens); one picked on the map (`0x110FB`, unmarked hexes ignored, and a sunk ship's hex too, its fleet slot being empty), then its card `FC4:0xC6D2` under the Info palette; repeated until the pick is cancelled |
-| Order List  | `0x1052E` | a window over the map (`0xC67B`: x 0, y 32, 52 columns, `24n + 32` tall) with, per ship of the player's side still in the battle, its slot number and name in blue (message 1378) at x 8, then “Flagship” (1379) at x 144, or from x 128 its Tactic, Method, and Target strings |
+| Order List  | `0x1052E` | a window over the map (`0xC67B`: x 0, y 32, 52 columns, `24n + 32` tall) with, per ship of the player's side still in the battle, its slot number and name in blue (message 1378) at x 8, then “Flagship” (1379) at x 144, or from x 128 its Tactic, Method, and Target strings                                                                                                                                                   |
 
 Own Ships and Other Ships change the whole screen's palette around their
 cards (`0x10271–0x102AA`, `0x103FB–0x10460`): the shimmer is unhooked
@@ -425,6 +424,7 @@ firing ship's corner (`DS:0xA03C`) to the target's.
    and to the left on y steps, since the same formula is applied to x. The
    truncated `fall` can leave it a few pixels short of the line at the end,
    6 pixels high over 160 pixels.
+
 4. **Drawing** (`0x11DA2–0x11F04`). The ball's cell is (x / 8, y / 8). A
    cell is in view when (x / 32, y / 32) lies in the 13 × 12 view
    (`0x11345`).
@@ -464,16 +464,16 @@ neighbours (NW `0x80`, N `0x40`, NE `0x20`, W `0x10`, E `0x08`, SW `0x04`,
 S `0x02`, SE `0x01`; neighbours past the edge are clamped). Any mask not listed
 keeps `0x84`:
 
-| Tile   | Masks                  |
-| ------ | ---------------------- |
-| `0x8B` | 1, 2, 3, 4, 6, 7       |
-| `0x89` | 8, 9, 32, 40, 41       |
-| `0x8C` | 11, 15, 43, 47         |
-| `0x88` | 16, 20, 128, 144, 148  |
-| `0x8A` | 22, 23, 150, 151       |
-| `0x86` | 64, 96, 192, 224       |
-| `0x87` | 104, 105, 232, 233     |
-| `0x85` | 208, 212, 240, 244     |
+| Tile   | Masks                 |
+| ------ | --------------------- |
+| `0x8B` | 1, 2, 3, 4, 6, 7      |
+| `0x89` | 8, 9, 32, 40, 41      |
+| `0x8C` | 11, 15, 43, 47        |
+| `0x88` | 16, 20, 128, 144, 148 |
+| `0x8A` | 22, 23, 150, 151      |
+| `0x86` | 64, 96, 192, 224      |
+| `0x87` | 104, 105, 232, 233    |
+| `0x85` | 208, 212, 240, 244    |
 
 Bits `0x20` and `0x40` mark a hex holding a ship of the attacking or defending
 side. No ship can enter land. Distance is counted in hexes (`0x12902`,
@@ -767,27 +767,27 @@ the assisting fleet turns to flee under the [morale rule](#morale). The protagon
 `0x1005B` accepts the flagship of the main enemy fleet or of the assisting
 fleet.
 
-| Code | Ending                                                  | Message                                                        |
-| ---: | ------------------------------------------------------- | -------------------------------------------------------------- |
-|    4 | The enemy flagship has no crew or has sunk: **victory** | 833, “The enemy's flagship ran up the white flag. …”           |
-|    6 | The protagonist wins the duel: **victory**              | 833                                                            |
-|    2 | The enemy flagship fled                                 | 565, “The battle ended as the enemy's flagship fled.”          |
-|    1 | Nightfall                                               | 563, “The setting sun put an end to the day's battle.”         |
-|    3 | The player's flagship fled                              | 564, “The battle ended as the flagship fled.”                  |
-|    9 | The player's flagship surrendered                       | 566, “Our flagship had no choice but to surrender.”            |
+| Code | Ending                                                  | Message                                                                                                             |
+| ---: | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+|    4 | The enemy flagship has no crew or has sunk: **victory** | 833, “The enemy's flagship ran up the white flag. …”                                                                |
+|    6 | The protagonist wins the duel: **victory**              | 833                                                                                                                 |
+|    2 | The enemy flagship fled                                 | 565, “The battle ended as the enemy's flagship fled.”                                                               |
+|    1 | Nightfall                                               | 563, “The setting sun put an end to the day's battle.”                                                              |
+|    3 | The player's flagship fled                              | 564, “The battle ended as the flagship fled.”                                                                       |
+|    9 | The player's flagship surrendered                       | 566, “Our flagship had no choice but to surrender.”                                                                 |
 |    5 | The player's flagship has no crew or has sunk: defeat   | 1017, “%s %d, %d. %s %s's journal stops abruptly …”; the game ends ([Game over at sea](at-sea.md#game-over-at-sea)) |
-|    7 | The protagonist loses the duel: defeat                  | 1017; the game ends                                            |
+|    7 | The protagonist loses the duel: defeat                  | 1017; the game ends                                                                                                 |
 
 Each ending shows a 192 × 128 `GRAPH.DAT` picture at (120, 32) (`0x15A56` →
 `0:0x58B7`) and prints its message in a fixed window:
 
-| Codes | Picture | Window |
-| ----- | ------- | ------ |
-| 4, 6 | 53 (`0x15B56`) | `0x15AA3`: (56, 176), 38 columns × 144 |
-| 2 | 54 (`0x15BBD`) | `0x15A6C`: (80, 176), 30 columns × 96 |
-| 3, 9 | 54 (`0x15CCD`) | `0x15A6C` |
-| 1 | 55 (`0x15C76`) | `0x15A6C` |
-| 5, 7 | 56 (`0x15D73`) | `0x15AA3` |
+| Codes | Picture        | Window                                 |
+| ----- | -------------- | -------------------------------------- |
+| 4, 6  | 53 (`0x15B56`) | `0x15AA3`: (56, 176), 38 columns × 144 |
+| 2     | 54 (`0x15BBD`) | `0x15A6C`: (80, 176), 30 columns × 96  |
+| 3, 9  | 54 (`0x15CCD`) | `0x15A6C`                              |
+| 1     | 55 (`0x15C76`) | `0x15A6C`                              |
+| 5, 7  | 56 (`0x15D73`) | `0x15AA3`                              |
 
 Message 1017 takes the month, day, and year, the protagonist's names, and
 “her” or “his” (`DS:0xA19F` / `0xA1A3`, by protagonist 1); defeat then sets
@@ -847,7 +847,7 @@ After these checks every fleet in the battle, the player's included, has its str
 `+0x28` recounted (`0x16134` → `0x1D40F`).
 
 An enemy flagship that fled (code 2) or survived to nightfall (code 1) keeps its
-fleet, provided its captain has that bit. Scenario scripts test “the opponent's
+fleet, provided its captain has that bit. Story scripts test “the opponent's
 fleet byte is `0xFF`” to tell a real victory from an escape.
 
 For endings 2, 4, and 6 the defeated captain then speaks a parting line
@@ -859,7 +859,7 @@ For endings 2, 4, and 6 the defeated captain then speaks a parting line
 | Merchant (IDs ending 1–4) |      832 |  836 |
 | Any other                 |      831 |  835 |
 
-A scenario flag set by a before- or after-battle route (`DS:0x0F6A` or
+A story script flag set by a before- or after-battle route (`DS:0x0F6A` or
 `DS:0x0EE0`) skips this line (`0x161A7–0x161B8`); nothing else is skipped.
 
 ### Leaving the battle
@@ -919,7 +919,7 @@ A fleet that attacks the player on its own does so only from 6:00 to 17:40
 
 ### Before the battle: Fight, Flee, or Surrender
 
-After the battle screen is drawn and the scenario's `0xA1` routes have run
+After the battle screen is drawn and the story script's `0xA1` routes have run
 ([Cancelled battles](#cancelled-battles)), an encounter dialogue follows
 unless either route left variable 63 set (`0x1507B`). Both sides' strength
 totals here include the supporting fleets (`0x1492B`; a fleet's rating is
@@ -931,7 +931,7 @@ A commodore whose sailor status is Piracy counts as fleet 60 in these tests.
 in the lower panel:
 
 - To a pirate: “Pirate %s %s, your days of terrorizing the seven seas are
-  numbered.” (810) when the shared scenario has an `0xA1` route for the
+  numbered.” (810) when the shared story script has an `0xA1` route for the
   battle, otherwise “Pirate %s %s, your luck has run out.” (811), with the
   pirate's first and last names. The pirate answers in the upper panel, “What
   rubbish! You're the one who is doomed to sink!” (813).
@@ -981,7 +981,7 @@ the enemy commodore speaks:
 
 Water, food, lumber, and shot are never taken. After a surrender the enemy
 fleet heads back to its home port, unless it is a story fleet (fleet flag
-`0x40`, which scenario scripts set) or its objective is 7
+`0x40`, which story scripts set) or its objective is 7
 (`0x15C98–0x15CB5`).
 
 When the dialogue ends the battle (an accepted offer, a successful flight, or
@@ -1012,7 +1012,7 @@ is dismissed (`0x13EE5`) as in the
 
 ### Cancelled battles
 
-A scenario's pre-battle route can cancel a battle before it starts (code 8,
+A story script's pre-battle route can cancel a battle before it starts (code 8,
 `0x150FD`). No battle is fought (`0x16444`), and the ending shows no message
 and gives no Fame or spoils (`0x15AD3`). The end sequence still runs
 (`0x16467`), however, and 8 is even. The opposing captain was already
@@ -1020,7 +1020,7 @@ recorded when the battle was set up (`0x14BF2`), so the naval Relation loss
 and personal-Friendship changes are applied against that fleet's nation as if
 it had been fought, including the same-nation shame and exile checks. The
 end-of-battle experience is zero, because its base is the pre-battle
-routine's result, −1 for a cancelled battle, divided by 5. The scenario's after-battle routes also still run (`0x16191`), as after any other battle.
+routine's result, −1 for a cancelled battle, divided by 5. The story script's after-battle routes also still run (`0x16191`), as after any other battle.
 
 Before the battle the protagonist's `0xA1` route runs first; if it cancels,
 the shared route is not run (`0x150E5–0x15105`). After the battle the shared
@@ -1057,13 +1057,13 @@ moves records 1–47 down and writes the last. The text is built when the
 journal is shown (`0x2367A`), from the date and a handler chosen by type
 (table at `0x2378B`):
 
-| Type | Writer                     | Message                                             | Parameters                                        |
-| ---: | -------------------------- | --------------------------------------------------- | ------------------------------------------------- |
-|    0 | Arrival, `0x212FA`         | 366                                                 | days at sea (`DS:0x2BAA`), port                   |
-|    1 | Harbor restock, `0x2D7AF`  | 367                                                 | days, port                                        |
-|    9 | Port sighted, `0x36C3C`    | 381, “Discovered %s.”                               | port                                              |
-|    2 | Battle, `0x15B30`/`0x15C73`/`0x15CCA` | 837, “Our fleet had a battle with a %s %s, %s.” | opponent's fleet ID (sailor `+0x24`), phrase |
-|   12 | Market purchase, `0x2A087` | 384, “Bought %d %s of %s for %ld gold pieces each.” | goods, price (high word, then low word), quantity |
+| Type | Writer                                | Message                                             | Parameters                                        |
+| ---: | ------------------------------------- | --------------------------------------------------- | ------------------------------------------------- |
+|    0 | Arrival, `0x212FA`                    | 366                                                 | days at sea (`DS:0x2BAA`), port                   |
+|    1 | Harbor restock, `0x2D7AF`             | 367                                                 | days, port                                        |
+|    9 | Port sighted, `0x36C3C`               | 381, “Discovered %s.”                               | port                                              |
+|    2 | Battle, `0x15B30`/`0x15C73`/`0x15CCA` | 837, “Our fleet had a battle with a %s %s, %s.”     | opponent's fleet ID (sailor `+0x24`), phrase      |
+|   12 | Market purchase, `0x2A087`            | 384, “Bought %d %s of %s for %ld gold pieces each.” | goods, price (high word, then low word), quantity |
 
 In a battle entry the nation is the adjective `DS:0xA3A[id / 10]`, the kind is
 MENU entry 52 (“Ship” for an ID of 60 or more or ending in 0, “Merchant ship”
@@ -1155,7 +1155,7 @@ candidates)` (`0x1571B–0x1573A`; `0x18229` lists the free captains, see
 [Assigning duties](sailors.md#assigning-duties)). When `K` is 0 nothing is
 announced and the cargo follows. Otherwise, while `K` is above 0:
 
-1. The vendor text window (scenario panel 0, x 240, y 8, 240 × 128) shows
+1. The vendor text window (story script panel 0, x 240, y 8, 240 × 128) shows
    1413, “We captured 1 enemy ship! We can add it to our fleet.”, when there
    is one candidate, else 558, “We captured %d enemy %s! We can add %d of
    them to our fleet.”, with the candidates (which never shrink), “ships”, and
@@ -1228,16 +1228,16 @@ instance's name in colour 1 at (328, 148) (`DS:0xB7BA`), and from (256, 168),
 1410 (`0x30FAB–0x3106F`). Its mode (`dx`) picks the values
 (`0x30EB8–0x30F93`):
 
-| Value | Mode 0 | Mode 1 | Mode 2 | Mode 3 |
-| --- | --- | --- | --- | --- |
-| Durability | ⌊9 × model `+1` / 10⌋ | that less a fifteenth | 0 | slot `+2` |
-| Maximum | ⌊9 × model `+1` / 10⌋ | that less a fifteenth | ⌊9 × model `+1` / 10⌋ | slot `+3` |
-| Tacking, Power | model `+2`, `+3` | model | model | model |
-| Capacity | model `+6` | model `+6` | model `+6` | model `+6` |
-| Cargo | instance `+0x16` | template `+0x16` | model `+6` | instance `+0x16` |
-| Guns | instance `+0x13` / model `+8` | template | 0 / model `+8` | instance `+0x13` / model `+8` |
-| Min/Max Crew | model `+5` / instance `+0x14` | template | model `+5` / 0 | model `+5` / instance `+0x14` |
-| Max Crew (Remodel) | model `+4` × 10 | same | same | same |
+| Value              | Mode 0                        | Mode 1                | Mode 2                | Mode 3                        |
+| ------------------ | ----------------------------- | --------------------- | --------------------- | ----------------------------- |
+| Durability         | ⌊9 × model `+1` / 10⌋         | that less a fifteenth | 0                     | slot `+2`                     |
+| Maximum            | ⌊9 × model `+1` / 10⌋         | that less a fifteenth | ⌊9 × model `+1` / 10⌋ | slot `+3`                     |
+| Tacking, Power     | model `+2`, `+3`              | model                 | model                 | model                         |
+| Capacity           | model `+6`                    | model `+6`            | model `+6`            | model `+6`                    |
+| Cargo              | instance `+0x16`              | template `+0x16`      | model `+6`            | instance `+0x16`              |
+| Guns               | instance `+0x13` / model `+8` | template              | 0 / model `+8`        | instance `+0x13` / model `+8` |
+| Min/Max Crew       | model `+5` / instance `+0x14` | template              | model `+5` / 0        | model `+5` / instance `+0x14` |
+| Max Crew (Remodel) | model `+4` × 10               | same                  | same                  | same                          |
 
 Mode 0 takes a ship instance, modes 1 and 2 a model (its template instance
 `model + 0x28`), mode 3 a ship slot. Captures and the Shipyard's own-ship

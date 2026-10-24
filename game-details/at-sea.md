@@ -28,7 +28,7 @@ single byte. It is set to 0 when the fleet sails from a Harbor (`0x2D7B4`) and
 incremented at each midnight (`0x1E979`); midnights in port also increment it,
 but sailing resets it. Story routes for voyage days
 receive this counter; see the
-[dialog system](../dialog-system/README.md#from-a-building-to-a-scenario-route).
+[dialog system](../dialog-system/README.md#from-a-building-to-a-story-script-route).
 
 ### Tick pacing
 
@@ -1022,7 +1022,7 @@ Chart does not show it until that cell is charted.
 
 Only three writes in `MAIN.EXE` set the flag: the starting port (`0x1BAC9`),
 sighting a port at sea (`0x36C41`, [Once per tick](#once-per-tick)), and
-entering a port, which sets `0x50` (`0x20F9D`). The scenario scripts that touch
+entering a port, which sets `0x50` (`0x20F9D`). The story scripts that touch
 the byte set `0x10` only on ports already visited (Otto's Seville,
 `SNR3.DAT 0x045D`; Pietro's Lisbon, `SNR5.DAT 0x014C`), or set `0x20`, hidden
 from the lookout (João's Sakai and Nagasaki; Ernst's Changan, Sakai, and
@@ -1355,7 +1355,7 @@ names its content, byte `+5` is its difficulty, and byte `+6` holds its type
 
 A new game sets `0x80` on all 98 records, then clears it on 50 chosen at
 random (`random(98)` until 50 distinct records are picked). Nothing clears
-`0x80` afterwards: no other executable routine and no scenario script does.
+`0x80` afterwards: no other executable routine and no story script does.
 So only those 50 villages can be sighted or searched, which is why
 [only 50 discoveries exist in each game](fame/adventure-fame.md#villages-and-discoveries).
 The other 48 still show village tiles on the map, but landing there opens

@@ -1,20 +1,20 @@
-# Scenario 0: Common quests and royal missions
+# Story script 0: Common quests and royal missions
 
-Scenario 0 (`SNR0`) is shared by all six protagonists. It is not a seventh
-character story. Its first six sections implement the idle state and the five
+Story script 0 (`SNR0`) is shared by all six protagonists. It is not a seventh
+storyline. Its first six sections implement the idle state and the five
 ordinary Guild assignments; its last seven sections implement missions offered
 by the protagonist's ruler. The royal missions are gated by the protagonist's
 **highest single Fame value** (Trade, Piracy, or Adventure) against the next
 title's threshold; the Guild assignments have no Fame gate.
 
-This document describes the shared scenario from the player's point of view.
+This document describes the shared story script from the player's point of view.
 It is based on the decoded `SNR0.DAT` route tables and dialogue and on the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md).
-Where a condition is evaluated by `MAIN.EXE` rather than by the scenario
+Where a condition is evaluated by `MAIN.EXE` rather than by the story script
 bytecode, the text cites the executable routine. The individual royal missions
-are described in the [royal mission catalog](./scenario-0-royal-missions.md).
+are described in the [royal mission catalog](./royal-missions.md).
 
-Evidence labels have the meanings defined in [the scenario README](./README.md).
+Evidence labels have the meanings defined in [the storylines README](./README.md).
 Message numbers are zero-based `SNR0.MES` IDs unless a `MESSAGE.DAT` raw index is
 named.
 
@@ -36,11 +36,11 @@ named.
 |      11 | Special search mission                            |  237–243 | Palace audience; Guild, Pub, and landing (executable)        |
 |      12 | Defeat a national fleet or pirates                |  244–271 | Palace audience; before and after naval battles              |
 
-The shared scenario keeps its own section and subsection bytes (`DS:0x0EE2`
+The shared story script keeps its own section and subsection bytes (`DS:0x0EE2`
 and `DS:0x0EE3`, save-slot-relative `0x00BA`–`0x00BB`), a 32-bit flag word
 (`DS:0x0EE4`, slot-relative `0x00BC`), and its own variables (`DS:0x0EEC`
 onward, two bytes per variable). An `F1` in any section 1–12 returns the shared
-scenario to idle section 0, subsection 0, and clears all shared flags
+story script to idle section 0, subsection 0, and clears all shared flags
 (`MAIN.EXE 0x39055–0x3906D`); the executable, not the bytecode, selects the
 nonzero sections.
 
@@ -51,7 +51,7 @@ The Guild assignment rewards also appear with the Fame they affect:
 
 ## Guild job list
 
-Entering a Guild while the shared scenario is idle runs section 0's Guild route
+Entering a Guild while the shared story script is idle runs section 0's Guild route
 (`SNR0 0x0066`) silently. If the protagonist is not eligible for a royal
 mission (flag 16 clear, [below](#becoming-eligible-for-a-royal-mission)), the
 route prepares three assignment rows (`0x0195–0x01E8`):
@@ -284,7 +284,7 @@ Both ends are Guild entry routes (`0x0F7B`):
    is paid and no Fame is awarded (message 81). With no delivery yet, an expired
    assignment costs 20% of Trade Fame (message 91); otherwise a reminder with
    the time left offers a give-up choice (messages 83–89, 10% penalty). Each
-   ending returns the shared scenario to idle.
+   ending returns the shared story script to idle.
 
 ## Defeat Pirates
 
@@ -375,7 +375,7 @@ sailor's current port (`MESSAGE.DAT` raw 599–600) when
 
 ## Becoming eligible for a royal mission
 
-The following rule is **decoded** from Scenario 0 section 0 (`0x0066–0x00E4` in
+The following rule is **decoded** from story script 0 section 0 (`0x0066–0x00E4` in
 the Guild route and `0x0306–0x0384` in the wildcard route):
 
 1. Read the protagonist's Trade, Piracy, and Adventure Fame (Fame record words
@@ -411,7 +411,7 @@ required Fame = 500 × (stored rank + 1)²
 
 The executable also contains a `40,000` value in its title table
 (`MAIN.EXE 0x474B8`), but that value does not govern royal-mission eligibility.
-The Scenario 0 square formula makes **40,500** the effective requirement for
+The story script 0 square formula makes **40,500** the effective requirement for
 promotion from Marquis to Duke. Stored rank 9, Duke, fails the gate, so there
 is no further promotion. Pirates cannot become eligible regardless of Fame.
 
@@ -488,7 +488,7 @@ three bits) to equal the protagonist's affiliation before printing raw
 `410 + nation` and setting flag 17 at `0x2E7BD`. Supply ports use a separate
 Harbor handler (`0x2E4E8`) without this test.
 
-The scenario interpreter setup at `0x0390B9` points its 32-bit flag field at
+The story script interpreter setup at `0x0390B9` points its 32-bit flag field at
 `DS:0x0EE4`. Address `0x0EE6` is therefore the byte containing flags 16–23;
 mask `0x01` is flag 16, `0x02` is flag 17, and `0x04` is flag 18. Arming
 changes the saved shared flags from `0x00010000` to `0x00030000`.
@@ -520,10 +520,10 @@ the protagonist's nation and flag 17 is set (`0x30451–0x30487`):
    data, and **Defect** rewrites it to the capital where the defection happens
    (`0x305C3`).
 3. The executable then dispatches audience context `0x15`, first to the
-   protagonist's scenario and, unless that route suppresses the audience, to
+   protagonist's story script and, unless that route suppresses the audience, to
    `SNR0`, where the ruler makes the offer.
 
-Arming sets flag 17 without changing Fame or advancing a scenario section.
+Arming sets flag 17 without changing Fame or advancing a story script section.
 
 ## How the mission family is chosen
 
@@ -602,8 +602,8 @@ through ordinary promotion, but this is the bytecode's exact behavior.
 
 ### Why the calendar day predicts the mission
 
-Scenario 0 does not consume an unpredictable, continuously evolving random
-stream for this choice. Immediately before interpreting a shared scenario
+Story script 0 does not consume an unpredictable, continuously evolving random
+stream for this choice. Immediately before interpreting a shared story script
 route, `MAIN.EXE` rebuilds its 32-bit seed from saved character and date
 fields (`0x38FF4–0x3904B`):
 
@@ -665,7 +665,7 @@ sections 6–12:
 - There is no calendar deadline. Sections 6–12 read no date and make no
   deadline comparison.
 - Losing one's title through the same-nation naval **shame** or **exile**
-  branch resets the shared scenario to section/subsection `0/0` and clears
+  branch resets the shared story script to section/subsection `0/0` and clears
   shared flags 16–18 (`MAIN.EXE 0x1602F–0x16035`). This does **not** use the
   refusal/give-up penalty and leaves all three Fame totals unchanged. The
   reset is unconditional, so it cancels an active Guild assignment as well as
@@ -689,19 +689,19 @@ sections 6–12:
   checks, refusal penalties, completion, and title awards.
 - `MAIN.EXE` `0x32E70–0x32F9C`: Job Assignment, active-job reminders, and the
   armed-invitation message.
-- `MAIN.EXE` `0x38FF4–0x3904B`: shared-scenario date/navigation seed.
-- `MAIN.EXE` `0x37F4F–0x37FA1`: scenario random-number step and bounded
+- `MAIN.EXE` `0x38FF4–0x3904B`: shared-story-script date/navigation seed.
+- `MAIN.EXE` `0x37F4F–0x37FA1`: story script random-number step and bounded
   remainder.
 - `MAIN.EXE` `0x39055–0x3906D`: return to idle after a shared section change.
 - `MAIN.EXE` `0x020A1B–0x020A31`: town-context matching and dispatch into the
-  shared scenario.
+  shared story script.
 - `MAIN.EXE` `0x30451–0x30487`: armed `Meet Ruler`; copy variable 30 into the
   shared section, reset the subsection, and dispatch context `0x05`.
 - `MAIN.EXE` `0x30A1E–0x30A5A`: untitled Palace admission.
 - `MAIN.EXE` `0x02BAFA–0x02BC8C`: Treat; the ruler-message helper call is at
   `0x02BBC9` and the flag-17 write at `0x02BBCD`.
 - `MAIN.EXE` `0x2E779–0x2E7C2`: Harbor arming.
-- `MAIN.EXE` `0x0390B9`: scenario-interpreter flag-base setup, identifying
+- `MAIN.EXE` `0x0390B9`: story-script-interpreter flag-base setup, identifying
   `DS:0x0EE4` as flag 0.
 - `MAIN.EXE` `0x474B8`: the ten-value title threshold table.
 - `MESSAGE.DAT` raw 410–415 and 932: ruler “looking for you” messages; raw 576:
@@ -710,7 +710,7 @@ sections 6–12:
 
 ## Engine notes
 
-These executable details, decoded outside the scenario program, explain behavior described above.
+These executable details, decoded outside the story script program, explain behavior described above.
 
 - **Loading goods (`E2`, `MAIN.EXE 0x37BF7`).** The script's goods and quantity
   are spread over the fleet's ships in slot order. A ship takes part only when
@@ -742,7 +742,7 @@ These behaviors are fully decoded; only the designers' intent is unknown.
   Assignment, the Pub patrons, Treat and the Waitress's Job Info read
   variables 16 and 17 only while a shared section is active, and sections 6–12
   write them first or never read them. The restored random state is also
-  discarded, because every scenario run reseeds it from the date
+  discarded, because every story script run reseeds it from the date
   (`MAIN.EXE 0x39048`). The block therefore has no visible effect and appears
   to be a leftover copy of the offer code.
 

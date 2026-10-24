@@ -71,7 +71,7 @@ refills the cache and clears `0x40` (`0x28F2B`). When a fleet is given a new
 destination, the game writes the whole word as `0x4000`, or `0x6000` for an
 exact target in the loaded area (`0x395AB`, `0x39671`, `0x20379`,
 `0x36DAC`, `0x36E4F`): cache slot 0, no cached nodes, no waypoint, and a
-rebuild pending. Scenario scripts use the same value. When the loaded sea area
+rebuild pending. Story scripts use the same value. When the loaded sea area
 shifts, fleets whose waypoint now lies on land are reset the same way,
 keeping only bit `0x01` (`0xBDD8`, `0xBE3D–0xBE42`).
 

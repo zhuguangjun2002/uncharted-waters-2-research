@@ -182,7 +182,7 @@ in [sailors.md](sailors.md).
 
 These levels also participate in systems that do not award experience:
 
-- [Royal-mission selection](scenarios/scenario-0-common-quests-and-royal-missions.md)
+- [Royal-mission selection](storylines/common-quests-and-royal-missions.md)
   includes the protagonist's Navigation Level and Navigation experience in its
   deterministic random seed.
 - [Piracy Fame](fame/piracy-fame.md) uses the defeated enemy captain's Battle
@@ -206,7 +206,7 @@ These levels also participate in systems that do not award experience:
 - `MAIN.EXE 0x20FB0–0x21064`: calculates both voyage-day awards and assigns
   them according to the Commodore, Captain, First Mate, and ordinary roles.
 - `MAIN.EXE 0x212DB–0x21301`: accepts the Port Call, dispatches the port-entry
-  scenario hook, and then processes Navigation experience.
+  story script hook, and then processes Navigation experience.
 - `MAIN.EXE 0x139BE–0x13A20`: calls the shared advancement routine for Battle
   experience, then performs the additional Courage and Swordsmanship rolls.
 - `MAIN.EXE 0x13A21–0x13AD9` and `0x13C72–0x13DD9`: award Battle experience

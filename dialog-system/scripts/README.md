@@ -1,9 +1,9 @@
 # Dialog research tools
 
 This directory contains the reproducible extractor and save-aware query for the
-English DOS dialog/scenario data. Player-facing behavior is documented in
+English DOS dialog/story script data. Player-facing behavior is documented in
 [`dialog-system/`](..), while maintained storyline guides live in
-[`game-details/scenarios/`](../../game-details/scenarios/).
+[`game-details/storylines/`](../../game-details/storylines/).
 
 ## Extract
 
@@ -14,17 +14,17 @@ pnpm run extract-dialog
 The command recreates the ignored `output/` directory:
 
 - `messages.json`: legacy flat João message export;
-- `scenarios.json`: complete structural disassembly of all seven SNR pairs;
-- `main-exe-vm.json`: executable offsets and scenario-VM dispatch evidence;
+- `story-scripts.json`: complete structural disassembly of all seven SNR pairs;
+- `main-exe-vm.json`: executable offsets and story-script-VM dispatch evidence;
 - `general-message-call-sites.json`: direct `MAIN.EXE` references to the
   combined `MESSAGE.DAT`/`MESSAGE2.DAT` namespace, with decoded text;
-- `readable/scenario-N.md`: generated structural transcripts;
+- `readable/story-script-N.md`: generated structural transcripts;
 - `readable/dialogue-lines.csv`: one row per recognized dialog occurrence;
 - `readable/instructions.csv`: reachable sequential VM instructions;
 - `readable/control-flow.csv`: branch and fallthrough edges.
 
 Interpretations and runtime observations belong in the hand-maintained
-scenario guides, keeping generated artifacts structural and reproducible.
+story script guides, keeping generated artifacts structural and reproducible.
 
 SNR strings and generated files preserve the game's `$n` and `$s` name
 placeholders and its `$dNN` and `$rNN` variable placeholders.
@@ -184,7 +184,7 @@ Run `pnpm run query-dialog -- --help` for all actions.
 - [Dialog-system overview](../README.md)
 - [Technical research notes](./REVERSE_ENGINEERING.md)
 - [Open questions](../open-questions.md)
-- [Scenario guides](../../game-details/scenarios/README.md)
+- [Story script guides](../../game-details/storylines/README.md)
 
 ## Verification
 
@@ -194,4 +194,4 @@ pnpm run typecheck
 ```
 
 When a binary interpretation changes, update the implementation, generated
-field names, relevant scenario guide, and regression tests together.
+field names, relevant story script guide, and regression tests together.

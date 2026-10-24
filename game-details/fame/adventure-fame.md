@@ -68,7 +68,7 @@ given to a ruler. Likewise, a discovery given to a ruler cannot later be sold
 to a collector. Rulers use discoveries for title advancement and pay neither
 gold nor Fame for them. Both paths test and set the same reported bit in the
 discovery record; see
-[Discoveries for the ruler](../scenarios/scenario-0-royal-missions.md#discoveries-for-the-ruler-section-10).
+[Discoveries for the ruler](../storylines/royal-missions.md#discoveries-for-the-ruler-section-10).
 
 ### Complete discovery catalog
 
@@ -217,7 +217,7 @@ scene; he does not select the ordinary Contract command first. If he later
 contracts with another cartographer, revisiting Mercator during the relevant
 story section automatically switches the active contract back to Mercator and
 halves all three of Ernst's Fame values (`SNR4.DAT 0x03EF–0x0412`); see
-[Ernst's scenario](../scenarios/scenario-4-ernst-von-bohr.md).
+[Ernst's storyline](../storylines/ernst-von-bohr.md).
 
 Reporting a chart awards 5 Adventure Fame and 80 gold for each newly charted
 cell. All five cartographers pay the same amount.
@@ -230,7 +230,7 @@ all 4,050 cells.
 
 ## Story awards
 
-The scenario bytecode contains the following one-time Adventure Fame awards:
+The story script bytecode contains the following one-time Adventure Fame awards:
 
 | Protagonist | Story event                             | Adventure Fame |
 | ----------- | --------------------------------------- | -------------: |

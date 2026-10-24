@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
 
-export interface ScenarioVmExecutableAnalysis {
+export interface StoryScriptVmExecutableAnalysis {
   readonly sha256: string;
   readonly loader: {
-    readonly openScenarioFilesOffset: number;
+    readonly openStoryScriptFilesOffset: number;
     readonly loadSectionOffset: number;
-    readonly scenarioDatPatternOffset: number;
-    readonly scenarioMesPatternOffset: number;
+    readonly storyScriptDatPatternOffset: number;
+    readonly storyScriptMesPatternOffset: number;
   };
   readonly streamReaders: {
     readonly byteOffset: number;
@@ -57,9 +57,9 @@ export interface ScenarioVmExecutableAnalysis {
   };
   readonly musicSelection: {
     readonly driver: string;
-    readonly scenarioActionHandlerOffset: number;
-    readonly scenarioWrapperOffset: number;
-    readonly scenarioDriverCallOffset: number;
+    readonly storyScriptActionHandlerOffset: number;
+    readonly storyScriptWrapperOffset: number;
+    readonly storyScriptDriverCallOffset: number;
     readonly portRegionDriverCallOffset: number;
     readonly ordinaryBuildingDriverCallOffset: number;
     readonly pubTrackId: number;
@@ -77,11 +77,11 @@ export interface ScenarioVmExecutableAnalysis {
     readonly townClockAddOffset: number;
     readonly portArrivalIncrementOffset: number;
   };
-  readonly menuCommandScenarioDispatch: {
+  readonly menuCommandStoryScriptDispatch: {
     readonly jobAssignment: {
       readonly handlerOffset: number;
       readonly dispatchOffset: number;
-      readonly scenario: "shared";
+      readonly storyScript: "shared";
       readonly selectorSource: string;
       readonly qualifier: string;
     };
@@ -89,14 +89,14 @@ export interface ScenarioVmExecutableAnalysis {
       readonly commandHandlerOffset: number;
       readonly handlerStartOffset: number;
       readonly handlerEndOffset: number;
-      readonly scenarioDispatch: "none";
+      readonly storyScriptDispatch: "none";
       readonly royalInvitationFlagWriteOffset: number;
     };
     readonly meetRuler: {
       readonly handlerOffset: number;
       readonly calls: readonly {
         readonly offset: number;
-        readonly scenario: "shared" | "protagonist";
+        readonly storyScript: "shared" | "protagonist";
         readonly selectorSource: string;
         readonly qualifier: string;
       }[];
@@ -138,13 +138,15 @@ function requireAscii(data: Buffer, offset: number, expected: string): void {
     );
 }
 
-export function analyzeScenarioVmExecutable(
+export function analyzeStoryScriptVmExecutable(
   data: Buffer,
-): ScenarioVmExecutableAnalysis {
+): StoryScriptVmExecutableAnalysis {
   requireAscii(data, 0x3c7a8, "C:SNR*.DAT");
   requireAscii(data, 0x3c804, "C:SNR*.MES");
   if (ACTION_JUMP_TABLE_OFFSET + 64 * 2 > data.length)
-    throw new Error("MAIN.EXE is too short for the scenario action jump table");
+    throw new Error(
+      "MAIN.EXE is too short for the story script action jump table",
+    );
 
   const actionHandlers = Array.from({ length: 64 }, (_, index) => {
     const runtimeOffset = data.readUInt16LE(
@@ -161,10 +163,10 @@ export function analyzeScenarioVmExecutable(
   return {
     sha256: createHash("sha256").update(data).digest("hex"),
     loader: {
-      openScenarioFilesOffset: 0x3854f,
+      openStoryScriptFilesOffset: 0x3854f,
       loadSectionOffset: 0x38593,
-      scenarioDatPatternOffset: 0x3c7a8,
-      scenarioMesPatternOffset: 0x3c804,
+      storyScriptDatPatternOffset: 0x3c7a8,
+      storyScriptMesPatternOffset: 0x3c804,
     },
     streamReaders: {
       byteOffset: 0x382b7,
@@ -215,9 +217,9 @@ export function analyzeScenarioVmExecutable(
     },
     musicSelection: {
       driver: "0000:952E",
-      scenarioActionHandlerOffset: 0x38d20,
-      scenarioWrapperOffset: 0x37980,
-      scenarioDriverCallOffset: 0x37984,
+      storyScriptActionHandlerOffset: 0x38d20,
+      storyScriptWrapperOffset: 0x37980,
+      storyScriptDriverCallOffset: 0x37984,
       portRegionDriverCallOffset: 0x20682,
       ordinaryBuildingDriverCallOffset: 0x20a0e,
       pubTrackId: 0x13,
@@ -237,11 +239,11 @@ export function analyzeScenarioVmExecutable(
       townClockAddOffset: 0x204a5,
       portArrivalIncrementOffset: 0x20521,
     },
-    menuCommandScenarioDispatch: {
+    menuCommandStoryScriptDispatch: {
       jobAssignment: {
         handlerOffset: 0x32e70,
         dispatchOffset: 0x32f72,
-        scenario: "shared",
+        storyScript: "shared",
         selectorSource: "DS:0x0E32 current port",
         qualifier: "0x06 Guild",
       },
@@ -249,7 +251,7 @@ export function analyzeScenarioVmExecutable(
         commandHandlerOffset: 0x2bc8d,
         handlerStartOffset: 0x2bafa,
         handlerEndOffset: 0x2bc8c,
-        scenarioDispatch: "none",
+        storyScriptDispatch: "none",
         royalInvitationFlagWriteOffset: 0x2bbcd,
       },
       meetRuler: {
@@ -257,19 +259,19 @@ export function analyzeScenarioVmExecutable(
         calls: [
           {
             offset: 0x30482,
-            scenario: "shared",
+            storyScript: "shared",
             selectorSource: "DS:0x0E32 current port",
             qualifier: "0x05 Palace",
           },
           {
             offset: 0x3048c,
-            scenario: "protagonist",
+            storyScript: "protagonist",
             selectorSource: "DS:0x0E32 current port",
             qualifier: "0x15 Palace audience",
           },
           {
             offset: 0x3049d,
-            scenario: "shared",
+            storyScript: "shared",
             selectorSource: "DS:0x0E32 current port",
             qualifier: "0x15 Palace audience",
           },
@@ -288,7 +290,7 @@ export function analyzeScenarioVmExecutable(
     globals: {
       currentSection: "DS:0x060E",
       currentSubsection: "DS:0x060F",
-      scenarioFlagsPointer: "DS:0x0610",
+      storyScriptFlagsPointer: "DS:0x0610",
       variablesPointer: "DS:0x0612",
       instructionOffset: "DS:0x0614",
       datHandle: "DS:0x0616",

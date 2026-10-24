@@ -1,8 +1,8 @@
 import { mkdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
-  disassembleScenario,
-  type ScenarioRoute,
+  disassembleStoryScript,
+  type StoryScriptRoute,
 } from "../../dialog-system/scripts/snr.js";
 import { writeFixedPortrait } from "../characters/index.js";
 import { prepareOutput, repoRoot, writeJson } from "../shared.js";
@@ -51,7 +51,7 @@ export async function run(): Promise<void> {
     .split("\0");
   const output = await prepareOutput("stories");
 
-  // Who a portrait number belongs to: a scenario portrait code is a KAO
+  // Who a portrait number belongs to: a story script portrait code is a KAO
   // picture number, shared by sailors, named characters, and waitresses.
   const byPortrait = new Map<number, Named>();
   for (const sailor of sailors)
@@ -81,13 +81,13 @@ export async function run(): Promise<void> {
       });
 
   const stories = [];
-  for (let scenario = 1; scenario <= 6; scenario++) {
-    const story = disassembleScenario(
-      scenario,
-      await readFile(join(repoRoot, `raw/SNR${scenario}.DAT`)),
-      await readFile(join(repoRoot, `raw/SNR${scenario}.MES`)),
+  for (let storyScript = 1; storyScript <= 6; storyScript++) {
+    const story = disassembleStoryScript(
+      storyScript,
+      await readFile(join(repoRoot, `raw/SNR${storyScript}.DAT`)),
+      await readFile(join(repoRoot, `raw/SNR${storyScript}.MES`)),
     );
-    const mainCharacter = scenario - 1;
+    const mainCharacter = storyScript - 1;
 
     const recruits = [];
     const portraits = new Map<number, number>(); // KAO → first section
@@ -112,7 +112,7 @@ export async function run(): Promise<void> {
           )
             portraits.set(line.characterId, section.id);
       // Routes keyed to one port (selector = port ID), at any building.
-      const routes: ScenarioRoute[] = [
+      const routes: StoryScriptRoute[] = [
         ...section.routes,
         ...section.entryRouteTables.flatMap((table) => table.routes),
       ];

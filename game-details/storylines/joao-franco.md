@@ -1,17 +1,17 @@
-# Scenario 1: João Franco
+# João Franco's storyline
 
-Scenario 1 (`SNR1`) is João's character story. It begins with a comparatively
+Story script 1 (`SNR1`) holds João's storyline. It begins with a comparatively
 free-form departure from Lisbon, then advances through five Adventure Fame
 milestones. Each milestone opens another chain of building, voyage-day, or
 battle events; reaching a later Fame value does not skip the active chain.
 
-This document describes the scenario from the player's point of view. It is
+This document describes the storyline from the player's point of view. It is
 based on the decoded `SNR1.DAT` route tables and dialogue and on the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md).
-Where a condition is evaluated by `MAIN.EXE` rather than by the scenario
+Where a condition is evaluated by `MAIN.EXE` rather than by the story script
 bytecode, the text cites the executable routine.
 
-Evidence labels have the meanings defined in [the scenario README](./README.md).
+Evidence labels have the meanings defined in [the storylines README](./README.md).
 
 ## Story and threshold map
 
@@ -48,7 +48,7 @@ protagonist's current nation, and Portugal is nation 0
 therefore cannot advance past any Fame gate while João is affiliated with a
 nation other than Portugal.** (Decoded.)
 
-Scenario services which are not mentioned below retain their ordinary game
+Story script services which are not mentioned below retain their ordinary game
 behavior. The tables describe the extra story behavior layered onto them. A
 route that ends with the VM's forced-exit operation (`F8`) ejects João from the
 building; one that ends without it leaves the building's ordinary menu
@@ -93,7 +93,7 @@ points toward the intended sequence.
    `0x0603` commissions the pending ship under the name in message 138 and
    sets flag 3.
 6. Recruit enough sailors at the **Pub** to put a crew aboard the _Hermes II_.
-   This is an ordinary engine requirement, not a João-scenario flag:
+   This is an ordinary engine requirement, not a João-story-script flag:
    **Sail** refuses to depart while any ship has no navigation crew
    ([Buildings: Sail](../buildings.md#sail)).
 7. Visit the **Harbor**. Its checks do not all behave alike. Without a ship,
@@ -115,7 +115,7 @@ points toward the intended sequence.
 9. Set sail. The first midnight at sea (voyage day 1) advances the opening
    subsection. On voyage day 3, Rocco discovers the stowaway who calls himself
    Domingo; Domingo (sailor 71) joins the roster (`FB 47` at `0x0937`), and
-   the scene advances the scenario to section 1.
+   the scene advances the story script to section 1.
 
 ### Lisbon building behavior during preparation
 
@@ -143,8 +143,8 @@ whatever the answer:
 Flag 8 also selects which of two missing-money reminders the Harbor uses.
 
 The three-way wildcard selection is deterministic for the current saved state,
-not a fresh unpredictable roll. Before every protagonist-scenario dispatch,
-`MAIN.EXE 0x3914A` rebuilds the scenario RNG seed from the saved year, month,
+not a fresh unpredictable roll. Before every protagonist-story-script dispatch,
+`MAIN.EXE 0x3914A` rebuilds the story script RNG seed from the saved year, month,
 and day, the protagonist's Navigation level plus Navigation experience, and
 the time of day; the shared `SNR0` seed omits the time of day
 (see the `EB` notes in the
@@ -258,7 +258,7 @@ neither side has won by then. The scene then renames sailor 71 “Alberto”
    subsection 0 to 1. If the triggering building is a Pub, another Pub visit
    is needed for the next scene.
 2. Enter any **Pub**. A patron warns João that Catalina is searching for him,
-   the scenario stores the Pub's port ID in variable 0, and flag 0 is set.
+   the story script stores the Pub's port ID in variable 0, and flag 0 is set.
 3. Enter an eligible building: any Pub, or any other building except the
    Harbor and Palace. Rocco's warning differs depending on whether João is
    still in the remembered port. The code then rolls `random(2)` (`EB 00 0002`
@@ -272,7 +272,7 @@ neither side has won by then. The scene then renames sailor 71 “Alberto”
    variant dialogue (subsection 2).
 6. In subsection 3, a **Harbor** visit in any regular port features a sailor
    admiring Catalina and prepares her fleet (see below). The next battle whose
-   opposing captain is Catalina (sailor 1) invokes the scenario's before- and
+   opposing captain is Catalina (sailor 1) invokes the story script's before- and
    after-battle routes.[^catalina-fleet]
 7. The after-battle route runs after any ending except João's defeat, which
    ends the game as in any battle. If Catalina no longer commands a fleet
@@ -297,7 +297,7 @@ aimed at the protagonist, using **Gossip** on her fleet starts the battle at
 any hour ([Nightfall](../naval-battle.md#nightfall)).
 
 [^catalina-fleet]:
-    Catalina's ten La Reales are not created by this scenario
+    Catalina's ten La Reales are not created by this story script
     event. In the untouched `raw/KOUKAI2.DAT`, Catalina points to fleet ID 10. Its fleet record begins at absolute file offset `0x23A9`, its ten
     ship slots begin at `0x23D4`, and every slot initially contains the empty
     pattern `FF 00 FF FF FF FF FF FF 00`. The cached fleet-strength byte at
@@ -362,14 +362,14 @@ any hour ([Nightfall](../naval-battle.md#nightfall)).
 | Ask about Sapha        | Optionally ask at **Pubs** outside Lisbon.                  | The patron is asked about Catalina and Sapha. Pubs whose port ID ends in 1 or 6 (`port mod 5 = 1`: Seville, Valencia, Syracuse, Athens, …) give the clue that Sapha works in a desolate Middle Eastern port, and set flag 0; others have never heard of her. |
 | Narrow the search      | After the clue, ask at **Pubs** with port IDs 72–80.        | Those Middle Eastern Pubs say no one of that name is there. Pubs elsewhere become ordinary.                                                                                                                                                                  |
 | Meet Sapha             | Enter the **Basra Pub** (port 76).                          | João learns that Sapha is an orphan but cannot persuade her to leave. Basra's Pub plays this scene with or without the clue.                                                                                                                                 |
-| Report to Ali          | Go to Istanbul and visit the **Lodge**.                     | João tells Ali where Sapha is. Ali leaves to meet her, and the scenario advances to section 3. The Istanbul **Pub** (Salim points to the Lodge) and other Istanbul buildings are optional.                                                                   |
+| Report to Ali          | Go to Istanbul and visit the **Lodge**.                     | João tells Ali where Sapha is. Ali leaves to meet her, and the story script advances to section 3. The Istanbul **Pub** (Salim points to the Lodge) and other Istanbul buildings are optional.                                                               |
 
 Lisbon's home and Pub supply stage-appropriate reminders throughout the
 search. They do not replace the Basra and Istanbul interactions.
 
 ## Section 3: Massawa and Poseidon's Staff (16,000 Fame)
 
-This is the longest section in the scenario. Its main path is **decoded**.
+This is the longest section in the story script. Its main path is **decoded**.
 Throughout it, the Lisbon home and Pub give stage-appropriate reminders about
 Lucia and Pietro.
 
@@ -460,7 +460,7 @@ When that calendar gate has passed, the remaining route is:
    50,000, `0x2B40–0x2B5E`).
 7. Visit the **Massawa Harbor**. Catalina states the evidence behind her grudge;
    Pietro and João show that the Franco family could not have destroyed her
-   brother's fleet. The scenario advances to section 4.
+   brother's fleet. The story script advances to section 4.
 
 The invasion does not create special fleets. At `SNR1.DAT 0x258A–0x25DF`, the
 special-building scene that begins João's defense loops over all 120 sailor
@@ -492,7 +492,7 @@ Both before-battle routes use wildcard selector `0xA1FF`, but internal checks
 at `0x2776–0x2787` and `0x27FF–0x2810` read the fleet byte of the opposing
 captain (variable 60) and reject the battle unless it is from `25` through
 `29`. An unrelated battle therefore cannot advance either subsection. The
-scenario does not require two particular captains; whichever qualifying
+story script does not require two particular captains; whichever qualifying
 fleets João meets supply the two battles, and nothing prevents the same fleet
 from supplying both.
 
@@ -554,7 +554,7 @@ This short section is mostly a travel handoff.
    the ship, and João is ejected. Once this is resolved, the Harbor farewell
    removes Enrico from the mate roster, parks his record (fleet and location
    bytes `0xFE`), adds 1,000 Adventure Fame (capped at 50,000), and advances
-   the scenario to section 5 (`0x2E08–0x2EAD`).
+   the story script to section 5 (`0x2E08–0x2EAD`).
 
 The Fame check is attached to the generic Pub route, so reaching 30,000 at sea,
 in another building, or in the Lisbon Pub does not by itself begin Enrico's
@@ -643,7 +643,7 @@ time, and Navigation state, so re-entering at the same moment repeats it.
     to the record's displayed-character/portrait selector at `+0x12`, loads the
     strings “Pirate” and “Rudolph” (messages 1052 and 1053, `D4 041C` and
     `D4 041D`), and copies them into the two nine-byte name fields at `+0x00`
-    and `+0x09`. It then starts the duel with `E8 3C`. The scenario does not
+    and `+0x09`. It then starts the duel with `E8 3C`. The story script does not
     write the eight attributes at `+0x14..+0x1B` or the Navigation and Battle
     levels at `+0x1C..+0x1D`, so Rudolph inherits whatever values sailor 60
     currently has in the save. In an untouched `raw/KOUKAI2.DAT`, whose 42-byte
@@ -657,12 +657,12 @@ time, and Navigation state, so re-entering at the same moment repeats it.
 
 | Stage                         | Building or event                          | Result                                                                                                                                                           |
 | ----------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plan the attack               | **Harbor**                                 | Lucia explains Neo-Atlantis, and the scenario mobilizes Catalina and five Spanish fleets around João. João is ejected.                                           |
+| Plan the attack               | **Harbor**                                 | Lucia explains Neo-Atlantis, and the story script mobilizes Catalina and five Spanish fleets around João. João is ejected.                                       |
 | Wait for the departure window | **Harbor**                                 | The Harbor stays usable only on a different calendar date from 08:20 through 14:40. Otherwise Rocco or Catalina sends João to the Lodge and ejects him.          |
 | Recruit Ezequiel              | Battle with one of the five Spanish fleets | Catalina surrenders; João explains Neo-Atlantis; Ezequiel joins the attack. The scene cancels the battle and reorganizes the pursuit groups.                     |
 | Attack Neo-Atlantis           | Before-battle hooks against fleets 60–69   | Martinez taunts the allies. Ezequiel attacks the fortress and Catalina handles the other fleets while João targets Martinez. Later battles bring further taunts. |
 | Win                           | After-battle hook                          | Martinez is defeated, Neo-Atlantis collapses, and João decides to return home.                                                                                   |
-| End the scenario              | Lisbon **Franco home**                     | The route invokes the ending operation `F4 00`. Other Lisbon buildings and every Harbor have explicit no-op routes at this final subsection.                     |
+| End the story script          | Lisbon **Franco home**                     | The route invokes the ending operation `F4 00`. Other Lisbon buildings and every Harbor have explicit no-op routes at this final subsection.                     |
 
 The Harbor planning scene saves the current year, month, and day in variables
 4, 3, and 2 (`0x35FF–0x3605`). A Harbor visit on that same date always
@@ -671,7 +671,7 @@ Harbor still ejects João at or before 08:00 (tick 24) and at or after 15:00
 (tick 45) (`0x3617–0x365D`). The usable departure window is therefore
 **08:20–14:40**; the comparison is not a simple “wait until morning” flag.
 
-At the end of the planning scene, the scenario finds Spain's two Convoys and
+At the end of the planning scene, the story script finds Spain's two Convoys and
 three Voyaging Fleets through the sailor records' fleet bytes and moves all
 five to João's exact current position. It gives them pursuit objective `7`,
 targeting sailor ID `0` (João), and flags `0x41`. Catalina's fleet, ID `10`
@@ -695,17 +695,17 @@ used. The scene ends with `F8`, which in a before-battle hook cancels the
 battle before it starts (outcome code 8, `MAIN.EXE 0x150F4–0x15105`; see
 [Cancelled battles](../naval-battle.md#cancelled-battles)).
 
-After Ezequiel joins, the scenario changes all five Spanish fleets from
+After Ezequiel joins, the story script changes all five Spanish fleets from
 objective `7` to objective `10`, still targeting João. Objective 10 follows
 the target fleet, and its Gossip line is message 160, “I have some business
 with you.” ([NPC fleet navigation](../npc/fleet-navigation.md)); this is the
-generic captain response, not new scenario dialogue.
+generic captain response, not new story script dialogue.
 
 The same reconfiguration creates the force waiting near Neo-Atlantis. Pirate
 Rudolph's fleet is fleet ID 60, because Rudolph is the renamed
 sailor-60 record described above.[^rudolph-stats] It is placed at the fixed
 position `(1922, 656)`, near the Amazon between Porto Velho and Cayenne, given
-pursuit objective `7`, and made to target João. The scenario places all nine
+pursuit objective `7`, and made to target João. The story script places all nine
 regular pirate fleets, IDs `61–69`, at precisely the same position with the
 same objective. Rudolph therefore does not spawn alone: he is the first fleet
 in a ten-fleet pirate block concentrated at one point.[^finale-fleet-code]
@@ -713,7 +713,7 @@ Each fleet's course is recomputed with `D1` after the write, so pursuit
 starts toward João's position at that moment.
 
 This is the same broad mechanism as the Turkish pursuit at Massawa: the
-scenario repurposes existing fleet records and changes their position,
+story script repurposes existing fleet records and changes their position,
 objective, target, and active flags. It does **not** create new ship records,
 refill durability, or reconstruct destroyed fleets. Consequently “spawn” here
 means reactivating and relocating Rudolph's and the regular pirates' existing
@@ -774,7 +774,7 @@ applies the naval Relation and Friendship changes against Spain
 Portugal–Spain Relation falls by 3–7 and, without the Portuguese Letter of
 Marque, João's Portuguese Friendship rises by 5–9 while his Spanish Friendship
 falls by 10–14 ([Diplomatic class](../friendship.md#diplomatic-class)).
-Choosing **Yes** lets the battle proceed but deliberately makes the scenario
+Choosing **Yes** lets the battle proceed but deliberately makes the story script
 unwinnable. Both routes apply the same mechanical punishment
 ([Stats](../stats.md)):[^ally-attack-failure]
 
@@ -787,7 +787,7 @@ unwinnable. Both routes apply the same mechanical punishment
   can change an attribute again before the next save.
 - Variable 9 is set to 1, which the final Lisbon-home route also treats as a
   bar to the ending.
-- The scenario advances beyond João's last story section. `MAIN.EXE` finds no
+- The story script advances beyond João's last story section. `MAIN.EXE` finds no
   further section offset (`0x385C7–0x385DF`) and stores section `0xFF`, and
   the protagonist dispatcher skips every route while the section is `0xFF`
   (`0x391DA`). This disables the remaining João-specific routes and makes his
@@ -844,7 +844,7 @@ assignments.
 
 ## Engine notes
 
-These executable details, decoded outside the scenario program, explain behavior described above.
+These executable details, decoded outside the story script program, explain behavior described above.
 
 - **Sailor byte `+0x29` bit `0x20`** marks a sailor record as in use. New
   sailors are created with it (`MAIN.EXE 0x1D8CF`). It is cleared when a
@@ -871,7 +871,7 @@ These executable details, decoded outside the scenario program, explain behavior
   ([Fleets that join a battle](../naval-battle.md#fleets-that-join-a-battle)).
 - **Sailor 60's rewrite after a decisive home duel** normally changes nothing.
   The new-game record already holds fleet 60 and location `0xFF`
-  (`KOUKAI2.DAT` `0x1081`), the scenario duel (`E8` → `MAIN.EXE 0x17F8A`) writes
+  (`KOUKAI2.DAT` `0x1081`), the story script duel (`E8` → `MAIN.EXE 0x17F8A`) writes
   no sailor fleet, location or `+0x29` bytes, and SNR1 only reads `+0x29`
   between the Shipyard duel and the home scene. The rewrite matters only if
   pirate fleet 60 was destroyed first. A battle loss (`0x15302`) or an

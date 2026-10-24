@@ -212,7 +212,7 @@ discards it on every pass, then polls the mouse and keyboard without waiting
 for a timer (`0x1863E`). The generator therefore advances as fast as the
 machine runs, for as long as the player hesitates. The title screen's Load
 Game / New Game / Quit Game menu (`0x1C1AF`), every yes/no confirmation
-(`0FC4:4529`), scenario forced menus (`0FC4:41F1`), list and quantity pickers
+(`0FC4:4529`), story script forced menus (`0FC4:41F1`), list and quantity pickers
 (`0FC4:43B1`), and battle menus (`0FC4:4419`) all use it. Message boxes that
 only wait for a click (`0:7690`), the sea menu, and the building menus do not.
 Random results such as the

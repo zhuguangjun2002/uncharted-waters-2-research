@@ -1,18 +1,18 @@
-# Scenario 3: Otto Baynes
+# Otto Baynes's storyline
 
-Scenario 3 (`SNR3`) is Otto's character story. After a London opening and the
+Story script 3 (`SNR3`) holds Otto's storyline. After a London opening and the
 theft of Spain's newest galleon from Seville, it advances through Piracy Fame
 milestones at 5,000, 15,000/20,000, and 30,000. Each milestone opens another
 chain of building, voyage-day, or battle events; reaching a later Fame value
 does not skip the active chain.
 
-This document describes the scenario from the player's point of view. It is
+This document describes the storyline from the player's point of view. It is
 based on the decoded `SNR3.DAT` route tables and dialogue and on the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md).
-Where a condition is evaluated by `MAIN.EXE` rather than by the scenario
+Where a condition is evaluated by `MAIN.EXE` rather than by the story script
 bytecode, the text cites the executable routine.
 
-Evidence labels have the meanings defined in [the scenario README](./README.md).
+Evidence labels have the meanings defined in [the storylines README](./README.md).
 
 ## Story and threshold map
 
@@ -40,12 +40,12 @@ The gate is only one part of each trigger:
 - 30,000 is tested on entering a **Harbor** in any regular port, once to start
   section 4 and again, silently, to arm section 5.
 
-The scenario adds fixed Piracy Fame of its own: 300 when the stolen galleon
+The story script adds fixed Piracy Fame of its own: 300 when the stolen galleon
 leaves Seville, 500 after the Spanish counterattack, 500 for keeping the
 appointment with Catalina, and 1,000 after each of two Armada battles. Only the
 last two awards are capped at 50,000.
 
-Scenario services which are not mentioned below normally retain their ordinary
+Story script services which are not mentioned below normally retain their ordinary
 game behavior. The tables describe the extra story behavior layered onto them.
 
 ## Section 0: the commission and the stolen galleon
@@ -68,7 +68,7 @@ normally.
    20 Food.[^idiot]
 3. Visit the **Harbor**. Matthew introduces himself and challenges Otto to meet
    him at the Pub. The Harbor then ejects Otto.
-4. Visit the **Pub**. Matthew starts a brawl: the scenario runs a sword duel
+4. Visit the **Pub**. Matthew starts a brawl: the story script runs a sword duel
    against Matthew Loy, sailor 75 (`E8 4B` at `SNR3.DAT 0x0284`; see
    [Dueling](../dueling.md#scripted-duels)). The result only selects Matthew's
    comment. He joins Otto's crew and becomes First Mate whether Otto wins,
@@ -194,11 +194,11 @@ The section contains three one-route stages:
    the stage.
 3. After that battle, the after-battle route clears fleet 18's flags byte to 0,
    deactivating the fleet, and adds 500 Piracy Fame without a cap. The
-   scenario advances to section 2.
+   story script advances to section 2.
 
 The after-battle route does not test whether Otto won. The executable
 dispatches it after every battle other than a defeat
-([Reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md#mainexe-scenario-vm)).
+([Reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md#mainexe-story-script-vm)).
 
 If the Seville stage was skipped (variable 9 is 1), each of the three routes
 simply advances: one building visit, then any battle, finishes the section
@@ -232,7 +232,7 @@ because that port's **Harbor** now ejects Otto until the section ends.
 | Hear the rumor       | Optional: visit the **Harbor**.                        | A townsperson says ghosts haunt the trader's place. Otto is ejected.                                                                                                                    |
 | Open the sack        | Visit the **Market** (04:00–19:40, its normal hours).  | Otto and Matthew free Emilio and Andreas, and Catalina arrives. She agrees to meet at the Pub “in about two hours”. Variable 15 = entry time + 5 ticks; flag 0 is set; Otto is ejected. |
 | Wait                 | Other buildings.                                       | Matthew's comments track the clock. The Harbor still ejects Otto. The Lodge and other buildings remain usable.                                                                          |
-| Keep the appointment | Enter the **Pub** 2:00–3:40 after entering the Market. | Catalina explains her revenge on the Franco family. Flag 1 is set, 500 Piracy Fame is added (no cap), and the scenario advances to section 3.                                           |
+| Keep the appointment | Enter the **Pub** 2:00–3:40 after entering the Market. | Catalina explains her revenge on the Franco family. Flag 1 is set, 500 Piracy Fame is added (no cap), and the story script advances to section 3.                                       |
 
 The Pub compares only the time of day, in 20-minute ticks, with variable 15
 (`SNR3.DAT 0x0D11–0x0E81`):
@@ -241,7 +241,7 @@ The Pub compares only the time of day, in 20-minute ticks, with variable 15
   usable;
 - from variable 15 + 1 through variable 15 + 6, the meeting; and
 - at variable 15 + 7 or later, Otto learns that Catalina waited about two
-  hours and left. The scenario still advances to section 3, but without the
+  hours and left. The story script still advances to section 3, but without the
   500 Fame.
 
 Because no date is stored, a Pub visit on a later day falls into the same
@@ -368,7 +368,7 @@ Fleet 18 is reactivated even though section 1 deactivated it.
 | Santo Domingo battle  | Fight any fleet with ID 15–19.                                                  | The before-battle hook advances. Harbors meanwhile point to Santo Domingo.                                                                                                 |
 | The fleet slips again | The same battle ends in anything but a defeat.                                  | The five fleets move to `(1977, 678)`, near the Amazon, and are set to pursue Otto (objective 7). +1,000 Piracy Fame, capped at 50,000.                                    |
 | Catalina's plea       | Encounter any fleet with ID 15–19 again. Harbors meanwhile point to the Amazon. | Otto finds wreckage of a great battle; Catalina arrives and asks him to spare Ezequiel. The battle is cancelled and the five fleets are sent home to Seville.              |
-| End of section        | Reach **voyage day 5**.                                                         | The scenario advances to section 5.                                                                                                                                        |
+| End of section        | Reach **voyage day 5**.                                                         | The story script advances to section 5.                                                                                                                                    |
 
 The battle hooks accept any of the five fleet IDs and do not test the
 location. A battle against one of them away from Nantes therefore counts as
@@ -485,7 +485,7 @@ The London visit is not required. The Seville Command Room route has no flag
 or variable test, so Otto can go there directly. Its scene stores a new
 appointment date, sets flag 3, repeats the sailor-60 conversion, advances the
 subsection, and ejects Otto. The five-way random roll uses the deterministic
-protagonist-scenario seed described in the
+protagonist-story-script seed described in the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md).
 
 ### The appointment
@@ -512,7 +512,7 @@ therefore appears the moment the appointment day begins at sea.
 The “Ezequiel” fleet is fleet ID 60, the pirate fleet record normally
 captained by Antonio Khan. On activation it is placed at `(170, 312)` near
 Bordeaux, given pursuit objective 7 against Otto, flagged `0x41`, and routed
-with `D1` (`SNR3.DAT 0x1F12–0x1F40`). The scenario writes no ship slots.
+with `D1` (`SNR3.DAT 0x1F12–0x1F40`). The story script writes no ship slots.
 Ezequiel therefore commands whatever ships fleet 60 currently holds, and his
 new attributes come from the sailor-60 conversion above.
 
@@ -552,7 +552,7 @@ Harbor have explicit no-op routes at this stage.
 
 ## Engine notes
 
-These executable details, decoded outside the scenario program, explain behavior described above.
+These executable details, decoded outside the story script program, explain behavior described above.
 
 - **Route word `0x4000`.** Writing exactly `0x4000` to fleet word `+0x0C`
   clears the cached route and waypoint and marks the route as needing a

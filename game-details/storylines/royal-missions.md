@@ -1,13 +1,13 @@
-# Scenario 0 royal mission catalog
+# Story script 0 royal mission catalog
 
 This is the player-facing catalog for the seven royal-mission sections in
 `SNR0`. All seven begin with the ruler greeting the protagonist, asking whether
 they accept, and promising a new title on success.
 
-See [the Scenario 0 overview](./scenario-0-common-quests-and-royal-missions.md)
+See [the story script 0 overview](./common-quests-and-royal-missions.md)
 for eligibility, Fame selection, invitations, the audience, promotion, and
 refusal penalties. Evidence labels have the meanings defined in
-[the scenario README](./README.md); message numbers are zero-based `SNR0.MES`
+[the storylines README](./README.md); message numbers are zero-based `SNR0.MES`
 IDs unless a `MESSAGE.DAT` raw index is named.
 
 ## Common structure
@@ -21,10 +21,10 @@ Every mission section has the same three stages:
 |     2 | Audience context `0x15`, plus mission-specific hooks | Progress check on each **Meet Ruler** at the home port: completion (+1 title), an incomplete report, or a give-up choice that halves all Fame |
 
 Every audience line ends with `F8`, so the ordinary ruler menu does not follow
-a scenario audience. The ruler portrait comes from variable 50
+a story script audience. The ruler portrait comes from variable 50
 ([below](#dynamic-ruler-portraits)). None of the missions has a deadline or pays
 Fame. Completion ends with `F1`, clearing flags 16–18 and returning the shared
-scenario to idle.
+story script to idle.
 
 The rank band used below is variable 23, `floor(min(rank, 6) / 3)`, computed from
 the stored rank at Fame-record `+0x0D` by section 0's Guild and Palace entry
@@ -151,7 +151,7 @@ for `min(N, variable 14)` new alliances (message 218, “$d14 ports”) and stor
 the target `variable 13 + min(N, variable 14)` in variable 19 (message 225,
 “$d19 allied ports”).
 
-The scenario recounts on each later audience (`0x23A8–0x2449`). If the count
+The story script recounts on each later audience (`0x23A8–0x2449`). If the count
 has reached the target, or equals exactly 95, the ruler reports the current
 alliance count (message 223 or 224) and awards the title. Otherwise the ruler
 reports that more allied ports are needed and offers the give-up choice
@@ -214,7 +214,7 @@ has the following stages:
 
 ### What is selected and when
 
-Three scenario variables carry the hunt:
+Three story script variables carry the hunt:
 
 | Variable | Meaning              | Set by                          |
 | -------- | -------------------- | ------------------------------- |
@@ -269,7 +269,7 @@ At the clue port, the handler chooses the informant once:
   test passes.
 
 The Guild then names the sailor (raw 596 and 597). Both IDs remain in the
-scenario variables, so asking again does not reroll them. The informant's
+story script variables, so asking again does not reroll them. The informant's
 identity and port are generated independently of the artifact.
 
 ### Map and discovery state
@@ -330,7 +330,7 @@ for the item ID stored in variable 18:
   bars and this title”). The script clears that inventory slot, loads 20,000,
   and executes the add-money operation five times for a fixed 100,000 gold
   pieces. It increments variable 40, the completed-special-search counter used
-  by the [mission-family selector](./scenario-0-common-quests-and-royal-missions.md#how-the-mission-family-is-chosen),
+  by the [mission-family selector](./common-quests-and-royal-missions.md#how-the-mission-family-is-chosen),
   awards the title, and sets `0x10` on the discovery record whose content byte
   equals variable 18;
 - not found: `D9` selector 3 (raw 944, “You still haven't found the …. Are you
@@ -349,7 +349,7 @@ for the item ID stored in variable 18:
 | `MAIN.EXE 0x33D59` onward      | Handles Cartographer Locate and scans carried items for treasure-map IDs `80–88`                  |
 | `SNR0.DAT 0x29A9–0x29BA`       | Clears the slot, adds 20,000 five times, and increments variable 40                               |
 
-The scenario chooses the artifact, clue port, and informant through three
+The story script chooses the artifact, clue port, and informant through three
 separate mechanisms. There is no fixed artifact-to-port or
 artifact-to-informant association in the data.
 
@@ -412,10 +412,10 @@ award the title twice.
 
 ## Engine notes
 
-These executable details, decoded outside the scenario program, explain behavior described above.
+These executable details, decoded outside the story script program, explain behavior described above.
 
 - **The player fleet's home port** (fleet byte `+0x26`) is written only by
-  the new-game data and **Defect** (`MAIN.EXE 0x305C3`); scenario scripts only
+  the new-game data and **Defect** (`MAIN.EXE 0x305C3`); story scripts only
   read it. The mission gate therefore sees the capital of the protagonist's
   current nation.
 - **The Defeat-a-fleet target is never the protagonist's own nation.** The
@@ -435,7 +435,7 @@ These executable details, decoded outside the scenario program, explain behavior
   before the artifact is named. Ordinary play can reach this state. The
   mission selector diverts Adventure rolls away from section 11 only when
   variable 40 is exactly 7
-  ([How the mission family is chosen](./scenario-0-common-quests-and-royal-missions.md#how-the-mission-family-is-chosen)),
+  ([How the mission family is chosen](./common-quests-and-royal-missions.md#how-the-mission-family-is-chosen)),
   but an artifact dug up during a search that is then abandoned leaves its
   record out of the scan without incrementing variable 40. After all seven
   artifacts have been dug up with at least one search abandoned, the next

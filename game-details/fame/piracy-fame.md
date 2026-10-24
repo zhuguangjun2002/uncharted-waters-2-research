@@ -9,7 +9,7 @@ The repeatable sources are:
 - timely Defeat Pirates Guild assignments; and
 - timely Collect Debt Guild assignments.
 
-The protagonist scenarios can also award fixed amounts directly.
+The protagonist story scripts can also award fixed amounts directly.
 
 ## Save storage
 
@@ -159,7 +159,7 @@ and Piracy Fame.
 
 ## Story awards
 
-The Prince Alberto and Duke Franco scenario sequence awards a fixed 1,000
+The Prince Alberto and Duke Franco story script sequence awards a fixed 1,000
 Piracy Fame and 1,000 Adventure Fame.
 
 Otto's Armada campaign (`SNR3` section 4) contains two fixed awards of 1,000
@@ -174,7 +174,7 @@ Each award runs in an after-naval-battle route (`0xA2FF`), following messages
 386–388 and 394–397 respectively.
 
 Catalina receives Piracy Fame through the ordinary naval-victory calculation
-during her combat-focused story; her scenario bytecode does not contain an
+during her combat-focused story; her story script bytecode does not contain an
 additional fixed Piracy Fame award.
 
 ## Story thresholds
@@ -194,7 +194,7 @@ followed by a section advance.
 
 Otto's optional Pietro scene needs 15,000; reaching 20,000 at any other
 building skips it. Both section 4 and section 5 test 30,000
-([Otto's scenario](../scenarios/scenario-3-otto-baynes.md)).
+([Otto's storyline](../storylines/otto-baynes.md)).
 
 ## Code evidence
 
@@ -208,10 +208,10 @@ The relevant calculations are located at:
   the two strength totals, and selects pre-combat surrender state 2;
 - `MAIN.EXE` `0x15240–0x152FB`: matching-national-Marque scan and diplomatic
   class selection;
-- Scenario bytecode section 4 (`0x110D–0x12B8`): Defeat Pirates;
-- Scenario bytecode section 5 (`0x12B8–0x15CB`): Collect Debt, including equal
+- Story script bytecode section 4 (`0x110D–0x12B8`): Defeat Pirates;
+- Story script bytecode section 5 (`0x12B8–0x15CB`): Collect Debt, including equal
   Trade and Piracy awards;
-- Protagonist scenario bytecode around `0x0F19`: paired 1,000-point Piracy and
+- Protagonist story script bytecode around `0x0F19`: paired 1,000-point Piracy and
   Adventure award;
 - `SNR3` section 4 at `0x1631–0x164F` and `0x173C–0x175A`: Otto's two fixed
   1,000-point Piracy awards; and

@@ -1,18 +1,18 @@
-# Scenario 6: Ali Vezas
+# Ali Vezas's storyline
 
-Scenario 6 (`SNR6`) is Ali's character story. It has six sections. Unlike the
+Story script 6 (`SNR6`) holds Ali's storyline. It has six sections. Unlike the
 other protagonists, Ali advances mainly through money, rank, Ottoman control of
 ports, and earlier choices; **Trade Fame** becomes a direct story gate only in
 the final section. A Fame-only progression model is therefore especially
 misleading for Ali.
 
-This document describes the scenario from the player's point of view. It is
+This document describes the storyline from the player's point of view. It is
 based on the decoded `SNR6.DAT` route tables and dialogue and on the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md).
-Where a condition is evaluated by `MAIN.EXE` rather than by the scenario
+Where a condition is evaluated by `MAIN.EXE` rather than by the story script
 bytecode, the text cites the executable routine.
 
-Evidence labels have the meanings defined in [the scenario README](./README.md).
+Evidence labels have the meanings defined in [the storylines README](./README.md).
 
 ## Story and threshold map
 
@@ -47,7 +47,7 @@ Several gates also require Ali still to be affiliated with the Ottoman Empire
 (protagonist sailor-record byte `+0x29`, low nibble `2`).[^affiliation] A
 defection at a foreign Palace therefore stalls those routes.
 
-Scenario services which are not mentioned below normally retain their ordinary
+Story script services which are not mentioned below normally retain their ordinary
 game behavior. The tables describe the extra story behavior layered onto them.
 Where a table says a building **ejects** Ali, its route ends in `F8`, which
 closes the scene without opening the building's menu.
@@ -128,10 +128,10 @@ After the Harbor repayment, Pietro appears (with his theme music) and asks to
 borrow the 10,000. Salim recalls that the Duchess of Lisbon sponsors him. The
 answer is another Yes/No prompt:
 
-| Answer | Effect                                                                                                  |
-| ------ | ------------------------------------------------------------------------------------------------------- |
-| Lend   | Deducts another 10,000 gold, adds a further **500 Trade Fame**, and stores `1` in scenario variable 20. |
-| Refuse | Pietro calls Ali a skinflint. Variable 20 is set to `0`; no gold or Fame changes.                       |
+| Answer | Effect                                                                                                      |
+| ------ | ----------------------------------------------------------------------------------------------------------- |
+| Lend   | Deducts another 10,000 gold, adds a further **500 Trade Fame**, and stores `1` in story script variable 20. |
+| Refuse | Pietro calls Ali a skinflint. Variable 20 is set to `0`; no gold or Fame changes.                           |
 
 Either answer sets the Harbor flag. Variable 20 persists across sections and
 changes dialogue, Pietro's repayment, and Trade Fame in section 3. The four
@@ -149,7 +149,7 @@ record) and Ottoman affiliation:
 
 Without a title, the Lodge keeper encourages Ali, and the wildcard route mocks
 him. The mockery is chosen by `EB 03 0002` (`random(2)`, the deterministic
-scenario RNG): one result says Ali should give up; the other asks about money
+story script RNG): one result says Ali should give up; the other asks about money
 and, with at least 10 ingots, predicts he will lose it all.
 
 Title reactions in the Pub, Harbor, Bank, and Shipyard are dialogue only and
@@ -181,7 +181,7 @@ context `0x15` from that command unconditionally (`0x3048C`). The Sultan:
    Ingots** (25 additions of 20,000 gold);
 3. gives a **Tax Permit (O)** if Ali does not already carry one and has an
    empty inventory slot;[^permit] and
-4. advances the scenario to section 2 and ejects Ali from the Palace.
+4. advances the story script to section 2 and ejects Ali from the Palace.
 
 ## Section 2: João, Catalina, and Sapha
 
@@ -207,7 +207,7 @@ or in an untested building does not by itself arm the event.
 | Change the sail | Istanbul **Harbor**          | João fits his emblem sail to Ali's ship. Flag 0 is cleared and the subsection advances.                                                                                                                                   |
 | Fool Catalina   | Battle with Catalina's fleet | Before the battle, Catalina takes Ali for João; Ali claims he bought the sail. She lets him go. The battle is cancelled, her fleet is withdrawn, and the subsection advances.[^decoy]                                     |
 
-While Ali waits for Catalina, the only scenario route is the before-battle
+While Ali waits for Catalina, the only story script route is the before-battle
 route for opposing captain 1 (`0xA101`). Every building behaves normally, and
 battles against any other captain are unaffected.
 
@@ -218,7 +218,7 @@ fleet's nation. See [Naval battle](../naval-battle.md#cancelled-battles).
 
 ### Wait for news
 
-The João scene sets scenario variable 10 to zero. During the next subsection,
+The João scene sets story script variable 10 to zero. During the next subsection,
 the voyage-day-5 route (`0xA005`) adds one to it and sets flag 0 once it
 reaches 6.[^voyage-counter] Ali therefore needs **six voyages that reach
 voyage day 5** after Catalina's encounter; the voyage during which the
@@ -240,7 +240,7 @@ voyage-day-1 transition cleared it, so these lines appear unreachable.
 | Stage      | Required action         | What changes                                                                                                                             |
 | ---------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | Meet Sapha | **Basra Pub** (port 76) | Sapha recognizes the name of the brother she lost, but is not yet convinced it is Ali. Ali gains **1,000 Trade Fame** and flag 0 is set. |
-| Tell Ladia | Istanbul **Pub**        | Ali tells Ladia; Salim admires Sapha. The scenario advances to section 3.                                                                |
+| Tell Ladia | Istanbul **Pub**        | Ali tells Ladia; Salim admires Sapha. The story script advances to section 3.                                                            |
 
 Before the meeting, the Basra Harbor sends Ali to the Pub and ejects him, and
 other Harbors outside Istanbul and Basra suggest sailing to Basra. After it,
@@ -273,7 +273,7 @@ section 5.
 | ---------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Take Radino home | **Venice Bank** (port 13)         | Radino fetches Howell, who asks Ali to collect a loan from Pietro. His reply to Ali depends on variable 20. A Yes/No prompt follows; either answer ejects Ali. |
 | Accept           | —                                 | Flag 0 is set.                                                                                                                                                 |
-| Refuse           | —                                 | The scenario advances directly to **section 4**, skipping the collection.                                                                                      |
+| Refuse           | —                                 | The story script advances directly to **section 4**, skipping the collection.                                                                                  |
 | Plan the search  | **Venice Harbor** after accepting | Salim proposes asking Pietro's sponsor in Lisbon. Flag 0 is cleared and the subsection advances.                                                               |
 
 Until Radino has been delivered, the Venice Harbor ejects Ali with “Let's get
@@ -287,7 +287,7 @@ Radino to the bank,” and other Harbors outside Istanbul repeat the reminder.
 | Leave Lisbon       | Lisbon **Harbor**                            | Salim notes the distance. The subsection advances.                                                                                                                                                                                   |
 | Optional clue      | **Nagasaki Pub** (port 99)                   | Pietro has been visiting but has probably gone east to Sakai. Sets flag 0.                                                                                                                                                           |
 | Find Pietro        | **Sakai Pub** (port 98)                      | Pietro repays; see the table below. Flag 1 is set.                                                                                                                                                                                   |
-| Settle with Howell | **Venice Bank** with at least 40 Gold Ingots | Howell's banker takes exactly 40 ingots and the scenario advances to section 4.                                                                                                                                                      |
+| Settle with Howell | **Venice Bank** with at least 40 Gold Ingots | Howell's banker takes exactly 40 ingots and the story script advances to section 4.                                                                                                                                                  |
 
 Before the Duchess visit, the Lisbon Harbor ejects Ali (“We'd better hurry up
 and go see the Duchess Franco”), and other Harbors point to Lisbon. The Venice
@@ -310,7 +310,7 @@ Pietro's payment depends on the section-1 choice:
 | Refused Pietro's request |                         40 ingots for Howell (Likely) |                 500 |                        500 (Likely) |
 
 The generous branch sets its amount explicitly. The refusal branch and the
-Venice Fame award instead use values left in scenario variables by earlier
+Venice Fame award instead use values left in story script variables by earlier
 routes.[^stale-vars] After the settlement, the generous branch retains 170 of
 Pietro's 210 ingots.
 
@@ -375,7 +375,7 @@ their follow-up lines.
 ### Howell's price
 
 Visit the **Venice Bank** after the Istanbul Pub scene. On the first visit,
-Howell sets the price in scenario variable 21:[^house-price]
+Howell sets the price in story script variable 21:[^house-price]
 
 ```text
 price = min(current Gold Ingots + 500, 10,000)
@@ -478,7 +478,7 @@ buildings react to the purchase.
     target sailor `5` (Ali), and flags `0x41`, then executes `D1`. It does not
     write ship slots, so Catalina's fleet has whatever ships `MAIN.EXE`'s
     monthly maintenance has given it (see the
-    [João scenario](./scenario-1-joao-franco.md#catalinas-pursuit)). The
+    [João story script](./joao-franco.md#catalinas-pursuit)). The
     before-battle route `0xA101` (table `0x13F1`, code `0x13F9`) again copies
     Ali's position into fleet 10, writes objective `0` (return home) with
     argument port `1` (Seville), clears the flags byte `+0x29` to `0`, and
@@ -552,7 +552,7 @@ buildings react to the purchase.
 
 ## Engine notes
 
-These executable details, decoded outside the scenario program, explain behavior described above.
+These executable details, decoded outside the story script program, explain behavior described above.
 
 - **An empty Catalina fleet still meets Ali.** The script sets fleet 10's
   active flags (`0x41`) without filling its ship slots. The active bit is
@@ -565,7 +565,7 @@ These executable details, decoded outside the scenario program, explain behavior
   60 and 63, and all 64 variables are zero in the new-game data, so the
   values these scenes reuse come only from earlier `SNR6.DAT` routes.
 - **Pub lines 426–428 are unreachable.** No executable routine writes the
-  protagonist scenario-flag bytes (`DS:0x0E5A–0x0E61`), so the flag-1 guard
+  protagonist story-script-flag bytes (`DS:0x0E5A–0x0E61`), so the flag-1 guard
   stays clear during the waiting subsection.
 - **Bit `0x08` of sailor byte `+0x29`** is never set on a protagonist. The only
   executable writers of a protagonist's byte are **Defect**, which copies a

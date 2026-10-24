@@ -182,7 +182,7 @@ The six protagonist records in the reference layout point at fleet IDs 0,
 depends on the protagonist selected in the save; it is not correct to assume
 that fleet 0 is active. The fleet ID should therefore always be read from
 the selected protagonist record as described above. Other protagonist fleets
-may be initialized differently by a different scenario or save state.
+may be initialized differently by a different storyline or save state.
 
 ## Fleet regeneration
 
@@ -193,7 +193,7 @@ then gives them a new commander. Protagonist fleets (IDs ending in 0) are
 never touched; a rival protagonist's fleet instead gains or replaces at most
 one ship a month through a separate routine (`0x1DE71`), described for
 Catalina's fleet in
-[João's scenario](scenarios/scenario-1-joao-franco.md#catalinas-pursuit). The
+[João's storyline](storylines/joao-franco.md#catalinas-pursuit). The
 initial file state described above is therefore only the starting point.
 
 ### Refilling ships
@@ -327,7 +327,7 @@ time in three, kept within ports 0–96
 
 Two bits in a sailor's byte `+0x29` affect the steps above. Nothing sets either on
 a sailor: the executable's writes to `+0x29` keep or clear them, the decoded
-scenario writes to sailor `+0x29` keep the upper nibble, and the new-sailor routine clears both. They therefore come
+story script writes to sailor `+0x29` keep the upper nibble, and the new-sailor routine clears both. They therefore come
 only from the new-game data, where no sailor has `0x10` and 61 have `0x40`,
 including all six protagonists.
 

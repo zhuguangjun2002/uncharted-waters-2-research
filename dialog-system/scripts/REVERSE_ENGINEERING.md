@@ -2,20 +2,20 @@
 
 This document records the evidence behind the structural SNR disassembler in
 `snr.ts`. Keep confirmed behavior separate from hypotheses: the output is
-useful now, but it is not yet a complete scenario-language decompiler.
+useful now, but it is not yet a complete story-script-language decompiler.
 
 ## Inputs and responsibilities
 
 - `SNR0` through `SNR6` each have a `.DAT` and `.MES` file.
 - `.MES` holds null-terminated dialogue strings behind an offset table.
-- `.DAT` holds the scenario program that selects messages, speakers, locations,
+- `.DAT` holds the story script program that selects messages, speakers, locations,
   conditions, effects, and branches.
 - `SNR0` is shared quest content. Protagonist dialogue and player IDs establish
   `SNR1` as João, `SNR2` as Catalina, `SNR3` as Otto, `SNR4` as Ernst, `SNR5`
   as Pietro, and `SNR6` as Ali.
-- `MAIN.EXE` loads and interprets the scenario program.
+- `MAIN.EXE` loads and interprets the story script program.
 
-See the maintained [scenario guides](../../game-details/scenarios/README.md) for
+See the maintained [story script guides](../../game-details/storylines/README.md) for
 the evidence-graded storyline maps built from these programs and runtime
 observations.
 
@@ -45,7 +45,7 @@ For `SNR1.MES`:
 - Message count: 1,189
 - `$n` means the player's first name.
 - `$s` means the player's last name.
-- `$dNN` inserts scenario variable `NN` (two decimal digits) as a decimal
+- `$dNN` inserts story script variable `NN` (two decimal digits) as a decimal
   number, and `$rNN` inserts the string referenced by variable `NN`. The
   expander at `MAIN.EXE 0x383E4` handles all four forms.
 - Some strings begin with `|Speaker label|\n`. This label is metadata and is
@@ -67,7 +67,7 @@ list of absolute `u32` section offsets terminated by `0xFFFFFFFF`.
 |       4 | `0x2C4C` | `0x2ED4` |          `0x2C62` |
 |       5 | `0x2ED4` | `0x3CCE` |          `0x2EF6` |
 
-### Scenario 0: shared quests and royal missions
+### Story script 0: shared quests and royal missions
 
 `SNR0` is shared content rather than a protagonist-specific storyline. Its 272
 messages divide into ordinary Guild/Bank contracts followed by missions offered
@@ -109,9 +109,9 @@ publish their contributing VM offsets as `presentationInstructionOffsets`.
 
 The save-aware query uses the same presentation state while executing the
 selected `SNR0` route. Its shared environment currently supplies saved
-scenario flags and variables, nation records and directed Relations, the
+story script flags and variables, nation records and directed Relations, the
 player fleet record and cargo, inventory, gold, calendar fields, and the
-shared-scenario RNG seed. `E9` forks explicit Yes and No outcomes. The Palace
+shared-story-script RNG seed. `E9` forks explicit Yes and No outcomes. The Palace
 invitation path is a two-stage dispatch. At the protagonist's own capital with
 shared flag 17 set, `Meet Ruler` copies the cached mission section from shared
 variable 30 into the shared section byte and resets the subsection
@@ -175,7 +175,7 @@ For example, `0xA301` means any regular port's Pub and `0xA303` means any
 regular port's Harbor. The shared-SNR matcher accepts 130 port selectors
 (`0x00`–`0x81`) before its `0xA3` fallback.
 
-## MAIN.EXE scenario VM
+## MAIN.EXE story script VM
 
 The following `MAIN.EXE` offsets are absolute file offsets for the fingerprint
 listed above:
@@ -185,7 +185,7 @@ listed above:
 - `0x38593` reads a section offset, loads the selected section into an allocated
   buffer, resets the VM instruction offset, and initializes interpretation.
 - `0x382B7` and `0x382CB` read a big-endian byte and `u16` respectively from the
-  current scenario stream.
+  current story script stream.
 - `0x38F4F` is the interpreter loop. It dispatches on the top two opcode bits.
 - `0x38C07` handles `0xC0`–`0xFF` through a 64-entry jump table beginning at
   `0x38C2B`.
@@ -199,10 +199,10 @@ listed above:
 - `Job Assignment` sets the selected-job state and invokes the shared matcher
   at `0x32F72` with the current port and qualifier `0x06`. It reuses the Guild
   context rather than introducing a command-only context.
-- The `Treat` handler at `0x2BAFA–0x2BC8C` contains no call to either scenario
+- The `Treat` handler at `0x2BAFA–0x2BC8C` contains no call to either story script
   matcher or dispatcher. Its royal-invitation branch writes shared flag 17
   directly at `0x2BBCD`.
-- `Meet Ruler` begins at `0x3044A` and makes three scenario dispatches using
+- `Meet Ruler` begins at `0x3044A` and makes three story script dispatches using
   the current port: shared context `0x05` at `0x30482`, protagonist context
   `0x15` at `0x3048C`, and shared context `0x15` at `0x3049D`.
 - All town call sites pass a concrete port and context. Selector `0xA3` and
@@ -363,7 +363,7 @@ The following ordinary-building command groups are now traced:
   player Friendship, directed Relations, alliance/blockade status, target,
   and merchant-fleet destination.
 - The Palace main handler is at `0x309A4`. Meet Ruler begins at `0x3044A` and,
-  after scenario dispatch, opens the Sphere of Influence, Letter of Marque,
+  after story script dispatch, opens the Sphere of Influence, Letter of Marque,
   and Tax Free Permit submenu. Defect begins at `0x3051D`; Gold and Ship aid
   begin at `0x3063A` and `0x306C2`. Gold consumes nation-record byte `+0x05`
   as thousands of gold. Ship reads the cached ship type at byte `+0x07` and
@@ -433,15 +433,15 @@ discovery records at slot-relative `0x6E74`, chart counters at `0x036A` and
 teacher lesson-price formula. The ordinary discovery list requires flags
 `!0x80`, `0x20`, and `!0x10`; selling the discovery sets `0x10`.
 
-Scenario action `EC` is a scenario-RNG checkpoint restore. Its handler at
-`0x38E9E` reads a scenario-variable index and calls `0x37FA3`, which loads that
-16-bit variable, shifts it left by eight, and stores it as the 32-bit scenario
+Story script action `EC` is a story-script-RNG checkpoint restore. Its handler at
+`0x38E9E` reads a story-script-variable index and calls `0x37FA3`, which loads that
+16-bit variable, shifts it left by eight, and stores it as the 32-bit story script
 RNG state. All six reachable uses are `EC 08` in SNR0's Guild-assignment setup
 routes.
 
-Scenario action `ED` is the inverse checkpoint save. Its handler at `0x38EA9`
-reads a scenario-variable index and calls `0x37FC1`, which shifts the 32-bit
-scenario RNG state at `DS:0xBC94`/`DS:0xBC96` right by eight and stores the
+Story script action `ED` is the inverse checkpoint save. Its handler at `0x38EA9`
+reads a story-script-variable index and calls `0x37FC1`, which shifts the 32-bit
+story script RNG state at `DS:0xBC94`/`DS:0xBC96` right by eight and stores the
 low word in that variable. All five reachable uses are in SNR0's idle
 Guild-preparation code: `ED 1F`, `ED 03`, `ED 04`, and `ED 05` at
 `SNR0.DAT 0x018D–0x01C6`, and `ED 1F` at `0x042D`. Variables 3–5 are the
@@ -461,15 +461,15 @@ restore the removed ship.
 
 The four opcode families are now structurally decoded:
 
-| Range         | Interpreter handler | Role                                       |
-| ------------- | ------------------: | ------------------------------------------ |
-| `0x00`–`0x3F` |           `0x3873E` | assignment, including scenario flag writes |
-| `0x40`–`0x7F` |           `0x3893E` | arithmetic and bit operations              |
-| `0x80`–`0xBF` |           `0x38A78` | comparisons with conditional destinations  |
-| `0xC0`–`0xFF` |           `0x38C07` | presentation/game actions and VM control   |
+| Range         | Interpreter handler | Role                                           |
+| ------------- | ------------------: | ---------------------------------------------- |
+| `0x00`–`0x3F` |           `0x3873E` | assignment, including story script flag writes |
+| `0x40`–`0x7F` |           `0x3893E` | arithmetic and bit operations                  |
+| `0x80`–`0xBF` |           `0x38A78` | comparisons with conditional destinations      |
+| `0xC0`–`0xFF` |           `0x38C07` | presentation/game actions and VM control       |
 
 Relevant VM globals include current section at `DS:0x060E`, subsection at
-`DS:0x060F`, scenario-flag pointer at `DS:0x0610`, variable-array pointer at
+`DS:0x060F`, story-script-flag pointer at `DS:0x0610`, variable-array pointer at
 `DS:0x0612`, instruction offset at `DS:0x0614`, and the current DAT/MES handles
 at `DS:0x0616`/`DS:0x0618`.
 
@@ -482,7 +482,7 @@ qualifier described above. Variable 63 (`DS:0x0EE0` and `DS:0x0F6A`) is a
 greeting-suppression word: the dispatch routines zero it before interpreting
 (`0x3914B`, `0x391CF`, `0x38FFB`, and `0x3908E`), and a script sets it with
 `0C 3F 0001`. There are 231 such reachable writes across all seven
-scenarios: 11 in SNR0, 38 in SNR1, 20 in SNR2, 10 in SNR3, 20 in SNR4, 22 in
+story scripts: 11 in SNR0, 38 in SNR1, 20 in SNR2, 10 in SNR3, 20 in SNR4, 22 in
 SNR5, and 110 in SNR6. The ordinary building main handlers test both words after entry
 dispatch and skip their ordinary greeting when either is nonzero, testing the
 shared word first: `0x2AFF2` (Market), `0x2D435` (Pub), `0x2E502` (supply-port
@@ -533,9 +533,9 @@ in 20-minute ticks from `DS:0x0737`. Their handlers occupy `MAIN.EXE
 0x38842–0x3885B`.
 
 Catalina's Lucia sequence confirms selector 4's lifecycle. Its Lisbon Pub
-agreement copies selector 4 to persistent scenario variable 0. Later Pub and
+agreement copies selector 4 to persistent story script variable 0. Later Pub and
 Lodge routes compare the current selector-4 value with that stored day and use
-scenario variable 16 as an independent interaction counter. Pub or early
+story script variable 16 as an independent interaction counter. Pub or early
 Lodge visits increment the counter; elapsed time alone does not. A different
 day selects the late dialogue.
 
@@ -548,7 +548,7 @@ zero through `bound - 1`. Its handler at `MAIN.EXE` file offset `0x38E87` reads
 the variable and bound, calls `0x37F4F`, divides a generated non-negative value
 by the bound, and stores the remainder in the selected VM variable.
 
-Before each protagonist-scenario dispatch, the routine beginning at
+Before each protagonist-story-script dispatch, the routine beginning at
 `MAIN.EXE 0x3914A` reconstructs the 32-bit RNG seed from the raw saved date
 bytes. `yearByte` is the calendar year minus 1501, while `monthByte` and
 `dayByte` are zero-based:
@@ -622,7 +622,7 @@ so Istanbul contributes to the count. The respective thresholds are exactly
 
 Both sections place Istanbul's specific Harbor route `0x0203` before the
 any-regular-port Harbor route `0xA303`. The counting route must therefore be
-triggered at a non-Istanbul Harbor. On success it sets the scenario flag
+triggered at a non-Istanbul Harbor. On success it sets the story script flag
 immediately without dialogue; later Istanbul routes expose the result through
 Radino's transfer or the Palace summons.
 
@@ -631,7 +631,7 @@ transition.
 
 Ali's final Venice Bank sequence also demonstrates persistent price state. On
 the first visit, it stores
-`min(current displayed Gold Ingots + 500, 10,000)` in scenario variable 21.
+`min(current displayed Gold Ingots + 500, 10,000)` in story script variable 21.
 Later visits compare `EA` with that cached target. The successful branch does
 not subtract the target amount: Howell reveals that the Istanbul house is a
 gift.
@@ -649,7 +649,7 @@ The shared-`SNR0` runner post-processes these transitions. After the
 interpreter returns, `0x39055–0x3906D` copies the section and subsection back
 to `DS:0x0EE2`/`DS:0x0EE3` and resets both to 0 whenever the section changed.
 An `F1` in a shared mission or assignment section therefore returns the
-shared scenario to idle section 0/subsection 0 rather than to the next
+shared story script to idle section 0/subsection 0 rather than to the next
 numbered section. Nonzero shared sections are instead selected by executable
 writes: after a matched offer, Job Assignment sets the section from shared
 variable 6 at `0x32F80`, and `Meet Ruler` copies shared variable 30 into the
@@ -689,12 +689,12 @@ the final two, `0xA303` and `0xA3FF`, first appear in section 1:
 |  `0xA303` | Any regular port, Harbor                                                |
 |  `0xA3FF` | Any regular port, wildcard context                                      |
 
-Across all scenarios, `0xA1xx` destinations contain fleet challenges and
+Across all story scripts, `0xA1xx` destinations contain fleet challenges and
 other pre-battle dialogue, while `0xA2xx` destinations contain surrender,
 search, and other aftermath dialogue. Together with their placement around
 the executable's naval-combat path, this identifies selector `0xA1` as
 before-naval-battle and `0xA2` as after-naval-battle. Qualifier `0xFF` remains
-the wildcard. The two specific qualifiers present in the supplied scenario
+the wildcard. The two specific qualifiers present in the supplied story script
 files resolve through the save's 120-record sailor table:
 
 | Qualifier | Zero-based sailor ID | Captain          |
@@ -733,9 +733,9 @@ changes from sea to port. Arrival's separate one-tick clock increment is at
 `0x0862` is a DAT dialogue-instruction offset, not another route key. Message
 189 at that offset ("Well this is a surprise...") can appear in both the Bank
 and Lodge, while message 187 at `0x0851` ("Just a little advice...") can appear
-at the Guild. These are branches of João's wildcard scenario handler, not
+at the Guild. These are branches of João's wildcard story script handler, not
 building-specific ordinary greetings. They are selected by `EB 00 0003` using
-the deterministic protagonist-scenario seed described above. Route keys are
+the deterministic protagonist-story-script seed described above. Route keys are
 therefore not always one-to-one universal building identifiers.
 
 ## Confirmed dialogue instructions
@@ -752,12 +752,12 @@ are stored zero-based, and the JSON IDs use the same zero-based values.
 Runtime captures resolve the positions spatially: position 1 is the upper
 dialogue panel and position 2 is the lower panel. Multiple consecutive lines
 may reuse either position. The ordinary vendor image is restricted to the
-upper panel; scenario characters can visually cover it there or appear below.
+upper panel; story script characters can visually cover it there or appear below.
 Dismissing a line clears its text while retaining the panel and portrait. The
 other panel therefore remains visible, with its previous portrait and an empty
 text area, when the next line moves between positions.
 
-Ordinary vendor artwork comes from `GRAPH.DAT`, separately from the scenario
+Ordinary vendor artwork comes from `GRAPH.DAT`, separately from the story script
 character selected by `CC`. Zero-based records 6–17 correspond to building IDs
 0–11 in order. Church/Mosque is the one variant: Church uses record 16 and
 Mosque uses record 20. Special residences retain record 13 regardless of
@@ -772,7 +772,7 @@ C0 00 C8 <message-index:u16be> C7
 
 Runtime observation of Catalina questioning a Pub bartender establishes the
 building-context behavior of position 0. It writes the selected message into
-the existing upper vendor panel without a scenario `CC`; the bartender remains
+the existing upper vendor panel without a story script `CC`; the bartender remains
 visible while the lower Andreas panel persists with cleared text. Position 0
 should therefore be described as using the surrounding building speaker, not
 as displaying portraitless text. Its behavior outside building interactions
@@ -782,7 +782,7 @@ The same captures distinguish presentation lifetime from the extractor's
 structural `dialogueRun` grouping. João's 1,000-coin reward splits two runs but
 does not clear either panel. The gold display changes and Rocco replaces the
 upper portrait while João remains below. A later `C4`, immediately after João
-says “Lucia!”, visibly closes both scenario panels with horizontal wipes,
+says “Lucia!”, visibly closes both story script panels with horizontal wipes,
 reveals the ordinary Pub vendor underneath, and allows the following line to
 construct a new upper panel.
 
@@ -810,7 +810,7 @@ The six values assigned according to nation are `0x14`, `0x18`, `0x1D`,
 `0x1B`, `0x25`, and `0x1C` for Portugal, Spain, Ottoman Turkey, England,
 Italy, and Holland respectively. Variable 50 therefore selects the home ruler
 for the offer and completion, while variable 51 selects the destination ruler.
-Every line remains in position 1, the upper scenario panel. Ordinary Palace
+Every line remains in position 1, the upper story script panel. Ordinary Palace
 dialogue still selects the ruler belonging to the capital being visited
 through a separate location-driven path.
 
@@ -844,7 +844,7 @@ C0 01 CC 0061 C8 003E C7  Carlotta, position 1, public message 62
 
 The repeated three-byte form `2C <small index> <0|1>` occurs where one-shot
 conversations complete. It is therefore classified as a likely Boolean
-scenario-state write. Its placement and the save-game comparison below both
+story-script-state write. Its placement and the save-game comparison below both
 support that interpretation.
 
 After João sees the initial Pub introduction, a later visit displays message 61
@@ -853,14 +853,14 @@ at `0x02D4` instead of replaying message 62 at `0x02E1`. The introduction writes
 `0x02DD`. Boolean flag 4 therefore records whether the opening Pub scene has
 already played.
 
-### Save-game scenario state
+### Save-game story script state
 
 The game stores all ten save slots in its shared save file; slot 1 begins at
 file offset `0x0097`, and each slot is `0x7CC8` bytes. Slot-relative offset
-`0x30` (slot-1 file offset `0x00C7`) stores the protagonist scenario section,
+`0x30` (slot-1 file offset `0x00C7`) stores the protagonist story script section,
 and `0x31` (`0x00C8`) stores its subsection; `MAIN.EXE` copies the VM
 subsection from `DS:0x060F` to its saved location `DS:0x0E59` at `0x391AE`.
-Slot-relative `0x32`–`0x35` (`0x00C9`–`0x00CC`) hold the scenario flags as a
+Slot-relative `0x32`–`0x35` (`0x00C9`–`0x00CC`) hold the story script flags as a
 32-bit little-endian bit array: flag `n` is bit `n & 7` of byte `n >> 3`.
 `2C <flag> 01` sets the corresponding persistent bit, and both the `E9`
 choice writer at `0x37EDE` and the flag comparisons at `0x38AE5` use the same
@@ -928,7 +928,7 @@ disassembler writes the same values in decimal in generated JSON.
 
 `CA`'s handler at `MAIN.EXE 0x38D20` reads its byte operand and calls the
 wrapper at `0x37980`. That wrapper passes the ID to the central music driver at
-`0000:952E`. Non-scenario systems call the same driver directly:
+`0000:952E`. Non-story-script systems call the same driver directly:
 
 - port entry (`0x2062A`) derives `0x0A` through `0x0E` from the port's Market
   ID through a 13-entry table, or `0x0F` for a supply port, and calls the
@@ -941,7 +941,7 @@ wrapper at `0x37980`. That wrapper passes the ID to the central music driver at
   report; after the player acknowledges it, `0x15BB3` selects `11` for the
   post-battle gold/item reward sequence. The defeat path selects `14` at
   `0x15D6E`, and the game-over path does the same at `0x1C8C9`. Another
-  non-scenario presentation flow selects raw track `03` at `0x1C2B8`, but that
+  non-story-script presentation flow selects raw track `03` at `0x1C2B8`, but that
   flow's exact role remains unnamed;
 - the music-option path resumes the saved current track from `DS:0x903A` at
   `0x26BA6` when music is re-enabled.
@@ -972,22 +972,22 @@ escape!"
 
 Frame measurements confirm the visible result: a roughly 0.27-second fade to
 black, about two seconds fully black, and a roughly 0.35-second fade back. This
-is distinct from scenario `C4`, which closes dialogue panels without producing
+is distinct from story script `C4`, which closes dialogue panels without producing
 the timed all-black interval.
 
 ## Duel and event-art evidence
 
 `E8 <sailor ID>` starts a duel against the specified sailor. The VM handler at
 `MAIN.EXE 0x38E66` reads the operand and passes it to the duel setup routine.
-Five reachable protagonist-scenario instructions use it:
+Five reachable protagonist-story-script instructions use it:
 
-| Scenario | Duel                            |              Instruction |
-| -------- | ------------------------------- | -----------------------: |
-| João     | Shipyard confrontation          | `SNR1.DAT 0x0CA6: E8 3C` |
-| João     | Franco-home confrontation       | `SNR1.DAT 0x0FFF: E8 3C` |
-| João     | South American Pub rescue       | `SNR1.DAT 0x32F4: E8 3C` |
-| Catalina | South American Pub rescue       | `SNR2.DAT 0x2965: E8 3C` |
-| Otto     | London Pub meeting with Matthew | `SNR3.DAT 0x0284: E8 4B` |
+| Story script | Duel                            |              Instruction |
+| ------------ | ------------------------------- | -----------------------: |
+| João         | Shipyard confrontation          | `SNR1.DAT 0x0CA6: E8 3C` |
+| João         | Franco-home confrontation       | `SNR1.DAT 0x0FFF: E8 3C` |
+| João         | South American Pub rescue       | `SNR1.DAT 0x32F4: E8 3C` |
+| Catalina     | South American Pub rescue       | `SNR2.DAT 0x2965: E8 3C` |
+| Otto         | London Pub meeting with Matthew | `SNR3.DAT 0x0284: E8 4B` |
 
 The four `3C` operands select sailor 60, Antonio Khan's record. João's and
 Catalina's South American Pub scenes both first rename and redraw that record
@@ -999,14 +999,14 @@ and ends the duel at either endpoint. The extractor records all five calls as
 `duelStartCandidates`. Combat rules and the circumstances of each encounter
 are documented in [Dueling](../../game-details/dueling.md).
 
-Immediately before message 292, the scenario executes:
+Immediately before message 292, the story script executes:
 
 ```text
 0x0D3B  C0 03 CB 0070 0018 00
 ```
 
 This fixed form occurs 39 times on reachable paths across the protagonist
-scenarios and is emitted as an `eventArtCandidate`. There are no reachable
+story scripts and is emitted as an `eventArtCandidate`. There are no reachable
 `CB` instructions in `SNR0`. Every call has coordinates `0x0070,0x0018`; only
 the final byte varies from 0 through 5.
 
@@ -1014,7 +1014,7 @@ The `CB` handler at `MAIN.EXE` file offset `0x38D2A` reads two big-endian words
 and one byte, then calls the graphics routine through `0x3799A` with the words
 as x/y coordinates and the byte as the zero-based record index. The resulting
 destination is `(112, 24)`. `MAIN.EXE` keeps an event-art data handle opened
-from the `C:EVENT*.DAT` pattern; protagonist scenario `n` uses `EVENTn.DAT`.
+from the `C:EVENT*.DAT` pattern; protagonist story script `n` uses `EVENTn.DAT`.
 Ali's four payment branches contain four separate `CB` calls that all select
 record 1. Event art is therefore a bytecode presentation action, not metadata
 attached to the selected message.
@@ -1058,10 +1058,10 @@ João's recognized checks are:
 |   `0x2CCA` |    30,000 |
 |   `0x2F5F` |    40,000 |
 
-The scenario record references identify the Fame category used by each
+The story script record references identify the Fame category used by each
 protagonist:
 
-| Scenario            | Fame category  |
+| Story script        | Fame category  |
 | ------------------- | -------------- |
 | João, Pietro, Ernst | Adventure fame |
 | Otto, Catalina      | Piracy fame    |
@@ -1175,7 +1175,7 @@ tests the same bit at `0x339C3` and `0x33A07`; the report-reward calculation at
 `0x33CB9` masks the same byte with `0x03`, leaving contract status separate
 from the reward modifier.
 
-Scenario action `DC` resolves a game-state field reference and stores it in a
+Story script action `DC` resolves a game-state field reference and stores it in a
 VM variable; its handler is at `MAIN.EXE 0x38D76`. In the cartographer pattern,
 `DC 00 04 <record> 16` makes variable 0 refer to byte `+0x16` of cartographer
 record selector `0x05`–`0x09`, in the order Giovanni, Gerard, Diogo, Olives,
@@ -1254,7 +1254,7 @@ section 2 only when flag 4 is set. Thus the complete transition is father-house
 aftermath → optional building detours → Harbor farewell → set sail → at-sea day
 1 → section 2. Merely setting sail does not advance the section. The decoded
 `0xA001` route runs on voyage day 1; its `F1` transition clears all four
-scenario-flag bytes.
+story-script-flag bytes.
 
 The father-house aftermath presents message 309 as a player choice:
 “Hmm... I wonder. $n, what do you want to do? Are you going to quit sea
@@ -1264,7 +1264,7 @@ tested as a flag. The set branch leads to messages
 310–316, where João offers to stay and help his father. The clear branch leads
 to messages 317–319, where he chooses to continue seeking Atlantis. This choice
 controls dialogue within the scene; both branches eventually continue the
-scenario.
+story script.
 
 Ceuta (port 26) remains eligible after visiting its Harbor. The Pub bytecode
 does not test a 13-region identifier.
@@ -1304,7 +1304,7 @@ In subsection 1, the first regular-port Pub visit with clear flags begins:
 That warning sets flag 0. Its path contains no clock or current-port-ID check,
 so the bytecode does not exclude Lisbon, Seville, or Istanbul as the 2,000-fame
 Pub handler does. Normal building opening hours still constrain when the player
-can enter. The route sets flag 0 and stores the current port ID in scenario
+can enter. The route sets flag 0 and stores the current port ID in story script
 variable 0.
 
 Subsequent Pub or other-building visits can produce port-dependent warnings.
@@ -1469,7 +1469,7 @@ cannot be predicted from a save. See
 ## Current disassembler limitations
 
 - Reachable code is now decoded sequentially from primary and nested route
-  tables. All seven scenarios decode without reaching an invalid action opcode,
+  tables. All seven story scripts decode without reaching an invalid action opcode,
   and every extracted protagonist dialogue is on a reachable instruction
   boundary.
 - Assignment, arithmetic, and comparison operand modes, every reachable action
@@ -1488,7 +1488,7 @@ cannot be predicted from a save. See
 
 ## Next investigation steps
 
-1. Map the remaining VM variable indices used by each scenario.
+1. Map the remaining VM variable indices used by each story script.
 2. Group instructions and edges into named basic blocks for a compact control-
    flow graph rather than exposing only the instruction-level CSV.
 3. Optionally validate uncertain operations in a debugger-enabled DOSBox-X by

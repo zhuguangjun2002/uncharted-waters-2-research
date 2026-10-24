@@ -137,7 +137,7 @@ above 110 the table lookup reads past its end and nothing further happens.
 No executable routine sets or clears the alliance bit `0x20` or the blockade
 bit `0x10`; they come from the new-game data, where Portugal and Spain are
 allied (status `0x25` and `0x21`) and Turkey and Italy blockade each other
-(`0x12`), and scenario scripts may add them (Otto's story sets a blockade
+(`0x12`), and story scripts may add them (Otto's story sets a blockade
 between Spain and England). The alliance bit has three effects:
 
 - the Relations screen marks the pair (`0x33178`);
@@ -245,7 +245,7 @@ so its absolute location depends on the save slot and protagonist index.
 
 ## Royal missions
 
-Royal missions change directed national Relations through the scenario relation accessor. The known mission effects are:
+Royal missions change directed national Relations through the story script relation accessor. The known mission effects are:
 
 | Mission action     | Relation change |
 | ------------------ | --------------: |
@@ -255,7 +255,7 @@ Royal missions change directed national Relations through the scenario relation 
 The result is clamped at stored relation `100`. The mission code updates both directions of the two participating
 nations.
 
-The shared royal-mission scenario contains separate mission families for document delivery (messages 154–184) and treaty
+The shared royal-mission story script contains separate mission families for document delivery (messages 154–184) and treaty
 negotiation (messages 185–215). The document branch contains `4C 0B 05` twice; the treaty branch contains `4C 0B 0A`
 twice.
 
@@ -307,7 +307,7 @@ hold:
    current affiliation. The check compares the low three bits of port-record
    byte `+0x13` with the low three bits of the protagonist sailor's byte
    `+0x29`.
-2. Shared Scenario 0 flags 17 and 18 are both clear. Thus an armed royal
+2. Shared story script 0 flags 17 and 18 are both clear. Thus an armed royal
    invitation or an offer already in progress disables defection.
 3. No accepted royal mission is active. When the shared section is neither
    `0` nor `255`, shared variable 6 values of 6 or higher disable the command;
@@ -366,7 +366,7 @@ stored `100`, or displayed `0`. It does not restore the nation-to-nation Relatio
 
 The successful escape has a deliberate blackout between the protagonist's
 "I'm not about to let myself be captured by the likes of you!" and the final
-relief message. This is executable-driven presentation, not scenario event
+relief message. This is executable-driven presentation, not story event
 art. The success branch at `MAIN.EXE 0x3095C–0x309A4` dismisses the dialogue,
 calls runtime routine `0000:98B1` to transition to a zeroed 48-byte palette,
 waits with argument `20`, and calls `0000:98A7` to restore the normal palette
@@ -377,8 +377,7 @@ out and fade in before "Whew, that was a narrow escape!"
 The lines come from different windows (`0x309F9–0x30A18`, `0x3080F`). The
 greeting, raw 443, is in the vendor's window (`0:0x8D95`). On a successful
 escape the protagonist says raw 446 (`0:0x7C27`), the panel is taken off
-(`0:0x7690`), the blackout runs, and the first mate (`0:0x8F64`) says raw
-448. On a failed one the protagonist says only raw 445, “Darn it!”; the panel
+(`0:0x7690`), the blackout runs, and the first mate (`0:0x8F64`) says raw 448. On a failed one the protagonist says only raw 445, “Darn it!”; the panel
 is taken off, the screen fades out, is restored (`FC4:0xB5B6`), waits 15
 units and fades back, and the ruler then speaks from his bottom panel
 (`0:0x7B81`, [Palace](buildings.md#palace-command-dialogue)) with raw 449,
@@ -394,8 +393,8 @@ hostile entry path prevents that audience from being selected when it triggers.
 The general port-building check applies to the Market, Pub, Shipyard, Lodge, Guild, Bank, Item Shop, and House of
 Fortune. It excludes the Harbor, Palace, special NPC residence, Church or Mosque, and ports controlled by Piracy.
 
-This check occurs after the shared and protagonist scenario entry dispatches.
-At `MAIN.EXE 0x20A1B–0x20A4C`, the building dispatcher runs both scenario
+This check occurs after the shared and protagonist story script entry dispatches.
+At `MAIN.EXE 0x20A1B–0x20A4C`, the building dispatcher runs both story script
 matchers and interpreters. It then tests their caller-owned interaction-control
 values at `0x20A53–0x20A6D`; a normal nonzero result continues into the hostile
 eligibility code at `0x20A70`, while an `F8` zero result normally exits before
@@ -430,7 +429,7 @@ met.
 ## Naval-victory rules
 
 These rules run at the end of a battle whose outcome code is even: 2 (the enemy flagship fled), 4 and 6 (victories), and
-8 (a battle cancelled by a scenario before it started); see
+8 (a battle cancelled by a story script before it started); see
 [How a battle ends](naval-battle.md#how-a-battle-ends). Nightfall, fleeing, and surrender skip them (`0x15DED`).
 
 For a normal national-fleet battle, the home→target Relation is reduced by `random(5) + 3`, 3 to 7 points, clamped at
@@ -514,13 +513,13 @@ your title has been stripped away," (569) respectively. Each is shown in a fixed
 (`0:0x756C`, style 0), with margins 22–47, then the message wait and the window closed (`0x15F9F–0x15FBF`,
 `0x16002–0x16022`).
 
-Both punishments also cancel the shared Scenario 0 state, including an active
+Both punishments also cancel the shared story script 0 state, including an active
 royal mission or Guild assignment, without using the voluntary refusal/give-up
 path. The converged code at `MAIN.EXE`
 `0x16020–0x16038`:
 
 - sets the protagonist's rank to **No Rank**;
-- resets shared Scenario 0 to section 0, subsection 0; and
+- resets shared story script 0 to section 0, subsection 0; and
 - clears shared flags 16–18, removing eligibility, an armed invitation, and an
   offer/mission in progress.
 
@@ -577,8 +576,8 @@ multiplier.
 - `MAIN.EXE` `0x33178–0x331C4`: Relations-screen alliance and blockade markers.
 - `MAIN.EXE` `0x0A198–0x0A1B1`: `random(n)`, returning `0..n−1`.
 - `SNR2.DAT` `0x07C3–0x07D7`: Catalina's section-0 day-one-at-sea route, Spain-Friendship write, and section advance.
-- Scenario bytecode `0x1C92–0x1CD1`: document-delivery Relation update.
-- Scenario bytecode `0x20B7–0x20F6`: treaty Relation update.
+- Story script bytecode `0x1C92–0x1CD1`: document-delivery Relation update.
+- Story script bytecode `0x20B7–0x20F6`: treaty Relation update.
 
 ## Open questions
 

@@ -254,7 +254,7 @@ either fixed or clamped to 100, so the towns differ only in the port name.
     (`0x2ACBA`) and Shipyard Invest (`0x32989`), and supply ports have
     neither building.
 
-  The documented scenario-script writes touch ports 97–99, or loop over
+  The documented story-script writes touch ports 97–99, or loop over
   ports 0–99.
 
 - **Character graphics.** The `CHAR` entries loaded at `0xDE62–0xDEAC` and
@@ -315,7 +315,7 @@ labels and switch back with `ESC F1`, such as `ESC C6 ESC F4 Navigation:%3d
 ESC C0 ESC F1` in `MESSAGE2.DAT`. A speaker label is part of the message
 text, so it wraps with the line like any other word.
 
-A scenario message is printed with paging on (`2DFF:0x7920`): `DS:0x880E`
+A story script message is printed with paging on (`2DFF:0x7920`): `DS:0x880E`
 is set, and the text's top and bottom (`DS:0x880A`, `0x880C`) come from the
 speaking window's record at `DS:0xBC18 + 24n` (+0x12 and +0x12 + +0x16). The
 vendor window and both portrait panels have text 112 pixels tall. At each
@@ -336,9 +336,9 @@ so a line holds `right − left + 1` characters. The vendor's window
 sets margins 32 and 56, 25 characters; the crew's portrait panels at `0xD0CD`
 set column + 11 to column + 36, 26 characters.
 
-#### Scenario windows
+#### Story script windows
 
-A scenario's windows are records at `DS:0xBC18 + 24n`: the frame's column,
+A story script's windows are records at `DS:0xBC18 + 24n`: the frame's column,
 y, width in columns and height, then the portrait's place, then the text's
 column (+0x10), y (+0x12), width (+0x14) and height (+0x16). Record 0 is the
 vendor's window (column 30, y 8, 30 × 128, text at column 32, y 16), record 1
@@ -457,12 +457,12 @@ The picker's drag works only for the styles that keep a place record, those
 whose style number (`DS:0xA55E`) is not 0 (`0x191E2`). The entry points set
 it:
 
-| Entry                             | Style | Used for                                                 | Drags |
-| --------------------------------- | ----: | -------------------------------------------------------- | ----- |
-| `0x19431`, `0x194DE`, `0x19586`   |     0 | the ordinary menus (`0x19452`, `0x194FF`, `0x195A6`)     | no    |
-| `FC4:0x43B1` (`0x195F1`)          |     0 | the grid picker over caller hit boxes (`0x19612`)        | no    |
-| `FC4:0x4419` (`0x19659`)          |     1 | the popup menu (`0x19681`), called only in naval battles | yes   |
-| `FC4:0x4529` (`0x19769`)          |     2 | the YES/NO buttons (`0x1978B`)                           | yes   |
+| Entry                           | Style | Used for                                                 | Drags |
+| ------------------------------- | ----: | -------------------------------------------------------- | ----- |
+| `0x19431`, `0x194DE`, `0x19586` |     0 | the ordinary menus (`0x19452`, `0x194FF`, `0x195A6`)     | no    |
+| `FC4:0x43B1` (`0x195F1`)        |     0 | the grid picker over caller hit boxes (`0x19612`)        | no    |
+| `FC4:0x4419` (`0x19659`)        |     1 | the popup menu (`0x19681`), called only in naval battles | yes   |
+| `FC4:0x4529` (`0x19769`)        |     2 | the YES/NO buttons (`0x1978B`)                           | yes   |
 
 The popup's record is filled when it opens: x and y at the pointer, and the
 largest x and y, `(75 − w) × 8` and `360 − 16n` for `n` items `w` characters
@@ -533,10 +533,10 @@ Every ordinary window is drawn by `0xC67B` (column `ax`, top `dx`, width in
 columns `bx`, then the height in pixels and a style on the stack) from 8 × 8
 tiles in `DATA1.014`, which the game keeps in the segment at `DS:0x0E0A`:
 
-| Tile | `DATA1.014` | Drawn |
-| ---- | ----------- | ----- |
-| Top-left, top-right, bottom-left, bottom-right corners | `0x2C20`, `0x2C40`, `0x2C60`, `0x2C80` | Once each (`0x59D2`) |
-| Top, left, right and bottom edges | `0x2CA0 + 0x80 × style`, then `+ 0x20`, `+ 0x40`, `+ 0x60` | Repeated along each side between the corners (`0x5EA6`) |
+| Tile                                                   | `DATA1.014`                                                | Drawn                                                   |
+| ------------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------- |
+| Top-left, top-right, bottom-left, bottom-right corners | `0x2C20`, `0x2C40`, `0x2C60`, `0x2C80`                     | Once each (`0x59D2`)                                    |
+| Top, left, right and bottom edges                      | `0x2CA0 + 0x80 × style`, then `+ 0x20`, `+ 0x40`, `+ 0x60` | Repeated along each side between the corners (`0x5EA6`) |
 
 The inside, a column in from either side and 8 pixels in from the top and
 bottom, is filled with colour 7 (`0x5F06`). The corners are the same brass
@@ -578,8 +578,8 @@ it does so as a wipe: each step copies back one 8-row strip at the top and
 one at the bottom, moving towards the middle, then waits one timer unit
 (`0xADBE`), for `h / 16 + 1` steps (`0xCCFC–0xCD8F`). The window's picture
 therefore shrinks from both edges and is gone after about `h / 16` units,
-about 80 ms for a 144-pixel scenario panel. Otherwise the whole area is
-copied back at once (`0xCD91`). The scenario's `C3`, `C4` and `D9` restore
+about 80 ms for a 144-pixel story script panel. Otherwise the whole area is
+copied back at once (`0xCD91`). The story script's `C3`, `C4` and `D9` restore
 panels 1 and 2 this way (`0x37863`); panel 0's window stays up.
 
 The ordinary menus (`0x19431`) take a column, a top and an item count: the
@@ -594,7 +594,7 @@ the longest item (`0x262C8–0x262D2`), so they end at column 78.
 
 Menus (the shared picker, `0x1947A`), the townsperson's window (`0xB834`),
 and most fixed message windows open through `0xCB6C`. The vendor's text window
-(`0xE3AF`), the scenario panels (`0xD0F9`, `0xD197`) and the ship cards
+(`0xE3AF`), the story script panels (`0xD0F9`, `0xD197`) and the ship cards
 (`0x21514`, `0x219B2`, `0x21BF8`) are drawn directly, without a shadow.
 
 Style 1 is used by the crew list (`0x23C3B`), Change Job Duty (`0x2407E`,
@@ -632,53 +632,53 @@ the first row shown.
 The callers and their types: the title is `MENU.DAT` entry 47's item for
 the type.
 
-| Type | Title           | Callers                                                                                                         |
-| ---: | --------------- | --------------------------------------------------------------------------------------------------------------- |
-|    0 | Ship            | Ship Info (`0x22994`), Rearrange (`0x25D7D`), Moor's Store and Exchange, the Shipyard's lists, battle Info's ships (`0x102AD`) |
-|    1 | Goods           | Log of Goods (`0x222F8`)                                                                                        |
-|    2 | Ship            | Sell Goods (`0x2A8E0`)                                                                                          |
-|    3 | Enemy Fleet     | the sea's Battle command (`0x16267`)                                                                            |
-|    4 | Remaining Space | Buy Goods' ship choice (`0x29F87`)                                                                              |
-|    5 | Port            | Auto Sail (`0x36E24`)                                                                                           |
+| Type | Title           | Callers                                                                                                                                  |
+| ---: | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+|    0 | Ship            | Ship Info (`0x22994`), Rearrange (`0x25D7D`), Moor's Store and Exchange, the Shipyard's lists, battle Info's ships (`0x102AD`)           |
+|    1 | Goods           | Log of Goods (`0x222F8`)                                                                                                                 |
+|    2 | Ship            | Sell Goods (`0x2A8E0`)                                                                                                                   |
+|    3 | Enemy Fleet     | the sea's Battle command (`0x16267`)                                                                                                     |
+|    4 | Remaining Space | Buy Goods' ship choice (`0x29F87`)                                                                                                       |
+|    5 | Port            | Auto Sail (`0x36E24`)                                                                                                                    |
 |    6 | Mate            | Mate Info (`0x229B6`), the Pub and Lodge sailors, battle Info's mates and the other fleets' commanders (`0x10213`, `0x102C5`, `0x1032C`) |
-|    7 | Ship            | the fleet-wide crew assignment (`0x2B57B`)                                                                      |
-|    8 | Type of Goods   | `0x2AFC2`                                                                                                       |
-|    9 | Mate            | Change Captain and Change Job Duty (`0x24049`, `0x24212`), Wages (`0x26289`), Celestial Navigation (`0x2F71A`), `0x334C9` |
-|   10 | Ship            | repairs ashore (`0x39CB2`)                                                                                      |
-|   11 | Water           | loading water ashore (`0x3A17D`)                                                                                |
-|   12 | Commodore       | View and Gossip (`0x255E1`, `0x26224`)                                                                          |
-|   13 | Item            | Item (`0x2F98C`), the Item Shop (`0x2F9FB`, `0x2FB3B`), the Pub's gift (`0x2C8B7`), Locate (`0x33DF5`)          |
-|   14 | Ship Model      | New and Used Ship (`0x31B8B`, `0x31E56`), keeping captured ships (`0x157C9`)                                    |
-|   15 | Material        | the hull (`0x31ADC`)                                                                                            |
-|   16 | Figurehead      | `0x32101`                                                                                                       |
-|   17 | Guns            | `0x321DF`                                                                                                       |
-|   18 | Discovery Item  | Discovery (`0x22451`), the Pub's (`0x2C7AF`) and the Residence's (`0x336D1`) discovery lists                    |
-|   20 | Region          | the Item Shop (`0x2FD75`)                                                                                       |
+|    7 | Ship            | the fleet-wide crew assignment (`0x2B57B`)                                                                                               |
+|    8 | Type of Goods   | `0x2AFC2`                                                                                                                                |
+|    9 | Mate            | Change Captain and Change Job Duty (`0x24049`, `0x24212`), Wages (`0x26289`), Celestial Navigation (`0x2F71A`), `0x334C9`                |
+|   10 | Ship            | repairs ashore (`0x39CB2`)                                                                                                               |
+|   11 | Water           | loading water ashore (`0x3A17D`)                                                                                                         |
+|   12 | Commodore       | View and Gossip (`0x255E1`, `0x26224`)                                                                                                   |
+|   13 | Item            | Item (`0x2F98C`), the Item Shop (`0x2F9FB`, `0x2FB3B`), the Pub's gift (`0x2C8B7`), Locate (`0x33DF5`)                                   |
+|   14 | Ship Model      | New and Used Ship (`0x31B8B`, `0x31E56`), keeping captured ships (`0x157C9`)                                                             |
+|   15 | Material        | the hull (`0x31ADC`)                                                                                                                     |
+|   16 | Figurehead      | `0x32101`                                                                                                                                |
+|   17 | Guns            | `0x321DF`                                                                                                                                |
+|   18 | Discovery Item  | Discovery (`0x22451`), the Pub's (`0x2C7AF`) and the Residence's (`0x336D1`) discovery lists                                             |
+|   20 | Region          | the Item Shop (`0x2FD75`)                                                                                                                |
 
 The window (`0x19F6C`) is (columns + 4) × 8 pixels wide and rows × 16 + 40
 tall for the record's full row count, however few rows there are. It is
 filled with colour 7 (`0:0x906`) and framed with 8 × 8 tiles from
 `DATA1.014` (`0:0x3D2`), with `W` = columns + 2:
 
-| Tile (`DATA1.014`) | Place (column, y from the window's corner)              |
-| ------------------ | ------------------------------------------------------- |
-| `0x39A0`           | (0, 0)                                                  |
-| `0x39C0`           | (1 … W, 0)                                              |
-| `0x39E0`           | (W + 1, 0)                                              |
-| `0x3A00`           | (0, 8 … height − 16)                                    |
-| `0x3A20`           | (W + 1, 8)                                              |
-| `0x3A40`           | (0, 16)                                                 |
-| `0x3A60`           | (1 … W, 16); (1 … W − 2, height − 8)                    |
-| `0x3A80`           | (W + 1, 16)                                             |
-| `0x3AA0`           | (0, 24)                                                 |
-| `0x3AC0`           | (1 … W − 2, 24)                                         |
-| `0x3AE0`           | (W − 1, 24)                                             |
-| `0x3B00`           | (W − 1, 32 … height − 16)                               |
-| `0x3B20`           | (0, height − 8)                                         |
-| `0x3B40`           | (W − 1, height − 8)                                     |
-| `0x3B60`, `0x3B80` | (W, 40 … height − 24) and (W + 1, …): the scroll track  |
-| `0x3BA0` (16 × 16) | (W, 24): the up arrow                                   |
-| `0x3C20` (16 × 16) | (W, height − 16): the down arrow                        |
+| Tile (`DATA1.014`) | Place (column, y from the window's corner)             |
+| ------------------ | ------------------------------------------------------ |
+| `0x39A0`           | (0, 0)                                                 |
+| `0x39C0`           | (1 … W, 0)                                             |
+| `0x39E0`           | (W + 1, 0)                                             |
+| `0x3A00`           | (0, 8 … height − 16)                                   |
+| `0x3A20`           | (W + 1, 8)                                             |
+| `0x3A40`           | (0, 16)                                                |
+| `0x3A60`           | (1 … W, 16); (1 … W − 2, height − 8)                   |
+| `0x3A80`           | (W + 1, 16)                                            |
+| `0x3AA0`           | (0, 24)                                                |
+| `0x3AC0`           | (1 … W − 2, 24)                                        |
+| `0x3AE0`           | (W − 1, 24)                                            |
+| `0x3B00`           | (W − 1, 32 … height − 16)                              |
+| `0x3B20`           | (0, height − 8)                                        |
+| `0x3B40`           | (W − 1, height − 8)                                    |
+| `0x3B60`, `0x3B80` | (W, 40 … height − 24) and (W + 1, …): the scroll track |
+| `0x3BA0` (16 × 16) | (W, 24): the up arrow                                  |
+| `0x3C20` (16 × 16) | (W, height − 16): the down arrow                       |
 
 That makes a title strip 16 pixels tall over a divider, the text area, and a
 scroll bar two columns wide on the right. The title is `MENU.DAT` 47's entry
@@ -765,18 +765,18 @@ card at `0x2B3C6` (parchment and ship picture, `0x2B3FA`) and the Info tab's
 ship and fleet cards (`0x2295C`, `0x229FC`). The town loop sets its own palette again on return
 (`0x2049B`).
 
-| Records          | Shown                                                        | Palette                                               |
-| ---------------- | ------------------------------------------------------------ | ----------------------------------------------------- |
-| 0, 1, 22         | YES/NO, the number pad, the parchment (`FC4:0xB592`)          | whichever is up: town or sea, Info, battle            |
-| 2, 3             | the side panels at sea and in port                           | town or sea; Info inside the Harbor and Shipyard      |
-| 6–17, 20         | building vendors                                             | town time-of-day; Info in the Harbor and Shipyard     |
-| 23, 24           | the duel                                                     | battle (entries 0–7 only)                             |
-| 26, 53–56        | the battle panel and its ending pictures                     | battle                                                |
-| 27               | gambling                                                     | town (entries 0–7 only)                               |
-| 28–52            | ships: `0:0x7DE5` → `0:0x58B7` at record 28 + type            | Info in the Harbor, Shipyard and Fleet/Ship Info      |
-| 57, 59           | rats and scurvy at sea                                       | sea time-of-day (use entries 10 and 8)                |
-| 58, 61           | the Storm (`0x1F1D8`) and the game over (`0x1C936`)           | sea (entries 0–7 only)                                |
-| 64               | a discovery ashore (`0x3A6C3`)                                | sea time-of-day (uses 10, 11 and 15)                  |
+| Records   | Shown                                                | Palette                                           |
+| --------- | ---------------------------------------------------- | ------------------------------------------------- |
+| 0, 1, 22  | YES/NO, the number pad, the parchment (`FC4:0xB592`) | whichever is up: town or sea, Info, battle        |
+| 2, 3      | the side panels at sea and in port                   | town or sea; Info inside the Harbor and Shipyard  |
+| 6–17, 20  | building vendors                                     | town time-of-day; Info in the Harbor and Shipyard |
+| 23, 24    | the duel                                             | battle (entries 0–7 only)                         |
+| 26, 53–56 | the battle panel and its ending pictures             | battle                                            |
+| 27        | gambling                                             | town (entries 0–7 only)                           |
+| 28–52     | ships: `0:0x7DE5` → `0:0x58B7` at record 28 + type   | Info in the Harbor, Shipyard and Fleet/Ship Info  |
+| 57, 59    | rats and scurvy at sea                               | sea time-of-day (use entries 10 and 8)            |
+| 58, 61    | the Storm (`0x1F1D8`) and the game over (`0x1C936`)  | sea (entries 0–7 only)                            |
+| 64        | a discovery ashore (`0x3A6C3`)                       | sea time-of-day (uses 10, 11 and 15)              |
 
 ### Port music
 
@@ -785,7 +785,7 @@ ship and fleet cards (`0x2295C`, `0x229FC`). The town loop sets its own palette 
 `0x2066B–0x20672`): track = table entry + 0x0A. Ports 100 and up get 0x0F
 (`0x20661`, `0x20680`). It runs on entering a town (`0xE226`) and after every
 building visit (`0x20B22`), so the port track always returns after a Pub, a
-Palace or a scenario `CA`.
+Palace or a story script `CA`.
 
 | Track  | Market IDs    | Markets                                                        |
 | ------ | ------------- | -------------------------------------------------------------- |
@@ -829,7 +829,7 @@ Byte `+0x13` of the saved display record carries two discovery flags:
   Log of Goods only considers visited ports.
 - `0x20`: the lookout never sights a port with this bit or `0x10`
   (`0x36BF3`), so such a port becomes known only by entering it. João's and
-  Ernst's scenario scripts set it on Changan, Sakai, and Nagasaki.
+  Ernst's story scripts set it on Changan, Sakai, and Nagasaki.
 
 A new game starts with 11 ports visited: Lisbon, Seville, Istanbul, Marseille,
 Genoa, Venice, Athens, Alexandria, Bordeaux, London, and Amsterdam. Barcelona,

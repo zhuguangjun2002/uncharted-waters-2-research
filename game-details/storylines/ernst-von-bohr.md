@@ -1,6 +1,6 @@
-# Scenario 4: Ernst von Bohr
+# Ernst von Bohr's storyline
 
-Scenario 4 (`SNR4`) is Ernst's character story. It opens in Amsterdam, where
+Story script 4 (`SNR4`) holds Ernst's storyline. It opens in Amsterdam, where
 the geographer Mercator funds Ernst's expedition and grants him a cartographer
 contract. After that the story advances through four Adventure Fame
 milestones: Paula joins, two sections of travel conversations follow, and the
@@ -9,13 +9,13 @@ ending in Changan. The story has no scripted naval battles, duels, voyage-day
 events, or clock and calendar gates. Its only recurring penalty is Mercator's
 reaction when Ernst holds another cartographer's contract.
 
-This document describes the scenario from the player's point of view. It is
+This document describes the storyline from the player's point of view. It is
 based on the decoded `SNR4.DAT` route tables and dialogue and on the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md).
-Where a condition is evaluated by `MAIN.EXE` rather than by the scenario
+Where a condition is evaluated by `MAIN.EXE` rather than by the story script
 bytecode, the text cites the executable routine.
 
-Evidence labels have the meanings defined in [the scenario README](./README.md).
+Evidence labels have the meanings defined in [the storylines README](./README.md).
 Unless a statement is labeled otherwise, it is **decoded**.
 
 ## Story and threshold map
@@ -47,7 +47,7 @@ No route in `SNR4.DAT` uses the at-sea selector `0xA0` or the before- and
 after-battle selectors `0xA1`/`0xA2`. Only Mercator's shop and the Harbor have
 story routes in sections 1–3. Section 4 later adds a wildcard route for the
 other buildings of the East Asian ports and specific routes for Changan.
-Scenario services which are not mentioned below normally retain their
+Story script services which are not mentioned below normally retain their
 ordinary game behavior. The tables describe the extra story behavior layered
 onto them.
 
@@ -122,7 +122,7 @@ not undone.
 Signing with another cartographer and never visiting Mercator again does not
 trigger the penalty. The accusation runs only when Ernst enters Mercator's shop.
 
-The shared scenario cannot suppress this route. The protagonist dispatch is
+The shared story script cannot suppress this route. The protagonist dispatch is
 skipped only when a shared `SNR0` route has set variable 63 first
 (`MAIN.EXE 0x20A32`). The only shared route that can match Amsterdam's special
 building is the idle section-0 wildcard `0xA3FF` (`SNR0.DAT 0x0306–0x0432`),
@@ -185,7 +185,7 @@ the premises.” (`MAIN.EXE 0x30A1E–0x30A5C`).
 | Market, Pub, Shipyard, Lodge, Guild, and Item Shop | The wildcard route `0x21FF` has the building speaker call Ernst “Professor” and say that Mercator was looking for him and will be waiting at his shop. Ernst is ejected (`F8`). | No route; ordinary behavior.                                                                 |
 | Palace, Church, Bank, and House of Fortune         | Explicit no-op routes (`0x0228–0x022B`, each a lone `F2`) keep them out of the wildcard route. Ordinary behavior.                                                               | No route; ordinary behavior.                                                                 |
 
-The wildcard reminder also sets scenario flag 0 (`0x0250`). No section-0 route
+The wildcard reminder also sets story script flag 0 (`0x0250`). No section-0 route
 tests that flag, and the section change clears it, so it has no effect.
 
 Until the Harbor scene, Mercator's shop itself is not usable. Its route in the
@@ -236,7 +236,7 @@ general route like any other port.
 |       3 |    1 | Ernst regrets not finding Paula's homeland; Hans teases that the Captain would like her to stay.  |
 |       3 |    2 | Paula lists the colors of the seas; Ernst asks Hans whether he has a dream.                       |
 
-The draw uses the protagonist-scenario seed rebuilt before each dispatch
+The draw uses the protagonist-story-script seed rebuilt before each dispatch
 (`MAIN.EXE 0x3914A`) from the saved date, time of day, and Ernst's navigation
 level and experience. It is therefore deterministic for a given saved state,
 not a fresh unpredictable roll. Since each building visit advances the clock,
@@ -377,7 +377,7 @@ clears the bit in stages:[^ernst-ports]
 
 None of these writes sets the known bit `0x10`. Each clue makes the port
 eligible for ordinary sighting, but Ernst must still find it. As in João's
-scenario, the final mask is broader than a pure `0x20` clear. It also clears
+story script, the final mask is broader than a pure `0x20` clear. It also clears
 the low four bits, which include the cached controlling-nation index. Changan's
 index then reads 0, Portugal, so anything that reads the cache counts Changan
 as Portuguese: Lisbon's Palace, for example, lists it under the Far East with

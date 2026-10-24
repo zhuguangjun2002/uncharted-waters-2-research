@@ -18,7 +18,7 @@ No investigation is open. The remaining gaps are the accepted
 [known limitations](#known-limitations).
 
 All ordinary building command groups have save-aware resolvers, every
-reachable scenario opcode is decoded, and every prediction that was checked in
+reachable story script opcode is decoded, and every prediction that was checked in
 play matched. Completed building mechanics are documented in
 [buildings](../game-details/buildings.md) and [ships](../game-details/ships.md).
 
@@ -97,7 +97,7 @@ These are accepted and not planned to be solved:
   and every choice prompt advances it for as long as the player hesitates
   ([General RNG consumption](../game-details/townspeople.md#general-rng-consumption)).
 
-## 2. Scenario-VM state and effects
+## 2. Story script-VM state and effects
 
 ### Known
 
@@ -123,7 +123,7 @@ In brief:
   royal-mission messages from `MESSAGE.DAT` (941–957).
 - `E2`/`E3` load, count, or transfer goods; `E4` sets gold; `E6`/`E7` add and
   deduct gold; `EA` reads Gold Ingots; `EE` reads free cargo space.
-- `EB` draws from the scenario RNG, `EC` restores it from a variable, and `ED`
+- `EB` draws from the story script RNG, `EC` restores it from a variable, and `ED`
   saves it into one.
 - `F4 <ending>` plays a protagonist's ending and exits to `END.EXE`.
 - `F9 <type>` starts a pending ship, `FA <mes>` commissions and names it, and
@@ -167,9 +167,9 @@ The following no longer need entries in this tracker:
 - ordinary building, voyage-day, battle, and Palace-audience route contexts;
 - shared `SNR0` message invocation and save-aware transcript selection;
 - dialogue-panel positions, portrait lifetime, and `C4`;
-- music IDs and selection through scenario action `CA`;
-- event-art selection through scenario action `CB`;
-- every reachable scenario action opcode and `D0`/`DC` record group;
+- music IDs and selection through story script action `CA`;
+- event-art selection through story script action `CB`;
+- every reachable story script action opcode and `D0`/`DC` record group;
 - the meanings of the record fields those scripts read and write;
 - the general RNG's initialization, persistence, and unpredictability from a
   save, including the choice prompt that advances it while waiting for input

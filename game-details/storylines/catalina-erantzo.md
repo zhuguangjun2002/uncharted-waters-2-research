@@ -1,19 +1,19 @@
-# Scenario 2: Catalina Erantzo
+# Catalina Erantzo's storyline
 
-Scenario 2 (`SNR2`) is Catalina's character story. It opens with a fixed
+Story script 2 (`SNR2`) holds Catalina's storyline. It opens with a fixed
 sequence in Seville that ends in her mutiny, then advances through seven further
 sections. Six of them are gated by **Piracy Fame** milestones; section 5 follows
 directly from the end of section 4's search. Each milestone opens another chain
 of building, voyage-day, or battle events; reaching a later Fame value does not
 skip the active chain.
 
-This document describes the scenario from the player's point of view. It is
+This document describes the storyline from the player's point of view. It is
 based on the decoded `SNR2.DAT` route tables and dialogue and on the
 [reverse-engineering notes](../../dialog-system/scripts/REVERSE_ENGINEERING.md).
-Where a condition is evaluated by `MAIN.EXE` rather than by the scenario
+Where a condition is evaluated by `MAIN.EXE` rather than by the story script
 bytecode, the text cites the executable routine.
 
-Evidence labels have the meanings defined in [the scenario README](./README.md).
+Evidence labels have the meanings defined in [the storylines README](./README.md).
 
 ## Story and threshold map
 
@@ -32,7 +32,7 @@ The thresholds compare **Piracy Fame**, the word at `+2` of Catalina's 14-byte
 Fame/Friendship record, not total Fame. Every gate except the 2,000 Pub
 comparison in section 2 also requires Pirate affiliation: the low nibble of
 Catalina's sailor byte `+0x29` must be `6`, the value written by the mutiny.
-There is no 4,000 comparison. The scenario itself awards no Piracy Fame;
+There is no 4,000 comparison. The story script itself awards no Piracy Fame;
 Catalina must earn it through ordinary naval victories or shared quests.
 
 The gate is only one part of each trigger:
@@ -49,7 +49,7 @@ The gate is only one part of each trigger:
   than Lisbon's Franco home and Pub.
 - 30,000 is tested on **voyage day 5**.
 
-Scenario services which are not mentioned below normally retain their ordinary
+Story script services which are not mentioned below normally retain their ordinary
 game behavior. The tables describe the extra story behavior layered onto them.
 In most stages after the mutiny, Lisbon's special building, the Franco home, has
 an explicit route in which Emilio or Andreas warns Catalina away and ejects her.
@@ -90,8 +90,8 @@ After the Pub rumor, the Shipyard says it is closing and ejects her, and the
 Guild gives gossip that a Portuguese attacked the Spanish fleet and ejects her.
 Other ordinary buildings and the Harbor keep their ordinary behavior.
 
-The `random(2)` roll uses the scenario RNG described in
-[João's scenario](./scenario-1-joao-franco.md#lisbon-building-behavior-during-preparation):
+The `random(2)` roll uses the story script RNG described in
+[João's storyline](./joao-franco.md#lisbon-building-behavior-during-preparation):
 the selection is deterministic for the saved state and time of day.
 
 [^saber]:
@@ -124,7 +124,7 @@ The Harbor scene sets up Catalina's new career:[^rebel]
 - The subsection advances.
 
 Set sail. On **voyage day 1**, Catalina's personal Friendship with Spain is set
-to its minimum, displayed as −100, and the scenario advances to section 1. No
+to its minimum, displayed as −100, and the story script advances to section 1. No
 building route exists in this last subsection.
 
 [^rebel]:
@@ -153,7 +153,7 @@ building route exists in this last subsection.
 | First skirmish          | Encounter any of fleets 15–19.                                                                      | Before-battle scene: “So this is just a preliminary skirmish.” The Fight/Flee/Surrender prompt is skipped and the subsection advances.                             |
 | Ezequiel's ultimatum    | Finish that battle without being defeated.                                                          | After-battle scene: the _Santa Cruz_ signals an offer of pardon; Emilio urges flight. The subsection advances.                                                     |
 | Second battle           | Encounter any of fleets 15–19 again.                                                                | Catalina refuses to give in. The prompt is again skipped and the subsection advances.                                                                              |
-| Andreas saves the fleet | Finish that battle without being defeated.                                                          | Andreas sets fire to the Spanish line, is pulled from the water, and joins. The pursuit fleets are sent home and the scenario advances to section 2.               |
+| Andreas saves the fleet | Finish that battle without being defeated.                                                          | Andreas sets fire to the Spanish line, is pulled from the water, and joins. The pursuit fleets are sent home and the story script advances to section 2.           |
 
 The 1-Fame comparison is literally `1`, not 1,000. At 0 Fame the route ends
 silently. Seville is excluded by an explicit port test, and the Palace and Meet
@@ -207,7 +207,7 @@ left alone.
     Protagonist before-battle routes are dispatched at `MAIN.EXE 0x150E5`. If a
     route matched and its interaction-control word comes back zero (the effect
     of `F8`), `0x150FD` records battle code 8, a cancelled battle. The end-of-battle diplomacy still runs against the opponent ([Cancelled battles](../naval-battle.md#cancelled-battles)). When either
-    scenario's variable 63 is nonzero (`0x15121–0x1512D`), the call to
+    story script's variable 63 is nonzero (`0x15121–0x1512D`), the call to
     `0x1507B`, which offers Fight, Flee, or Surrender, is skipped. Scripts set
     variable 63 with `0C 3F 0001`. After-battle routes are dispatched at
     `0x16191–0x161A2`; the path is skipped only when a defeat has set game mode
@@ -653,7 +653,7 @@ changed, and João's fleet keeps objective 10.
 
 ## Engine notes
 
-These executable details, decoded outside the scenario program, explain behavior described above.
+These executable details, decoded outside the story script program, explain behavior described above.
 
 - **Route word `0x4000`.** Writing exactly `0x4000` to fleet word `+0x0C`
   clears the cached route and waypoint and marks the route as needing a

@@ -4,19 +4,19 @@ import { join } from "node:path";
 import test from "node:test";
 
 import { repoRoot } from "../../scripts/shared.js";
-import { analyzeScenarioVmExecutable } from "./main-exe.js";
-import { disassembleScenario } from "./snr.js";
+import { analyzeStoryScriptVmExecutable } from "./main-exe.js";
+import { disassembleStoryScript } from "./snr.js";
 
-async function readScenario(id: number) {
-  return disassembleScenario(
+async function readStoryScript(id: number) {
+  return disassembleStoryScript(
     id,
     await readFile(join(repoRoot, `raw/SNR${id}.DAT`)),
     await readFile(join(repoRoot, `raw/SNR${id}.MES`)),
   );
 }
 
-test("MAIN.EXE exposes the scenario loader and four-family VM dispatch", async () => {
-  const analysis = analyzeScenarioVmExecutable(
+test("MAIN.EXE exposes the story script loader and four-family VM dispatch", async () => {
+  const analysis = analyzeStoryScriptVmExecutable(
     await readFile(join(repoRoot, "raw/MAIN.EXE")),
   );
   assert.equal(
@@ -82,9 +82,9 @@ test("MAIN.EXE exposes the scenario loader and four-family VM dispatch", async (
   });
   assert.deepEqual(analysis.musicSelection, {
     driver: "0000:952E",
-    scenarioActionHandlerOffset: 0x38d20,
-    scenarioWrapperOffset: 0x37980,
-    scenarioDriverCallOffset: 0x37984,
+    storyScriptActionHandlerOffset: 0x38d20,
+    storyScriptWrapperOffset: 0x37980,
+    storyScriptDriverCallOffset: 0x37984,
     portRegionDriverCallOffset: 0x20682,
     ordinaryBuildingDriverCallOffset: 0x20a0e,
     pubTrackId: 0x13,
@@ -102,11 +102,11 @@ test("MAIN.EXE exposes the scenario loader and four-family VM dispatch", async (
     townClockAddOffset: 0x204a5,
     portArrivalIncrementOffset: 0x20521,
   });
-  assert.deepEqual(analysis.menuCommandScenarioDispatch, {
+  assert.deepEqual(analysis.menuCommandStoryScriptDispatch, {
     jobAssignment: {
       handlerOffset: 0x32e70,
       dispatchOffset: 0x32f72,
-      scenario: "shared",
+      storyScript: "shared",
       selectorSource: "DS:0x0E32 current port",
       qualifier: "0x06 Guild",
     },
@@ -114,7 +114,7 @@ test("MAIN.EXE exposes the scenario loader and four-family VM dispatch", async (
       commandHandlerOffset: 0x2bc8d,
       handlerStartOffset: 0x2bafa,
       handlerEndOffset: 0x2bc8c,
-      scenarioDispatch: "none",
+      storyScriptDispatch: "none",
       royalInvitationFlagWriteOffset: 0x2bbcd,
     },
     meetRuler: {
@@ -122,19 +122,19 @@ test("MAIN.EXE exposes the scenario loader and four-family VM dispatch", async (
       calls: [
         {
           offset: 0x30482,
-          scenario: "shared",
+          storyScript: "shared",
           selectorSource: "DS:0x0E32 current port",
           qualifier: "0x05 Palace",
         },
         {
           offset: 0x3048c,
-          scenario: "protagonist",
+          storyScript: "protagonist",
           selectorSource: "DS:0x0E32 current port",
           qualifier: "0x15 Palace audience",
         },
         {
           offset: 0x3049d,
-          scenario: "shared",
+          storyScript: "shared",
           selectorSource: "DS:0x0E32 current port",
           qualifier: "0x15 Palace audience",
         },
@@ -191,11 +191,11 @@ test("MAIN.EXE exposes the scenario loader and four-family VM dispatch", async (
 });
 
 test("disassembles João's building dialogue and one-shot state writes", async () => {
-  const scenario = await readScenario(1);
-  assert.equal(scenario.messages.length, 1189);
-  assert.equal(scenario.sections.length, 6);
+  const storyScript = await readStoryScript(1);
+  assert.equal(storyScript.messages.length, 1189);
+  assert.equal(storyScript.sections.length, 6);
 
-  const opening = scenario.sections[0]!;
+  const opening = storyScript.sections[0]!;
   assert.deepEqual(
     opening.routes.map((route) => [
       route.key,
@@ -280,7 +280,7 @@ test("disassembles João's building dialogue and one-shot state writes", async (
     rawHex: "c4",
   });
 
-  const princeKidnapping = scenario.sections[1]!;
+  const princeKidnapping = storyScript.sections[1]!;
   const anyPortHarbor = princeKidnapping.routes.find(
     (route) => route.key === 0xa303,
   )!;
@@ -348,7 +348,7 @@ test("disassembles João's building dialogue and one-shot state writes", async (
       [0x0fff, 60, "e83c"],
     ],
   );
-  const otto = await readScenario(3);
+  const otto = await readStoryScript(3);
   assert.deepEqual(
     otto.sections.flatMap((section) => section.duelStartCandidates),
     [{ offset: 0x0284, opponentSailorId: 75, rawHex: "e84b" }],
@@ -370,7 +370,7 @@ test("disassembles João's building dialogue and one-shot state writes", async (
   );
 
   const eventArtCalls = (
-    await Promise.all([1, 2, 3, 4, 5, 6].map(readScenario))
+    await Promise.all([1, 2, 3, 4, 5, 6].map(readStoryScript))
   )
     .flatMap((candidate) => candidate.sections)
     .flatMap((section) => section.eventArtCandidates);
@@ -380,7 +380,7 @@ test("disassembles João's building dialogue and one-shot state writes", async (
     ["112,24"],
   );
 
-  const navalBattleRoutes = scenario.sections[2]!.entryRouteTables.flatMap(
+  const navalBattleRoutes = storyScript.sections[2]!.entryRouteTables.flatMap(
     (table) => table.routes,
   ).filter((route) => route.key === 0xa101 || route.key === 0xa201);
   assert.deepEqual(
@@ -410,7 +410,7 @@ test("disassembles João's building dialogue and one-shot state writes", async (
   );
 
   const antonioRoute = (
-    await readScenario(2)
+    await readStoryScript(2)
   ).sections[5]!.entryRouteTables.flatMap((table) => table.routes).find(
     (route) => route.key === 0xa13c,
   )!;
@@ -420,16 +420,16 @@ test("disassembles João's building dialogue and one-shot state writes", async (
   );
 });
 
-test("identifies every naturally occurring scenario music cue", async () => {
-  const scenarios = await Promise.all(
-    Array.from({ length: 7 }, (_, id) => readScenario(id)),
+test("identifies every naturally occurring story script music cue", async () => {
+  const storyScripts = await Promise.all(
+    Array.from({ length: 7 }, (_, id) => readStoryScript(id)),
   );
-  const allCues = scenarios.flatMap((scenario) =>
-    scenario.sections.flatMap((section) => section.musicCueCandidates),
+  const allCues = storyScripts.flatMap((storyScript) =>
+    storyScript.sections.flatMap((section) => section.musicCueCandidates),
   );
   assert.equal(allCues.filter((cue) => cue.knownTrack === undefined).length, 0);
 
-  const catalina = scenarios[2]!;
+  const catalina = storyScripts[2]!;
   const cues = catalina.sections.flatMap((section) =>
     section.musicCueCandidates.map((cue) => [cue.offset, cue.knownTrack]),
   );
@@ -455,13 +455,13 @@ test("identifies every naturally occurring scenario music cue", async () => {
 });
 
 test("sequential VM decoding follows table-relative control flow", async () => {
-  const scenarios = await Promise.all(
-    Array.from({ length: 7 }, (_, id) => readScenario(id)),
+  const storyScripts = await Promise.all(
+    Array.from({ length: 7 }, (_, id) => readStoryScript(id)),
   );
 
   const actionMnemonic = (opcode: number) =>
-    scenarios
-      .flatMap((scenario) => scenario.sections)
+    storyScripts
+      .flatMap((storyScript) => storyScript.sections)
       .flatMap((section) => section.instructions)
       .find((instruction) => instruction.opcode === opcode)?.mnemonic;
   assert.deepEqual(
@@ -478,14 +478,14 @@ test("sequential VM decoding follows table-relative control flow", async () => {
     ],
   );
 
-  for (const scenario of scenarios)
-    for (const section of scenario.sections) {
+  for (const storyScript of storyScripts)
+    for (const section of storyScript.sections) {
       assert.equal(
         section.instructions.some(
           (instruction) => instruction.kind === "invalid",
         ),
         false,
-        `scenario ${scenario.scenarioId}, section ${section.id}`,
+        `story script ${storyScript.storyScriptId}, section ${section.id}`,
       );
       const instructionOffsets = new Set(
         section.instructions.map((instruction) => instruction.offset),
@@ -498,7 +498,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
         );
     }
 
-  const opening = scenarios[1]!.sections[0]!;
+  const opening = storyScripts[1]!.sections[0]!;
   assert.deepEqual(
     opening.instructions
       .filter(
@@ -517,7 +517,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
     ],
   );
 
-  const joaoAfterTrial = scenarios[1]!.sections[1]!.dialogueRuns.flatMap(
+  const joaoAfterTrial = storyScripts[1]!.sections[1]!.dialogueRuns.flatMap(
     (run) => run.lines,
   ).find((line) => line.messageId === 309);
   assert.deepEqual(joaoAfterTrial, {
@@ -530,7 +530,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
     choiceFlag: 16,
     rawHex: "c001cc0012c80135e910",
   });
-  const sharedCourierLines = scenarios[0]!.sections[7]!.dialogueRuns.flatMap(
+  const sharedCourierLines = storyScripts[0]!.sections[7]!.dialogueRuns.flatMap(
     (run) => run.lines,
   );
   assert.deepEqual(
@@ -551,7 +551,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
       [0x1c49, 1, undefined, 51, "c001cd33c800adc7"],
     ],
   );
-  const sharedGuildOffer = scenarios[0]!.sections[0]!.dialogueRuns.flatMap(
+  const sharedGuildOffer = storyScripts[0]!.sections[0]!.dialogueRuns.flatMap(
     (run) => run.lines,
   ).find((line) => line.messageId === 1);
   assert.deepEqual(sharedGuildOffer, {
@@ -565,7 +565,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
     choiceFlag: 0,
     rawHex: "c000c80000c80001e900",
   });
-  const sharedNoCargoSpace = scenarios[0]!.sections[1]!.dialogueRuns.flatMap(
+  const sharedNoCargoSpace = storyScripts[0]!.sections[1]!.dialogueRuns.flatMap(
     (run) => run.lines,
   ).find((line) => line.messageId === 13);
   assert.deepEqual(sharedNoCargoSpace, {
@@ -577,7 +577,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
     speakerLabel: "Head Trader",
     rawHex: "c000c8000cc8000dc7",
   });
-  const sharedLines = scenarios[0]!.sections.flatMap((section) =>
+  const sharedLines = storyScripts[0]!.sections.flatMap((section) =>
     section.dialogueRuns.flatMap((run) => run.lines),
   );
   const accountedSharedMessageIds = new Set<number>();
@@ -648,7 +648,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
     ],
   );
   assert.deepEqual(
-    scenarios[0]!.sections[1]!.instructions.find(
+    storyScripts[0]!.sections[1]!.instructions.find(
       (instruction) => instruction.offset === 0x0a26,
     ),
     {
@@ -689,7 +689,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
     ],
   );
 
-  const nested = scenarios[1]!.sections[1]!.instructions.find(
+  const nested = storyScripts[1]!.sections[1]!.instructions.find(
     (instruction) => instruction.offset === 0x0a26,
   );
   assert.deepEqual(
@@ -697,7 +697,7 @@ test("sequential VM decoding follows table-relative control flow", async () => {
     [0x09f4, 0x0a2e],
   );
   assert.deepEqual(
-    scenarios[1]!.sections[1]!.instructions.filter(
+    storyScripts[1]!.sections[1]!.instructions.filter(
       (instruction) =>
         instruction.offset === 0x09e9 || instruction.offset === 0x09ed,
     ).map((instruction) => [instruction.mnemonic, instruction.rawHex]),
@@ -709,8 +709,8 @@ test("sequential VM decoding follows table-relative control flow", async () => {
 });
 
 test("finds João's explicit fame thresholds", async () => {
-  const scenario = await readScenario(1);
-  const checks = scenario.sections.flatMap((section) => section.fameChecks);
+  const storyScript = await readStoryScript(1);
+  const checks = storyScript.sections.flatMap((section) => section.fameChecks);
   assert.deepEqual(
     [...new Set(checks.map((check) => check.threshold))],
     [2_000, 8_000, 16_000, 30_000, 40_000],

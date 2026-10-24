@@ -3,7 +3,7 @@
 Features, art, text, and data that are in the game's files but that the
 game never uses or that cannot be reached: cut or scrapped content, unused
 duplicates, and placeholders. Every entry is settled from the executable,
-the data files, or the scenario bytecode; entries marked "already
+the data files, or the story script bytecode; entries marked "already
 documented" link to the page that covers them in full.
 
 ## At a glance
@@ -68,7 +68,7 @@ record. How a record is stored and drawn is in [Pictures](pictures.md). All
 The vendor routine's building index comes from the building-entry routine
 (`0x209F5`, the building under the player, 0–11; the dispatcher rejects
 anything above 11 at `0x20965`), from fixed values in building handlers
-(`0x2D322` and others), and from `DS:0xBC7A`, which the scenario route
+(`0x2D322` and others), and from `DS:0xBC7A`, which the story script route
 matchers set to the current building (`0x39096`, `0x3912F`, `0x391D7`,
 `0x39282`). It can therefore produce only 6–17 and 20. The remaining draw at
 `0x379C6` reads the `EVENTn.DAT` files (`C:EVENT*.DAT` at `DS:0x0C02`), not
@@ -144,7 +144,7 @@ In short:
 - Several code paths and data records are present but unreachable: officer
   lookup routines nobody calls, three fleet item bytes nobody reads, two
   anomaly regions that never fire, an unlinked navigation node, residences
-  with no occupant, and a handful of scenario lines and routes.
+  with no occupant, and a handful of story script lines and routes.
 
 ### Placeholder messages
 
@@ -210,7 +210,7 @@ the message is a constant, and none of those constants is 241, 1,028, or
 | Values set by the caller           | `0x1C992`/`0x1C9E7` (1,013–1,016), `0x1E139` (572/574), `0x1EC3D` (340–351, from callers passing 340, 344, 348), `0x1F21F` (350–381), `0x2B0F5`/`0x2F89D`/`0x33EF8` (128/129), `0x33EE8` (126/127)                                                                                                                                                                              | as listed                                                                       |
 | Generated lists                    | `0x36A51` (`(selector + 255) × 2 + 0 or 1`, selector a byte: 510–1,021); list renderer 20 of the chooser table at `DS:0xA5E0` (`0x19DF7`: 465 + region)                                                                                                                                                                                                                         | 465–472, 510–1,021                                                              |
 
-None of these can produce 241, 1,028, or 1,029. Scenario scripts show general
+None of these can produce 241, 1,028, or 1,029. Story scripts show general
 messages only through `D9`, whose nine formatters use 941–957
 ([`D9`](../dialog-system/scripts/REVERSE_ENGINEERING.md)).
 
@@ -239,9 +239,9 @@ belong to the same earlier design.
 - **Pub attendant lines 307 and 308** and the non-Carlotta Lisbon greeting
   depend on protagonist byte `+0x29` bit `0x10`, which nothing sets
   (`0x2D3A6–0x2D3B8`; [Waitresses](waitresses.md)).
-- **Ladia's lines 425–428** in Ali's story need scenario flag 1, which no
+- **Ladia's lines 425–428** in Ali's story need story script flag 1, which no
   route sets in that subsection and no executable routine writes
-  ([Ali](scenarios/scenario-6-ali-vezas.md)).
+  ([Ali](storylines/ali-vezas.md)).
 - **The supply-port welcome, message 578** ("Welcome to %s! It's nice to
   have visitors from abroad."), is the waving man's line when the port ID is
   100 or higher (`0xB8F7–0xB906`). At a supply port the waving man stands on
@@ -260,7 +260,7 @@ port's three regular and one secret item bytes
 ([Port metadata](ports.md)); fleets carry items 50–69 as spoils
 ([Gold and items](naval-battle.md#gold-and-items)); the royal special search
 uses maps 80–86 and treasures 90–96
-([Royal missions](scenarios/scenario-0-common-quests-and-royal-missions.md)); the stories hand
+([Royal missions](storylines/common-quests-and-royal-missions.md)); the stories hand
 out the Saber, the Royal Crown, the Medallion Map, the Map of Staff, the Gold
 Medallion, and Poseidon's Staff.
 
@@ -284,7 +284,7 @@ else. The records outside every source are:
 
 - **Hair tonics (70–72).** Price 0, type 13 like the royal treasures, and
   the Balm's picture slice (22). No code compares an inventory slot with
-  `0x46`–`0x48`, no story document grants them, and no general or scenario
+  `0x46`–`0x48`, no story document grants them, and no general or story script
   message mentions a hair tonic. Count Morie's only collector behaviour is
   the ordinary Contract, Discovery, and Rumor menu
   ([Collector and cartographer dialogue](buildings.md#collector-and-cartographer-dialogue)).
@@ -386,14 +386,14 @@ never into combat, and no item of either type exists.
   they only say “Commodore, this building is locked” unless a wider story
   route plays; Timbuktu's is never reached by any route
   ([Story residences](buildings.md#story-residences)).
-- **Scenario leftovers.** Section 0's Palace route repeats the Transport
+- **Story script leftovers.** Section 0's Palace route repeats the Transport
   Goods offer's port computation and its results are never read
-  ([Design notes](scenarios/scenario-0-common-quests-and-royal-missions.md#design-notes));
+  ([Design notes](storylines/common-quests-and-royal-missions.md#design-notes));
   Ernst's section-0 wildcard reminder sets flag 0, which nothing tests
-  ([Ernst](scenarios/scenario-4-ernst-von-bohr.md)); the section advances
+  ([Ernst](storylines/ernst-von-bohr.md)); the section advances
   after `F4` (program exit) in Pietro's and Ernst's endings are never reached
-  ([Pietro](scenarios/scenario-5-pietro-conti.md),
-  [Ernst](scenarios/scenario-4-ernst-von-bohr.md)).
+  ([Pietro](storylines/pietro-conti.md),
+  [Ernst](storylines/ernst-von-bohr.md)).
 
 ## The opening and the endings
 

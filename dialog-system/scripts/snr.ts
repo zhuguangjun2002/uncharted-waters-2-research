@@ -1,4 +1,4 @@
-export interface ScenarioMessage {
+export interface StoryScriptMessage {
   readonly id: number;
   readonly body: string;
   readonly speakerLabel?: string;
@@ -13,7 +13,7 @@ export interface DialogueLine {
   readonly speakerMessageId?: number;
   readonly messageId: number;
   /**
-   * Present for executable text shown by a scenario action such as `D9`; the
+   * Present for executable text shown by a story script action such as `D9`; the
    * combined general-message index replaces the `SNR*.MES` message.
    */
   readonly generalMessageIndex?: number;
@@ -35,15 +35,15 @@ export interface DialogueRun {
   readonly lines: readonly DialogueLine[];
 }
 
-export type ScenarioInstructionKind =
+export type StoryScriptInstructionKind =
   "assignment" | "arithmetic" | "conditional-branch" | "action" | "invalid";
 
-export interface ScenarioInstruction {
+export interface StoryScriptInstruction {
   readonly offset: number;
   readonly endOffset: number;
   readonly opcode: number;
   readonly opcodeHex: string;
-  readonly kind: ScenarioInstructionKind;
+  readonly kind: StoryScriptInstructionKind;
   readonly mnemonic: string;
   readonly rawHex: string;
   readonly destinationBaseOffset: number;
@@ -52,13 +52,13 @@ export interface ScenarioInstruction {
   readonly terminal: boolean;
 }
 
-export interface ScenarioControlFlowEdge {
+export interface StoryScriptControlFlowEdge {
   readonly from: number;
   readonly to: number;
   readonly type: "fallthrough" | "branch";
 }
 
-export interface ScenarioRoute {
+export interface StoryScriptRoute {
   readonly key: number;
   readonly keyHex: string;
   readonly selector: number;
@@ -77,9 +77,9 @@ export interface ScenarioRoute {
   readonly knownEvent?: KnownRouteEvent;
 }
 
-export interface ScenarioEntryRouteTable {
+export interface StoryScriptEntryRouteTable {
   readonly offset: number;
-  readonly routes: readonly ScenarioRoute[];
+  readonly routes: readonly StoryScriptRoute[];
 }
 
 export type KnownLocation =
@@ -129,7 +129,7 @@ export type KnownMusicTrack =
   | "game-over-theme" // Defeated
   | "fanfare"; // Victory in a Naval Battle
 
-export interface ScenarioSection {
+export interface StoryScriptSection {
   readonly id: number;
   readonly offset: number;
   readonly endOffset: number;
@@ -140,8 +140,8 @@ export interface ScenarioSection {
    */
   readonly destinationBaseOffset: number;
   readonly entryOffsets: readonly number[];
-  readonly routes: readonly ScenarioRoute[];
-  readonly entryRouteTables: readonly ScenarioEntryRouteTable[];
+  readonly routes: readonly StoryScriptRoute[];
+  readonly entryRouteTables: readonly StoryScriptEntryRouteTable[];
   readonly dialogueRuns: readonly DialogueRun[];
   readonly booleanStateWrites: readonly {
     offset: number;
@@ -188,15 +188,15 @@ export interface ScenarioSection {
     extractedAsset: string;
     rawHex: string;
   }[];
-  readonly instructions: readonly ScenarioInstruction[];
-  readonly controlFlowEdges: readonly ScenarioControlFlowEdge[];
+  readonly instructions: readonly StoryScriptInstruction[];
+  readonly controlFlowEdges: readonly StoryScriptControlFlowEdge[];
   readonly rawHex: string;
 }
 
-export interface DisassembledScenario {
-  readonly scenarioId: number;
-  readonly messages: readonly ScenarioMessage[];
-  readonly sections: readonly ScenarioSection[];
+export interface DisassembledStoryScript {
+  readonly storyScriptId: number;
+  readonly messages: readonly StoryScriptMessage[];
+  readonly sections: readonly StoryScriptSection[];
 }
 
 const KNOWN_LOCATIONS = new Map<number, KnownLocation>([
@@ -253,7 +253,7 @@ function formatBody(body: string): string {
   return body.replace(/\|.*?\|\n/g, "").replaceAll("'", "’");
 }
 
-export function readScenarioMessages(data: Buffer): ScenarioMessage[] {
+export function readStoryScriptMessages(data: Buffer): StoryScriptMessage[] {
   if (data.length < 4) throw new Error("SNR message table is too short");
   const firstOffset = data.readUInt32BE(0);
   if (firstOffset < 4 || firstOffset > data.length || firstOffset % 4 !== 0)
@@ -298,7 +298,7 @@ function readSectionOffsets(data: Buffer): number[] {
 function readDialogueLine(
   data: Buffer,
   offset: number,
-  messages: readonly ScenarioMessage[],
+  messages: readonly StoryScriptMessage[],
 ): { line: DialogueLine; length: number } | undefined {
   let length: number;
   let position: number;
@@ -410,7 +410,7 @@ function readDialogueRuns(
   data: Buffer,
   start: number,
   end: number,
-  messages: readonly ScenarioMessage[],
+  messages: readonly StoryScriptMessage[],
 ): DialogueRun[] {
   const runs: DialogueRun[] = [];
   let current: DialogueLine[] = [];
@@ -445,7 +445,7 @@ function readSectionHeader(
   start: number,
   end: number,
 ): Pick<
-  ScenarioSection,
+  StoryScriptSection,
   "entryOffsets" | "routes" | "codeOffset" | "destinationBaseOffset"
 > {
   const headerLength = data.readUInt16BE(start);
@@ -467,7 +467,7 @@ function readSectionHeader(
   for (let cursor = start + 2; cursor < firstTableEnd - 2; cursor += 2)
     entryOffsets.push(start + data.readUInt16BE(cursor));
 
-  const routes: ScenarioSection["routes"][number][] = [];
+  const routes: StoryScriptSection["routes"][number][] = [];
   let codeOffset = firstTableEnd;
   for (let cursor = firstTableEnd; cursor + 4 <= end; cursor += 4) {
     const key = data.readUInt16BE(cursor);
@@ -491,7 +491,7 @@ function annotateRoute(
   key: number,
   destination: number,
   tableOffset: number,
-): ScenarioRoute {
+): StoryScriptRoute {
   const selector = key >> 8;
   const qualifier = key & 0xff;
   const isPortSelector = selector <= 0x63 || selector === 0xa3;
@@ -549,8 +549,8 @@ function readEntryRouteTable(
   data: Buffer,
   tableOffset: number,
   end: number,
-): ScenarioEntryRouteTable {
-  const routes: ScenarioRoute[] = [];
+): StoryScriptEntryRouteTable {
+  const routes: StoryScriptRoute[] = [];
   for (let cursor = tableOffset; cursor + 4 <= end; cursor += 4) {
     const key = data.readUInt16BE(cursor);
     const destination = data.readUInt16BE(cursor + 2);
@@ -660,12 +660,12 @@ function readInstruction(
   offset: number,
   end: number,
   destinationBaseOffset: number,
-): ScenarioInstruction | undefined {
+): StoryScriptInstruction | undefined {
   const opcode = data[offset];
   if (opcode === undefined || offset >= end) return undefined;
 
   let length: number;
-  let kind: ScenarioInstructionKind;
+  let kind: StoryScriptInstructionKind;
   let mnemonic: string;
   let terminal = false;
   let branchDestination: number | undefined;
@@ -679,7 +679,7 @@ function readInstruction(
     kind = "assignment";
     mnemonic =
       opcode === 0x2c
-        ? "set-scenario-flag"
+        ? "set-story-script-flag"
         : opcode === 0x0f && data[offset + 2] === 7
           ? "read-time-of-day"
           : "assign";
@@ -744,15 +744,15 @@ function readReachableInstructions(
     destinationBaseOffset: number;
   }[],
 ): {
-  instructions: ScenarioInstruction[];
-  controlFlowEdges: ScenarioControlFlowEdge[];
+  instructions: StoryScriptInstruction[];
+  controlFlowEdges: StoryScriptControlFlowEdge[];
 } {
   const pending = [...entries];
-  const instructions = new Map<number, ScenarioInstruction>();
+  const instructions = new Map<number, StoryScriptInstruction>();
   const edgeKeys = new Set<string>();
-  const controlFlowEdges: ScenarioControlFlowEdge[] = [];
+  const controlFlowEdges: StoryScriptControlFlowEdge[] = [];
 
-  const addEdge = (edge: ScenarioControlFlowEdge): void => {
+  const addEdge = (edge: StoryScriptControlFlowEdge): void => {
     if (edge.to < start || edge.to >= end) return;
     const key = `${edge.from}:${edge.to}:${edge.type}`;
     if (edgeKeys.has(key)) return;
@@ -836,9 +836,9 @@ function presentationStateKey(
  */
 function readStatefulDialogueLines(
   data: Buffer,
-  messages: readonly ScenarioMessage[],
-  instructions: readonly ScenarioInstruction[],
-  controlFlowEdges: readonly ScenarioControlFlowEdge[],
+  messages: readonly StoryScriptMessage[],
+  instructions: readonly StoryScriptInstruction[],
+  controlFlowEdges: readonly StoryScriptControlFlowEdge[],
   entryOffsets: readonly number[],
 ): StatefulDialogueLine[] {
   const instructionByOffset = new Map(
@@ -986,14 +986,14 @@ function readStatefulDialogueLines(
   );
 }
 
-export function disassembleScenario(
-  scenarioId: number,
+export function disassembleStoryScript(
+  storyScriptId: number,
   dat: Buffer,
   mes: Buffer,
-): DisassembledScenario {
-  const messages = readScenarioMessages(mes);
+): DisassembledStoryScript {
+  const messages = readStoryScriptMessages(mes);
   const offsets = readSectionOffsets(dat);
-  const sections = offsets.map((offset, id): ScenarioSection => {
+  const sections = offsets.map((offset, id): StoryScriptSection => {
     const endOffset = offsets[id + 1] ?? dat.length;
     const header = readSectionHeader(dat, offset, endOffset);
     const entryRouteTables = header.entryOffsets.map((entryOffset) =>
@@ -1056,18 +1056,18 @@ export function disassembleScenario(
       (left, right) =>
         left.offset - right.offset || left.endOffset - right.endOffset,
     );
-    const booleanStateWrites: ScenarioSection["booleanStateWrites"][number][] =
+    const booleanStateWrites: StoryScriptSection["booleanStateWrites"][number][] =
       [];
-    const stateBranchCandidates: ScenarioSection["stateBranchCandidates"][number][] =
+    const stateBranchCandidates: StoryScriptSection["stateBranchCandidates"][number][] =
       [];
-    const fameChecks: ScenarioSection["fameChecks"][number][] = [];
-    const musicCueCandidates: ScenarioSection["musicCueCandidates"][number][] =
+    const fameChecks: StoryScriptSection["fameChecks"][number][] = [];
+    const musicCueCandidates: StoryScriptSection["musicCueCandidates"][number][] =
       [];
-    const sceneBreakCandidates: ScenarioSection["sceneBreakCandidates"][number][] =
+    const sceneBreakCandidates: StoryScriptSection["sceneBreakCandidates"][number][] =
       [];
-    const duelStartCandidates: ScenarioSection["duelStartCandidates"][number][] =
+    const duelStartCandidates: StoryScriptSection["duelStartCandidates"][number][] =
       [];
-    const eventArtCandidates: ScenarioSection["eventArtCandidates"][number][] =
+    const eventArtCandidates: StoryScriptSection["eventArtCandidates"][number][] =
       [];
 
     const instructionOffsets = new Set(
@@ -1149,11 +1149,11 @@ export function disassembleScenario(
         eventArtCandidates.push({
           offset: cursor,
           commandOffset: cursor + 2,
-          resourceFile: `EVENT${scenarioId}.DAT`,
+          resourceFile: `EVENT${storyScriptId}.DAT`,
           eventImageIndex: dat[cursor + 7]!,
           x: dat.readUInt16BE(cursor + 3),
           y: dat.readUInt16BE(cursor + 5),
-          extractedAsset: `event${scenarioId}-${dat[
+          extractedAsset: `event${storyScriptId}-${dat[
             cursor + 7
           ]!.toString().padStart(2, "0")}-192x144.png`,
           rawHex: dat.subarray(cursor, cursor + 8).toString("hex"),
@@ -1178,5 +1178,5 @@ export function disassembleScenario(
       rawHex: dat.subarray(offset, endOffset).toString("hex"),
     };
   });
-  return { scenarioId, messages, sections };
+  return { storyScriptId, messages, sections };
 }
