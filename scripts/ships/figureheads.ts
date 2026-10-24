@@ -4,8 +4,9 @@ import { decodePlanar, writePng } from "../shared.js";
 
 // The ten figurehead pictures the Ship card draws beside the ship
 // (game-details/fleet-info.md): 48 × 48, four planes interleaved a byte at
-// a time, in TRANSIT.DAT at 0x1980 + 0x480 × n for figurehead n (1-based,
-// the Shipyard menu's order), in the Info palette at DS:0xAB6E.
+// a time with the first plane as the colour's lowest bit, in TRANSIT.DAT at
+// 0x1980 + 0x480 × n for figurehead n (1-based, the Shipyard menu's order),
+// in the Info palette at DS:0xAB6E.
 
 export const FIGUREHEADS = [
   "Sea Horse",
@@ -52,7 +53,12 @@ export async function writeFigureheads(
     readFile(transitPath),
     readFile(mainExePath),
   ]);
-  const palette = infoPalette(exe);
+  // decodePlanar reads the first plane as the highest bit; these images
+  // store it as the lowest, so look each value up with its bits reversed.
+  const info = infoPalette(exe);
+  const reversed = (value: number) =>
+    ((value & 1) << 3) | ((value & 2) << 1) | ((value & 4) >> 1) | (value >> 3);
+  const palette = info.map((_, value) => info[reversed(value)]!);
   const bytes = (SIZE * SIZE * 4) / 8;
   await mkdir(directory, { recursive: true });
   for (let n = 1; n <= FIGUREHEADS.length; n++) {

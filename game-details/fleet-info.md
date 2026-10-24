@@ -289,7 +289,8 @@ same way with list type 6 and the Mate Info card (`0x22A35–0x22A4B`). The
 card holds:
 
 - the ship's type picture at (136, 48) and, when it has one, its figurehead
-  at (272, 48): 48 × 48, four planes, in `TRANSIT.DAT` at
+  at (272, 48): 48 × 48, four planes interleaved a byte at a time, the
+  first plane holding each colour's lowest bit, in `TRANSIT.DAT` at
   `0x1980 + 0x480 × figurehead` (the file name is at `DS:0x0C44`);
 - water ÷ 10, food ÷ 10, lumber, and shot beside their 16 × 32 icons
   (`DATA1.014 0x20D0 + 0x100 × n`) at x 328 and 384, y 48 and 88, the
@@ -427,8 +428,7 @@ until Esc; with no mates it says 229.
 (480, 16), 112 × 96, with its count as `%5d` at (496, 72). Each ship picked
 in the crew list asks “How many men will you assign to your/my ship?” (230,
 “your” when the protagonist captains it) at (240, 288), 0 up to the smaller
-of the ship's crew plus the pool and its bunks; with nothing to give it says
-777. Men leaving a ship carry its health into the pool's, and men joining a
+of the ship's crew plus the pool and its bunks; with nothing to give it says 777. Men leaving a ship carry its health into the pool's, and men joining a
 ship bring the pool's, both as crew-weighted averages (`0x244A4–0x24525`).
 Leaving with men in the pool asks “We will dismiss %d men. Is this OK?” (231);
 No continues.
