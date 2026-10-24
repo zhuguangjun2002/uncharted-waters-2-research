@@ -255,6 +255,12 @@ movement.
 
 ### What full loads do to prices
 
+- **One sale, one price.** Every lot in a single sale fetches the price from
+  before the sale; the index drops only once it's done. A load sold in one
+  transaction therefore gets the full price on every lot, and the drop that
+  follows makes the port's goods cheaper to buy straight away, most of all
+  goods of the same kind (Silver after Gold), at no cost to the sale. The
+  wiki's Market page states only the rule; using it belongs here.
 - **Selling.** A full Galeass of Gold is worth far more than
   `10 × (Economy + 500)`, so its sale lowers category 6 by 10 and all ten
   categories by 3 (unless its value lies just above a multiple of 65,536).
