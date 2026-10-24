@@ -326,12 +326,14 @@ Friendship with the destination nation by 10:
 if former-affiliation Friendship >= stored 30:
     former-affiliation Friendship -= 30
 
-destination-nation Friendship += 10
+destination-nation Friendship = max(100, min(200, destination-nation Friendship + 10))
 ```
 
 Stored `30` corresponds to displayed `-70`. When the former affiliation's stored Friendship is below `30`, the handler
-leaves it unchanged rather than reducing it below zero. The destination gain is capped at stored `200`, or displayed
-`+100`. The defection handler does not change the nation-to-nation Relations matrix.
+leaves it unchanged rather than reducing it below zero. The destination's new value is capped at stored `200`, or displayed
+`+100`, and raised to at least stored `100`, displayed `0`
+(`0x30609–0x30621`: `min` at `0:0x4B54`, then `max` at `0:0x4B5B`), so defecting to a
+nation that hates you resets its Friendship to neutral. The defection handler does not change the nation-to-nation Relations matrix.
 
 ## Hostile-country building encounters
 
