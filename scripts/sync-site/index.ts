@@ -29,6 +29,7 @@ const JSON_FILES = [
   "scripts/ships/output/shipyardToShips.json",
   "scripts/goods/output/goods.json",
   "scripts/goods/output/port-markets.json",
+  "scripts/goods/output/markets.json",
   "scripts/discoveries/output/discoveries.json",
   "scripts/portraits-items-discoveries/output/items.json",
   "scripts/draw-world-map/output/sea-palettes.json",
