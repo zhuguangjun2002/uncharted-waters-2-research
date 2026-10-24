@@ -121,6 +121,10 @@ export async function extractPortMetadata(): Promise<Port[]> {
       };
     port.marketId = String(data[cursor + 35]!);
     port.industryId = String(data[cursor + 36]!);
+    // The Pub's drink (0 rum … 13 sake): the game's port record is 0x25
+    // bytes plus this one, so in these 37-byte steps it is the next
+    // record's second byte (game-details/buildings.md, Treat).
+    port.drink = data[cursor + 38]!;
   }
   const locations = await readFile(join(repoRoot, "raw/ZA_DAT.DAT"));
   cursor = 0;

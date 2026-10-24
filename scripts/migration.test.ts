@@ -67,7 +67,7 @@ test("all migrated domain extractors produce compatible artifacts", async () => 
     [
       "ports",
       "ports.json",
-      "f1fb72c8514b7699877a88474e990e25804ef456cdb1aca8c3bfc3b780348646",
+      "8157980f4e596628ab2ee6a2a249395fe0bad16d69e8e873b44e10dcad78ef96",
     ],
     [
       "ships",
