@@ -8,6 +8,7 @@ import {
 } from "../shared.js";
 import { extractPortMetadata } from "../ports/index.js";
 import { writeShipsPng } from "./graph-ships.js";
+import { writeFigureheads } from "./figureheads.js";
 
 type Ship = Record<string, unknown> & { name: string };
 async function ships(): Promise<Record<string, Ship>> {
@@ -96,6 +97,11 @@ export async function run(): Promise<void> {
   await writeShipsPng(
     join(repoRoot, "raw/GRAPH.DAT"),
     join(output, "ships.png"),
+  );
+  await writeFigureheads(
+    join(repoRoot, "raw/TRANSIT.DAT"),
+    join(repoRoot, "raw/MAIN.EXE"),
+    join(output, "figureheads"),
   );
 }
 if (

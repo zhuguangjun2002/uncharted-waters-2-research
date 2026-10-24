@@ -10,6 +10,7 @@ import { join, resolve } from "node:path";
 import { gzipSync } from "node:zlib";
 import sharp from "sharp";
 import { repoRoot } from "../shared.js";
+import { FIGUREHEADS } from "../ships/figureheads.js";
 
 // Copies the exporters' output that the wiki uses into the site, which keeps
 // a committed snapshot and never reads this repo. Run the exporters first
@@ -215,6 +216,17 @@ export async function run(): Promise<void> {
         `graph-${String(28 + Number(id)).padStart(3, "0")}-128x96.png`,
       ),
       join(shipImages, `${slug(ship.name)}.png`),
+    );
+  // The ten figureheads, by name (TRANSIT.DAT, in the Shipyard's order).
+  const figureheadImages = await fresh(join(site, "public/images/figureheads"));
+  for (const [index, name] of FIGUREHEADS.entries())
+    await copyFile(
+      join(
+        repoRoot,
+        "scripts/ships/output/figureheads",
+        `figurehead-${String(index + 1).padStart(2, "0")}.png`,
+      ),
+      join(figureheadImages, `${slug(name)}.png`),
     );
   const discoveryImages = await fresh(join(site, "public/images/discoveries"));
   const discoverySource = join(repoRoot, "scripts/discoveries/output");
