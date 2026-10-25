@@ -13,7 +13,7 @@ documented" link to the page that covers them in full.
 | Three vendor-sized pictures: a woman in a pink gown, a craftsman, a nobleman before armour | `GRAPH.DAT` records 18, 19, 21                        | No code can draw them                                                |
 | Japanese at-sea and in-port screen frames                                                  | `GRAPH.DAT` records 4, 5                              | Only the English records 2 and 3 are drawn                           |
 | **Duel** in the Pub and Lodge sailor menus                                                 | `MENU.DAT` entries 12, 3                              | Cut off by the menus' item counts; no handler                        |
-| **Secret Call** in the Palace menu                                                         | `MENU.DAT` entry 16                                   | Cut off; the Duke event runs another way                             |
+| **Secret Call** in the Palace menu                                                         | `MENU.DAT` entry 16                                   | Cut off; the Duke ending runs another way                            |
 | Nine menus, including two settings screens and older Guild menus                           | `MENU.DAT` entries 18, 19, 21, 30, 37, 38, 49, 59, 60 | Never loaded                                                         |
 | Placeholder lines "this is number N (line N+1)"                                            | `MESSAGE2.DAT` 22, 33, 46, 66                         | No code refers to them                                               |
 | An empty Item Shop line, and an older two-line version of the Transfer Cargo warning       | `MESSAGE.DAT` 241; `MESSAGE2.DAT` 28–29               | No code shows them                                                   |
@@ -107,16 +107,62 @@ kinds). Menus are shown by `FC4:B4A4` with `bl` = number of items.
 
 The dispatch tables behind these menus (`DS:0xB62C`, `DS:0xB54C`, and the
 Palace's at `DS:0xB6F0`) hold only the shown items' handlers. The Palace's
-Duke event (`0x30B54–0x30B6E`: rank byte `+0x0D` = 9 and bit 1 of `DS:0xE28`
-call event 15) runs after any Palace command; it is not reached through the
-menu.
+Duke event is not reached through the menu either; it is
+[the Duke ending](#the-duke-ending).
 
-Open question: what event 15 is, and whether ordinary play ever arms bit 1 of
-`DS:0xE28` while the protagonist is a Duke at a Palace. The byte otherwise holds
-options (bit 0 Graphics Delay, bit 3 sound); bit 1 is set or cleared together
-with the shared story script's section (`DS:0xEE2`/`0xEE3`) at
-`0x1BD80–0x1BDAE`, and event 15's caller clears it at `0x1C7E1`. Not seen in
-play; the wiki doesn't mention it.
+### The Duke ending
+
+After every Palace command that is not cancelled, at any Palace, the loop
+checks the protagonist (`0x30B54–0x30B6E`): if the rank byte `+0x0D` is 9
+(Duke) and bit 1 of `DS:0xE28` is set, it calls the ending routine
+`FC4:0x7501` (file `0x1C741`) with end state `0x0F`. This is the same routine
+the story scripts' `F4 <ending>` reaches with the protagonist's ending number
+(`0x38EDC`), and that the game-over states `0x10`–`0x1F` use
+([At sea](at-sea.md#game-over-at-sea)).
+
+Bit 1 is armed from the start and stays armed until this ending runs.
+`DS:0xE28` is byte 0 of a save slot. A new game sets it to `0xFF` (`0x1B1DF`)
+and loads `DATA1.015` over the slot area (`0x1C2CA–0x1C2EF`), whose byte 0 is
+also `0xFF`. The Options screen toggles only bits 0 and 2 (`0x26B69`,
+`0x26B7E`), and loading a slot reads the saved byte (`0x1BD5F`) and keeps bit 1
+when it is set (`0x1BD93`, `0x1BDAE`). No other instruction writes the byte
+except the ending routine, which clears bit 1 (`0x1C7E1`). So the first Palace
+command a protagonist completes as a Duke ends the game. Normally this is the **Meet Ruler** that awards the title, because
+promotions are given there on the return from a royal mission
+([Royal missions](storylines/royal-missions.md#shared-lifecycle)). Unless a
+story ending has run first, every protagonist who reaches Duke sees it.
+
+End state `0x0F` takes the routine's ordinary branch (high nibble 0) with three
+extra steps:
+
+1. On a black screen, it opens a style-1 window (column 23, y 120, 34 columns
+   by 120; `0x1C7AC–0x1C7BC`) with message 746, “Select a slot to save this
+   game. Choose this slot to continue your quest as a Duke.” (`0x1C7C1`),
+   and waits (`0x19878`).
+2. It clears bit 1 of `DS:0xE28` (`0x1C7E1`) and, unlike the story endings,
+   keeps bit 6 (`0x1C7E6–0x1C7EC`). When the fleet is in port it sets the
+   previous-port byte `DS:0xE33` to `0x82`, a value that no port has
+   (`0x1C7D5–0x1C7DC`). It then opens `C:KOUKAI2.DAT` and runs the slot picker
+   and save (`0x1C7F7`, `0x1BFE8` mode 3, `0x1BE12`).
+3. It passes `0x100` + the protagonist (`DS:0x1439`) as the ending number,
+   with the protagonist's nation (`+0x29` & `0x0F`) as the second value, where
+   story endings pass 0 (`0x1C847–0x1C85F`). Then, like every ending, it hands
+   both values to `END.EXE` through `int 65h` (`0x1C862–0x1C892`) and exits
+   (`0x1C899`).
+
+`END.EXE` reads the two values with functions `0x301` and `0x401` (its
+`0x3B7–0x3C4`, into `DS:0x37D0` and `DS:0x37DE`). A nonzero high byte skips
+`ENDGRP.DAT` record 7, the 640 × 300 panorama (`0x472–0x47F`;
+[below](#evidence-endexe)). The nation plus 6 is the first argument of the
+ruler's congratulation and new-rank lines at `0x15F3–0x1636` (“Oh, %s %s.
+You've accomplished your mission…”, “%s, I've decided to give you a new
+rank…”).
+
+The saved slot is the way to keep playing. Loading a slot with bit 6 set and
+bit 1 clear zeroes the shared story script's section and subsection
+(`DS:0xEE2`/`0xEE3`, `0x1BD9A–0x1BDA9`), so any shared mission in progress is
+dropped. Because bit 1 stays clear in that slot, the Duke ending never runs
+again.
 
 **Entries never loaded:**
 

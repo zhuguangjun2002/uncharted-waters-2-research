@@ -2147,8 +2147,10 @@ disable Defect. Although **Secret Call** is the fifth label stored in the menu
 record, the ordinary Palace loop supplies only four selectable entries and its
 dispatch table contains only the first four command handlers. The apparent
 fifth command is therefore not an ordinary repeatable service. A separate
-post-command hook invokes a special event when the protagonist is a Duke and
-the corresponding global event bit is armed.
+post-command hook (`0x30B54–0x30B6E`) ends the game the first time a Palace
+command finishes with the protagonist a Duke: it offers a save to continue as
+a Duke, then plays the protagonist's ending
+([The Duke ending](leftovers.md#the-duke-ending)).
 
 ### Collector and cartographer dialogue
 
