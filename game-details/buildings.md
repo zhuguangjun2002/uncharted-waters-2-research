@@ -1293,7 +1293,12 @@ navigator, or an ordinary sailor.
 | Map owner or Bank debt collector          |          604–614 | Runs the map sale or debt-collection interaction instead of the ordinary patron menu. |
 
 The same patron can therefore expose different dialogue and submenu commands;
-`Meet` is not merely a random-greeting command.
+`Meet` is not merely a random-greeting command. A patron in the protagonist's
+own fleet (fleet byte `+0x24` equal to the protagonist's) gets no menu at all:
+the introduction routine `0x2BDC7` shows one of raw indices 134–136 at random
+and returns 0, so `0x2C60F` skips the `Treat / Gossip / Hire` menu
+(`0x2BDD6–0x2BE16`, `0x2C616–0x2C61C`). A mate's Loyalty can therefore be
+raised by Treat only before hiring.
 
 The Pub and Lodge share the same hiring core. Let `A` be the candidate's
 highest ability from Leadership through Charm, excluding Luck, and let `i` be
