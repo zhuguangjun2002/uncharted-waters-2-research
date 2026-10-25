@@ -812,12 +812,12 @@ the executable use it (save slot `0x4F40 + port × 20`, returned by
 `MAIN.EXE 0:59EE`). The `DATA1.015` copy starts two bytes earlier, at
 `0x4F3E`, so its offsets are two higher.
 
-| Offset         |     Size | Field         | Encoding                                                                                                             |
-| -------------- | -------: | ------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `+0x00`        |  2 bytes | Longitude / X | little-endian `u16`; the extractor converts the wrapped map coordinate                                               |
-| `+0x02`        |  2 bytes | Latitude / Y  | little-endian `u16`                                                                                                  |
-| `+0x04..+0x12` | 15 bytes | Port name     | null-terminated string                                                                                               |
-| `+0x13`        |   1 byte | Flags         | low 3 bits: nation; `0x10` known; `0x20` hidden from the lookout; `0x40` visited ([below](#known-and-visited-ports)) |
+| Offset         |     Size | Field         | Encoding                                                                                                                                                                                                                |
+| -------------- | -------: | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `+0x00`        |  2 bytes | Longitude / X | little-endian `u16`; the extractor converts the wrapped map coordinate                                                                                                                                                  |
+| `+0x02`        |  2 bytes | Latitude / Y  | little-endian `u16`                                                                                                                                                                                                     |
+| `+0x04..+0x12` | 15 bytes | Port name     | null-terminated string                                                                                                                                                                                                  |
+| `+0x13`        |   1 byte | Flags         | low 3 bits: nation; `0x08` colony flag, never set in play ([Sphere of Influence](sphere-of-influence.md#colony-flag)); `0x10` known; `0x20` hidden from the lookout; `0x40` visited ([below](#known-and-visited-ports)) |
 
 ### Known and visited ports
 

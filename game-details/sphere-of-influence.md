@@ -59,7 +59,8 @@ A region contributes only when the required allied-port Industry totals reach 30
 region by iterating over all 100 regular ports (`MAIN.EXE` 0x2FF24–0x2FF78).
 The Palace's Economy total counts a port twice when bit 3 of its display byte
 `+0x13` is set (`0x2FF48–0x2FF53`: `× 2` for the bit, `× 1` otherwise); both
-totals are 16-bit words.
+totals are 16-bit words. That bit is never set in play
+([Colony flag](#colony-flag)).
 It then applies these supply-line checks:
 
 | Requested region | Required allied-port Industry totals                                |
@@ -138,6 +139,42 @@ East Africa is active because its own Industry exceeds 300 and West Africa or
 the Middle East can supply it. India is active because both the Middle East and
 India exceed 300. The New World has two allied ports, but they contribute no
 economic power because their combined Industry is only 290.
+
+### Colony flag
+
+Bit `0x08` of display byte `+0x13` belongs to a mechanic that never runs. Only
+the midnight allegiance refresh (`0x1E88F`) touches it, through two helpers:
+
+- `0x1E81E`, called when a nation has at least 75% Support but the cached
+  controller names another, writes the new controller and then sets `0x08`
+  when the port's Economy (executable record `+0x00`) is below 150 and its port
+  ID is 42 or higher (`0x1E830–0x1E83F`).
+- After the nation loop, a port with `0x08` set and Economy of 150 or more
+  goes to `0x1E854` (`0x1E8F4–0x1E905`), which clears the bit and raises each
+  of the port's ten Market category rates (executable `+0x0E..+0x17`) by
+  `min(100 − rate, random(5) + 10)`.
+- `0x1E849`, which resets a controller that has dropped below 75% to 6, masks
+  with `0xF6` and so clears `0x08` too, with no price change.
+
+While set, the bit doubles the port's Economy in the Palace totals and, through
+the same totals, in the monthly Guild Profit.
+
+The setting path needs Support and the cached controller to disagree at
+midnight, and nothing in play makes them disagree for a port with ID 42 or
+higher. The investment handler refreshes the cache at once (`0x327C3`, writing
+only the low three bits, `0x32823–0x3282E`); the new-game mismatches are
+Bordeaux, Nantes, Oslo, Stockholm, Algiers, and Tunis, IDs 4–37; the story
+scripts that rewrite the low nibble (Ernst's and João's) leave every nation
+below 75% there, so midnight takes the reset path; and the blockade port
+seizure (`0x1D246`, which writes the cache at `0x1D2B3` and keeps `0x08`)
+never runs ([Monthly status update](friendship.md#monthly-status-update)). No
+port starts with the bit set in `DATA1.015`. The other executable writes to a
+`+0x13` byte address other record types.
+
+The design reads as a colony mechanic: a small overseas port newly taken over
+counts double until it grows to 150 Economy, when its prices rise. It may have
+been meant for computer nations taking ports, which the dormant blockade
+seizure would have done.
 
 ## Regional maxima
 
