@@ -67,8 +67,10 @@ names are read from the table at `DS:0x0A1E`.
   `0x12847`, and Gunnery at `0x1289C` (held by any of the three). Other ships
   use only their own captain's values. Seamanship is not pooled, and duels use
   the protagonist's own Swordsmanship and Luck (`0x13D42`).
-- **Weather anomalies.** The First Mate's Luck counts towards avoiding an
-  anomaly, and their Intuition towards warning of one; see
+- **Weather anomalies.** The best Luck among the protagonist, the First Mate,
+  and the Chief Navigator counts toward avoiding an anomaly (`0x1ECF8`), and
+  the better Intuition of the First Mate and the Chief Navigator toward warning
+  of one; see
   [Checks every four hours](at-sea.md#checks-every-four-hours).
 - **Spokesman.** The First Mate speaks first for most crew lines in ports,
   such as provisioning at the Harbor; see
