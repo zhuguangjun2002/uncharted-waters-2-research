@@ -83,7 +83,7 @@ The entry messages map to `MESSAGE.DAT` raw indices as follows:
 | Bank, Venice                  |                97 |           `0x2F166` | Selected when current port ID is 13, Venice (`0x2F15B`).                                                                                                                                                                                                        |
 | Bank, regional branch         |                98 |           `0x2F17D` | Selected at every other Bank.                                                                                                                                                                                                                                   |
 | Item Shop, daytime            |               235 |           `0x2FCC6` | Used during the 8:00 AM–8:00 PM opening.                                                                                                                                                                                                                        |
-| Item Shop, secret hour        |               764 |           `0x2FCB9` | Used during the 2:00–3:00 AM opening: “For a limited time only...”                                                                                                                                                                                              |
+| Item Shop, secret hour        |               764 |           `0x2FCB9` | Tested for 4:00–6:00 AM, when the shop is closed, so never shown: “For a limited time only...”                                                                                                                                                                  |
 | Church                        |                91 |           `0x32C67` | Computed as `91 + 712 × mosque`; Church uses zero.                                                                                                                                                                                                              |
 | Mosque                        |               803 |           `0x32C67` | The same computation uses one for a Mosque.                                                                                                                                                                                                                     |
 | House of Fortune              |               298 |           `0x33534` | Fixed.                                                                                                                                                                                                                                                          |
@@ -504,10 +504,12 @@ internal item-selection loop. Cancelling that loop returns to the Item Shop's
 two-command menu; leaving the main menu returns outside without an additional
 farewell.
 
-During the daytime opening, the Buy list comes from the three regular item IDs
-at saved port-metadata offsets `+0x1F..+0x21`. During the 2:00–3:00 AM opening,
-it contains only the secret item at `+0x22`; `0xFF` means that no item occupies
-that position. Item IDs are zero-based.
+The Buy list is built at `MAIN.EXE 0x1854B` (`0xFC4:0x330B`). During the
+daytime opening it comes from the three regular item IDs at saved
+port-metadata offsets `+0x1F..+0x21`. During the 2:00–3:00 AM opening (time
+ticks 6–8, `0x1855E–0x18571`) the loop reads four slots instead of three, so
+the list holds the three regular items followed by the secret item at
+`+0x22`. A slot holding `0xFF` is skipped. Item IDs are zero-based.
 
 **Buy** uses these `MESSAGE.DAT` raw indices:
 
@@ -2530,9 +2532,14 @@ This branch reads only the building index and time. It does not inspect the
 port's item records, so the extra opening is not conditional on a Secret Shop
 Item. Secret inventory is stored separately in the regular-port metadata in
 `DATA1.015`: the byte at record offset `+0x22` is the zero-based secret item
-ID, with `0xFF` meaning that the port has none. At those hours the shop uses
-raw message 764 instead of its daytime greeting, and Buy offers that secret
-item instead of the three regular items.
+ID, with `0xFF` meaning that the port has none. At those hours Buy offers
+that secret item after the three regular items.
+
+The handler at `0x2FCAF–0x2FCC5` chooses raw message 764, “For a limited time
+only...”, over the usual raw 235 when the time is at least tick `0x0C` and
+below `0x12`, that is from 4:00 AM to before 6:00 AM. The shop is closed then,
+and the visit's own duration is applied only after the interaction, so the
+greeting is shown at no hour the shop is open: the 2:00–3:00 AM visits get raw 235. The constants match 2:00 and 3:00 AM in 10-minute units.
 
 ### Churches and mosques
 
