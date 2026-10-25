@@ -111,6 +111,13 @@ Duke event (`0x30B54–0x30B6E`: rank byte `+0x0D` = 9 and bit 1 of `DS:0xE28`
 call event 15) runs after any Palace command; it is not reached through the
 menu.
 
+Open question: what event 15 is, and whether ordinary play ever arms bit 1 of
+`DS:0xE28` while the protagonist is a Duke at a Palace. The byte otherwise holds
+options (bit 0 Graphics Delay, bit 3 sound); bit 1 is set or cleared together
+with the shared story script's section (`DS:0xEE2`/`0xEE3`) at
+`0x1BD80–0x1BDAE`, and event 15's caller clears it at `0x1C7E1`. Not seen in
+play; the wiki doesn't mention it.
+
 **Entries never loaded:**
 
 | Entry | Items                                                                     |
