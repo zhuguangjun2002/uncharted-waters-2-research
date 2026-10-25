@@ -424,9 +424,10 @@ separate from the random confrontation inside an eligible building.
 ## Catalina's opening Spain-Friendship event
 
 On Catalina's first day at sea, her section-0 `0xA001` story route sets her personal Friendship with Spain to stored `0`,
-or displayed `-100`, and advances the story section. Her current affiliation is unchanged. This remains true if she has
-defected back to Spain before the event. Affiliation changes to Piracy only when the naval-victory exile condition is
-met.
+or displayed `-100`, and advances the story section. By then she is already a pirate: the Harbor scene that gives her the
+_Rebel_ sets the nation nibble of her sailor byte `+0x29` to 6, Pirate (`SNR2.DAT 0x0720`; see
+[Catalina](storylines/catalina-erantzo.md)). Apart from that script, affiliation changes to Piracy only when the
+naval-victory exile condition is met.
 
 ## Naval-victory rules
 
