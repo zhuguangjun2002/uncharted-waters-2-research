@@ -271,6 +271,12 @@ and cleanup details. A Harbor refusal reaches the dismissal routine at
 `MAIN.EXE 0x2E3C3`, which also clears the paired wage and stores the current
 port instead of choosing a random one.
 
+Neither path touches the Loyalty byte `+0x23`: `0x13EE5` writes only the duty
+(`+0x26`), fleet (`+0x24`), and port (`+0x25`) bytes (`0x13F29–0x13F3B`), and
+`0x2E3C3` the same three (`0x2E3FF–0x2E40A`). A departed mate therefore keeps
+the Loyalty they left with, below 40 or below 30, and hiring them again adds
+10 to it.
+
 The Loyalty field is read at `MAIN.EXE 0x334A8–0x3351A`; hiring updates it at
 `0x2C40E–0x2C4ED`, monthly payroll at `0x1DFF6–0x1E15B`, and the battle-start
 withdrawal begins at `0x14C3E`. Its persistent dismissal helper is
