@@ -41,7 +41,7 @@ const attributeNames = [
   "knowledge",
   "intuition",
   "courage",
-  "swordsmanship",
+  "swordplay",
   "charm",
   "luck",
 ] as const;

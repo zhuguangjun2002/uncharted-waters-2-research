@@ -1518,7 +1518,7 @@ Neither call waits, and the background music keeps playing. Finding a discovery
 gives no Fame, gold, or experience by itself.
 
 Crew losses in both cases, and after a counterattack during **Plunder**, use
-the protagonist's Swordsmanship `S` and Battle Level `B` (`0x3A4EA`):
+the protagonist's Swordplay `S` and Battle Level `B` (`0x3A4EA`):
 
 ```text
 h    = floor(S / 2)

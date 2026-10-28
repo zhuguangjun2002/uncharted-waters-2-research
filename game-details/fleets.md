@@ -352,7 +352,7 @@ rival behind the player's Navigation Level jumps to the player's + 1 +
 `random(5)` each to Seamanship, Knowledge and Intuition (`0x1DD0F`); a rival
 behind the player's Battle Level gains `random(2) + trunc(difference / 2) + 1`
 levels, each adding `random(3)` to Leadership and `random(5)` each to
-Courage and Swordsmanship; all capped at 100. In the iteration for sailor 60
+Courage and Swordplay; all capped at 100. In the iteration for sailor 60
 the level bytes read and changed are sailor 6's, because the pointer has
 already moved on, while the attribute rises go to sailor 60.
 

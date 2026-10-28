@@ -30,7 +30,7 @@ the first two inventory slots, overwriting whatever items those two slots held.
 Items in the remaining inventory slots, including Letters of Marque, are
 preserved. The current
 protagonist's leadership, seamanship, knowledge, intuition,
-courage, swordsmanship, charm, luck, Navigation Level, and Battle Level are all
+courage, swordplay, charm, luck, Navigation Level, and Battle Level are all
 set to 100.
 The current player's first ship is converted to a Tekkousen, renamed "Edited",
 and fitted with a Goddess figurehead. Both the current crew and the configured crew maximum are set to the

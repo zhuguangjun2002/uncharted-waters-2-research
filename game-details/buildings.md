@@ -2446,7 +2446,7 @@ not select a different ordinary vendor image.
 Poor personal Friendship with the nation controlling a port can replace normal entry with a hostile encounter. The
 Palace and ordinary buildings use different encounter probabilities and confiscation rules, documented under
 [Hostile-country building encounters](friendship.md#hostile-country-building-encounters). The escape score uses
-Swordsmanship and Battle Level.
+Swordplay and Battle Level.
 
 ### Opening-hours implementation
 

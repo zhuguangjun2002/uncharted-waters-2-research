@@ -271,7 +271,7 @@ test("sets protagonist stats and levels without changing the source", () => {
     knowledge: 100,
     intuition: 100,
     courage: 100,
-    swordsmanship: 100,
+    swordplay: 100,
     charm: 100,
     luck: 100,
   });

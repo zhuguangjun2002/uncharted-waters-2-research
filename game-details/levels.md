@@ -149,14 +149,14 @@ Level gained by that award:
 
 ```text
 Courage         += random(3)  # 0–2
-Swordsmanship   += random(2)  # 0–1
+Swordplay   += random(2)  # 0–1
 ```
 
 All six increases are capped at 100. Thus an award that gains one Battle Level
 can increase Leadership, Seamanship, Knowledge, Intuition, and Courage by 0–2
-each, and Swordsmanship by 0–1. Charm and Luck are not changed. If one large
+each, and Swordplay by 0–1. Charm and Luck are not changed. If one large
 award crosses several Battle Levels, the Leadership-through-Intuition rolls
-still occur only once, while the Courage and Swordsmanship rolls repeat for
+still occur only once, while the Courage and Swordplay rolls repeat for
 each level gained.
 
 Unlike a Navigation level-up, a Battle level-up does not run the additional
@@ -188,7 +188,7 @@ These levels also participate in systems that do not award experience:
 - [Piracy Fame](fame/piracy-fame.md) uses the defeated enemy captain's Battle
   Level in the victory award.
 - [Hostile-country building encounters](friendship.md#hostile-country-building-encounters)
-  use the protagonist's Battle Level together with Swordsmanship when testing
+  use the protagonist's Battle Level together with Swordplay when testing
   an attempted escape.
 
 ## Code evidence
@@ -208,7 +208,7 @@ These levels also participate in systems that do not award experience:
 - `MAIN.EXE 0x212DB–0x21301`: accepts the Port Call, dispatches the port-entry
   story script hook, and then processes Navigation experience.
 - `MAIN.EXE 0x139BE–0x13A20`: calls the shared advancement routine for Battle
-  experience, then performs the additional Courage and Swordsmanship rolls.
+  experience, then performs the additional Courage and Swordplay rolls.
 - `MAIN.EXE 0x13A21–0x13AD9` and `0x13C72–0x13DD9`: award Battle experience
   for ordinary damaging attacks, durability defeat, and crew defeat.
 - `MAIN.EXE 0x33373–0x333C2`: implements the House of Fortune's Navigation and

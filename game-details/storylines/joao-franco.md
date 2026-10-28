@@ -649,7 +649,7 @@ time, and Navigation state, so re-entering at the same moment repeats it.
     currently has in the save. In an untouched `raw/KOUKAI2.DAT`, whose 42-byte
     sailor table begins at `0x06A9`, record 60 begins at `0x1081` and has
     Leadership 81, Seamanship 78, Knowledge 89, Intuition 73, Courage 68,
-    Swordsmanship 80, Charm 70, Luck 51, Navigation level 7, Battle level 16,
+    Swordplay 80, Charm 70, Luck 51, Navigation level 7, Battle level 16,
     age 44, and no skills. Modified sailor-60 values therefore also carry into
     this duel. The name is never restored.
 
@@ -780,7 +780,7 @@ unwinnable. Both routes apply the same mechanical punishment
 
 - João's first name is replaced with message 1159 “Spiteful” or 1169
   “Nitwit”.
-- Leadership, Seamanship, Knowledge, Intuition, Courage, and Swordsmanship are
+- Leadership, Seamanship, Knowledge, Intuition, Courage, and Swordplay are
   set to `10`.
 - Charm is set to `50` and Luck to `0`. Navigation and Battle level are not
   changed. Because this happens in the before-battle hook, the ensuing battle

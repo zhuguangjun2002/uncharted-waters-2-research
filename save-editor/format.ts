@@ -27,7 +27,7 @@ export const SAILOR_STAT_NAMES = [
   "knowledge",
   "intuition",
   "courage",
-  "swordsmanship",
+  "swordplay",
   "charm",
   "luck",
 ] as const;

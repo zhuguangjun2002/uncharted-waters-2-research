@@ -392,7 +392,7 @@ fleet:[^perot-record]
 - The name becomes “Bret Perot” and the portrait selector becomes 96, which is
   character 96 of the transcripts, the portrait of every earlier Perot line.
 - The attributes become Leadership 78, Seamanship 75, Knowledge 48, Intuition
-  95, Courage 84, Swordsmanship 73, Charm 31, and Luck 100, with Navigation
+  95, Courage 84, Swordplay 73, Charm 31, and Luck 100, with Navigation
   level 14 and Battle level 18.
 - Sailor 60's nation nibble becomes 6, Pirate.
 - Fleet 60, normally Antonio Khan's, is placed at `(352, 342)`, two units north

@@ -418,7 +418,7 @@ of those retreating fleets (`SNR3.DAT 0x1898–0x18F8`):
 
 The punishment is a loop at `SNR3.DAT 0x18CE–0x18E4` over Otto's sailor
 record (sailor 2), hard-coded rather than read from the protagonist ID. It sets
-**Leadership, Seamanship, Knowledge, Intuition, Courage, and Swordsmanship**
+**Leadership, Seamanship, Knowledge, Intuition, Courage, and Swordplay**
 (`+0x14..+0x19`) to 10. Charm, Luck, Navigation Level, and Battle Level are
 not changed. Unlike João's ally-attack branch, it does not end the story: the
 section still advances on voyage day 5, and every later attack on those fleets
@@ -462,7 +462,7 @@ clear.
     Khan) and message 466, “Roberto”, to the first-name field `+0x00`. A word
     write of 25 sets portrait byte `+0x12` to Ezequiel's portrait and also
     zeroes byte `+0x13`. The attributes at `+0x14..+0x1B` become Leadership
-    98, Seamanship 96, Knowledge 97, Intuition 97, Courage 98, Swordsmanship
+    98, Seamanship 96, Knowledge 97, Intuition 97, Courage 98, Swordplay
     90, Charm 96, and Luck 100. Navigation Level `+0x1C` becomes 42 and Battle
     Level `+0x1D` 44. The low nibble of affiliation byte `+0x29` becomes 1
     (Spain), preserving the high nibble.

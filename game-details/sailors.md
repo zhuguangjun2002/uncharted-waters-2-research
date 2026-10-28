@@ -66,7 +66,7 @@ names are read from the table at `DS:0x0A1E`.
   Mate, and the Chief Navigator: attributes at `0x127E1`, Battle Level at
   `0x12847`, and Gunnery at `0x1289C` (held by any of the three). Other ships
   use only their own captain's values. Seamanship is not pooled, and duels use
-  the protagonist's own Swordsmanship and Luck (`0x13D42`).
+  the protagonist's own Swordplay and Luck (`0x13D42`).
 - **Weather anomalies.** The best Luck among the protagonist, the First Mate,
   and the Chief Navigator counts toward avoiding an anomaly (`0x1ECF8`), and
   the better Intuition of the First Mate and the Chief Navigator toward warning
@@ -286,7 +286,7 @@ withdrawal begins at `0x14C3E`. Its persistent dismissal helper is
 
 ## Main characters
 
-|  ID | Sailor           | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordsmanship | Charm | Luck | Navigation Level | Battle Level | Age | Skills                            |
+|  ID | Sailor           | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordplay | Charm | Luck | Navigation Level | Battle Level | Age | Skills                            |
 | --: | ---------------- | ----------- | ---------: | ---------: | --------: | --------: | ------: | ------------: | ----: | ---: | ---------------: | -----------: | --: | --------------------------------- |
 |   0 | Joao Franco      | Portugal    |         78 |         75 |        73 |        85 |      82 |            82 |    89 |   50 |                1 |            1 |  18 | Negotiation                       |
 |   1 | Catalina Erantzo | Spain       |         80 |         79 |        65 |        52 |      86 |            92 |    95 |   50 |                8 |           10 |  18 | Gunnery                           |
@@ -303,7 +303,7 @@ The Luck of 50 is what `KOUKAI2.DAT` stores. A new game replaces it with
 Edmund Gilbert is present in the game files as a sailor record, but he never
 joins the player and cannot be hired. He is an antagonist during Otto’s story.
 
-|  ID | Sailor          | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordsmanship | Charm | Luck | Navigation Level | Battle Level | Age | Skills                           |
+|  ID | Sailor          | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordplay | Charm | Luck | Navigation Level | Battle Level | Age | Skills                           |
 | --: | --------------- | ----------- | ---------: | ---------: | --------: | --------: | ------: | ------------: | ----: | ---: | ---------------: | -----------: | --: | -------------------------------- |
 |  69 | Rocco Alemkel   | Portugal    |         75 |         82 |        84 |        90 |      93 |            92 |    70 |   70 |               30 |           32 |  65 | Gunnery, Celestial Navigation    |
 |  70 | Enrico Malione  | Portugal    |         66 |         48 |        93 |        55 |      62 |            48 |    82 |  100 |                1 |            1 |  24 | Accounting                       |
@@ -323,7 +323,7 @@ without sailor byte `+0x29` bit `0x40` (79, 91, 94, 99, 101, 102, and 109) can
 move up to two port IDs a month; the rest stay put
 ([Sailor flags](fleets.md#sailor-flags-0x10-and-0x40)).
 
-|  ID | Sailor           | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordsmanship | Charm | Luck | Navigation Level | Battle Level | Age | Skills                                                              |
+|  ID | Sailor           | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordplay | Charm | Luck | Navigation Level | Battle Level | Age | Skills                                                              |
 | --: | ---------------- | ----------- | ---------: | ---------: | --------: | --------: | ------: | ------------: | ----: | ---: | ---------------: | -----------: | --: | ------------------------------------------------------------------- |
 |  79 | Pilly Reis       | Turkey      |         80 |        100 |       100 |       100 |      68 |            52 |    74 |  100 |               60 |           50 |  37 | Negotiation, Accounting, Gunnery, Cartography, Celestial Navigation |
 |  80 | Afmet Glanie     | Turkey      |         82 |         79 |        53 |        78 |      83 |            58 |    66 |   88 |                1 |            1 |  27 | —                                                                   |
@@ -357,7 +357,7 @@ way ([After the battle](naval-battle.md#after-the-battle)). How new sailors are
 generated, and how defeated fleets draft unemployed sailors of their nation
 as commanders, is in [Fleet regeneration](fleets.md#fleet-regeneration).
 
-|  ID | Sailor           | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordsmanship | Charm | Luck | Navigation Level | Battle Level | Age | Skills                                     |
+|  ID | Sailor           | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordplay | Charm | Luck | Navigation Level | Battle Level | Age | Skills                                     |
 | --: | ---------------- | ----------- | ---------: | ---------: | --------: | --------: | ------: | ------------: | ----: | ---: | ---------------: | -----------: | --: | ------------------------------------------ |
 |  81 | Al Fasi          | Turkey      |         73 |         67 |        89 |        81 |      63 |            86 |    89 |   74 |                2 |            3 |  19 | Accounting                                 |
 |  84 | Roberto Almanzan | Portugal    |         75 |         52 |        75 |        56 |      69 |            79 |    54 |   88 |                2 |            1 |  22 | —                                          |
@@ -425,7 +425,7 @@ Pirate captains (nationality Piracy) are shown at sea under a false flag,
 nation `ID mod 6`, until a mate unmasks them; see
 [pirate disguises](at-sea.md#another-fleets-details-and-pirate-disguises).
 
-|  ID | Sailor           | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordsmanship | Charm | Luck | Navigation Level | Battle Level | Age | Skills                                                     |
+|  ID | Sailor           | Nationality | Leadership | Seamanship | Knowledge | Intuition | Courage | Swordplay | Charm | Luck | Navigation Level | Battle Level | Age | Skills                                                     |
 | --: | ---------------- | ----------- | ---------: | ---------: | --------: | --------: | ------: | ------------: | ----: | ---: | ---------------: | -----------: | --: | ---------------------------------------------------------- |
 |   6 | Simon Sekeira    | Portugal    |         74 |         74 |        86 |        53 |      77 |            61 |    87 |   64 |               14 |           15 |  24 | Negotiation, Accounting, Cartography, Celestial Navigation |
 |   7 | Louis Costa      | Portugal    |         80 |         51 |        86 |        89 |      52 |            89 |    59 |   89 |               17 |           17 |  32 | Accounting, Gunnery, Celestial Navigation                  |

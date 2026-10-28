@@ -630,7 +630,7 @@ D = max(1, min(W, 50 + random(floor(C / 2))))
 ```
 
 - `L` is the pooled Leadership, `BL` the pooled Battle Level, and `S` the
-  pooled Swordsmanship. The code reads Leadership twice for `A`.
+  pooled Swordplay. The code reads Leadership twice for `A`.
 - `G` is the number of guns firing: half the guns, limited by half the
   combat crew.
 - Gunnery halves the divisor, which roughly doubles the damage.
@@ -683,7 +683,7 @@ gains 10 Battle experience
 
 When a ship attacks an adjacent ship, the boarding fight (`0x13CC5`) runs
 `0x12D08` once for each side. The boarding factor `M` is set when the battle starts
-(`0x1474C–0x14773`) from the captain's own Swordsmanship `Sw` and Battle Level
+(`0x1474C–0x14773`) from the captain's own Swordplay `Sw` and Battle Level
 `BL`, which are not pooled:
 
 ```text
@@ -703,14 +703,14 @@ X = floor(M × F / 100)
 K = max(1, min(50, floor(((X × (50 + random(floor(S / 2)))) mod 65536) / 100)))
 ```
 
-`S` is the side's pooled Swordsmanship. The attacker strikes first: the
+`S` is the side's pooled Swordplay. The attacker strikes first: the
 target loses `min(crew, K)` for the attacker's `K`. The target then strikes
 back with its reduced crew, and the attacker loses `min(crew, K)` for the
 target's `K`.
 
 - Each side kills between 1 and 50 crew per boarding attack.
 - There is no term for the difference between the two crews. Each side's
-  kills depend only on its own combat crew, boarding factor, and Swordsmanship,
+  kills depend only on its own combat crew, boarding factor, and Swordplay,
   so a larger crew kills more.
 - Boarding never damages durability, Power, Tacking, or guns.
 - The product is taken modulo 65536 before dividing by 100 (`0x12D64`). That
@@ -730,7 +730,7 @@ When an enemy flagship boards the player's flagship (`0x13D0E`), it
 challenges the protagonist to a duel instead when both of these hold:
 
 ```text
-random(15) + enemy captain's Swordsmanship >= protagonist's Swordsmanship
+random(15) + enemy captain's Swordplay >= protagonist's Swordplay
 enemy captain's Luck                      >= random(player flagship's crew)
 ```
 

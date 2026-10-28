@@ -344,8 +344,8 @@ matrix.
 Both the Palace and ordinary-building handlers calculate the same escape score:
 
 ```text
-escape score = Swordsmanship
-             + floor(Swordsmanship × Battle Level / 100)
+escape score = Swordplay
+             + floor(Swordplay × Battle Level / 100)
 
 escape succeeds when escape score >= random(150)
 ```
@@ -413,7 +413,7 @@ random(100) must be greater than stored Friendship + 20
 ```
 
 The second condition becomes increasingly likely as Friendship worsens. When it triggers, the player is warned that
-"some gruff-looking men are approaching." The same Swordsmanship-and-Battle-Level escape check is then used. If the
+"some gruff-looking men are approaching." The same Swordplay-and-Battle-Level escape check is then used. If the
 player is caught, three quarters of their carried gold is seized and personal Friendship with the port's nation
 increases by 20 stored points, equivalent to a 20-point displayed improvement. Unlike the Palace punishment, this does
 not reset Friendship to neutral.

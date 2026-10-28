@@ -10,7 +10,7 @@ exchange, the attacker chooses **Thrust**, **Slash**, or **Strike**, and the
 defender chooses **Parry**, **Block**, or **Dodge**. The game's tips suggest
 counters for each attack and defense, but the damage routine never compares
 the two moves.
-Swordsmanship, Battle Level, the equipped weapon and armor, random rolls, and
+Swordplay, Battle Level, the equipped weapon and armor, random rolls, and
 the combatants' preceding moves all affect the damage actually applied.
 
 Duels can begin in two ways:
@@ -178,7 +178,7 @@ from 0 through `n - 1`, or zero when `n` is zero.
 
 For the attacker, let:
 
-- `S` = Swordsmanship;
+- `S` = Swordplay;
 - `BL` = Battle Level;
 - `W` = equipped weapon rating, or 0 (a weapon counts as equipped when `W`
   is at least 1, `0x177DE`);
@@ -423,7 +423,7 @@ only. The challenger is the attacking ship's captain. After the duel
 opponent.", with the caret; it gives the protagonist 10 × the opponent's
 Battle Level in battle experience, and a loss or time-out 3 ×, through the
 shared level routine (`0x20E14`). If a level is gained, or the opponent's
-Swordsmanship is at least the protagonist's, the protagonist's Swordsmanship
+Swordplay is at least the protagonist's, the protagonist's Swordplay
 and Courage each gain `random(3)`, capped at 100. A decided duel ends the
 battle (`0x18069–0x180A4`).
 

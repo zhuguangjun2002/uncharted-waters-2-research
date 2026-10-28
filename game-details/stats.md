@@ -13,7 +13,7 @@ them.
 | `+0x16` | Knowledge     |
 | `+0x17` | Intuition     |
 | `+0x18` | Courage       |
-| `+0x19` | Swordsmanship |
+| `+0x19` | Swordplay |
 | `+0x1A` | Charm         |
 | `+0x1B` | Luck          |
 
@@ -30,7 +30,7 @@ modifies them.
 | Knowledge     | Navigation level-up (0–4); Battle level-up (0–2)                                                         |
 | Intuition     | Navigation level-up (0–2); Battle level-up (0–2)                                                         |
 | Courage       | Battle level-up (0–2 per level); a duel during a naval battle (0–2)                                      |
-| Swordsmanship | Battle level-up (0–1 per level); a duel during a naval battle (0–2)                                      |
+| Swordplay | Battle level-up (0–1 per level); a duel during a naval battle (0–2)                                      |
 | Charm         | nothing                                                                                                  |
 | Luck          | Pray (0–1, once per visit); a large donation at a Church or Mosque; one story choice in João's storyline |
 
@@ -40,7 +40,7 @@ Gaining one or more Navigation or Battle Levels from a single award runs one
 set of `random(3)` rolls on Leadership, Seamanship, Knowledge, and Intuition.
 A Navigation level-up adds a second `random(3)` to Leadership, Seamanship, and
 Knowledge. A Battle level-up adds `random(3)` Courage and `random(2)`
-Swordsmanship for each level gained. See
+Swordplay for each level gained. See
 [Navigation attribute increases](levels.md#navigation-attribute-increases) and
 [Battle attribute increases](levels.md#battle-attribute-increases).
 
@@ -52,13 +52,13 @@ equal to 10 × the opponent's Battle Level for a win (message 83, “We
 defeated the opponent.”) and 3 × the opponent's Battle Level otherwise. This
 award goes through the shared level-up routine, so a new Battle Level brings
 the Leadership-through-Intuition rolls above, but not the per-level Courage
-and Swordsmanship rolls.
+and Swordplay rolls.
 
-Then, if that award gained a Battle Level **or** the opponent's Swordsmanship
+Then, if that award gained a Battle Level **or** the opponent's Swordplay
 is at least the protagonist's, the protagonist gains:
 
 ```text
-Swordsmanship += random(3)    # 0–2, capped at 100
+Swordplay += random(3)    # 0–2, capped at 100
 Courage       += random(3)    # 0–2, capped at 100
 ```
 
@@ -148,7 +148,7 @@ stays at its starting value unless it is lowered.
 - A Pub patron whose best attribute from Leadership through Courage is above
   75 names it as a specialty ([Pub](buildings.md#pub-command-dialogue)).
 
-### Swordsmanship
+### Swordplay
 
 - Decides duels, together with Battle Level ([Dueling](dueling.md)).
 - Adds a random bonus to cannon damage and, with Battle Level, sets each
@@ -216,7 +216,7 @@ rival's level becomes `P + 1 + random(2)`. For each level gained, the rival's
 Leadership rises by `random(3)` and Seamanship, Knowledge, and Intuition by
 `random(5)`, each capped at 100 (`0x1DD0F`). Battle Level follows the same
 pattern: it rises by `floor((P − R) / 2) + 1 + random(2)`, and each level
-gained adds `random(3)` Leadership and `random(5)` Courage and Swordsmanship.
+gained adds `random(3)` Leadership and `random(5)` Courage and Swordplay.
 Charm and Luck never change.
 
 ## Open questions
