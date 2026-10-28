@@ -53,14 +53,23 @@ Portugal's Tax Free Permit removes the Market markup there
 ([Market](buildings.md)). Every other port, including all 28 with a nation at
 100%, starts with the index the rule gives.
 
+Algiers and Tunis's starting byte is `0x00`, with no nation set and not even
+the known bit most ports carry; nation 0 is Portugal. Ceuta's is also `0x00`
+and correct only because Ceuta is 100% Portuguese. The four English ports
+carry `0x06` or `0x56`, the same as unowned ports such as Marseille (`0x56`).
+Interpretation, not established by the data: the Support values of these six
+ports look edited after the display bytes were written, England's four
+perhaps for balance (without them England starts with three allied ports),
+and the first-midnight refresh hid the mismatch.
+
 ### Regional activation
 
 A region contributes only when the required allied-port Industry totals reach 300. The Palace routine builds Economy and Industry totals for each nation and
 region by iterating over all 100 regular ports (`MAIN.EXE` 0x2FF24–0x2FF78).
 The Palace's Economy total counts a port twice when bit 3 of its display byte
 `+0x13` is set (`0x2FF48–0x2FF53`: `× 2` for the bit, `× 1` otherwise); both
-totals are 16-bit words. That bit is never set in play
-([Colony flag](#colony-flag)).
+totals are 16-bit words. That bit marks a small overseas port a computer
+fleet's investment has just won ([Colony flag](#colony-flag)).
 It then applies these supply-line checks:
 
 | Requested region | Required allied-port Industry totals                                |
@@ -142,8 +151,9 @@ economic power because their combined Industry is only 290.
 
 ### Colony flag
 
-Bit `0x08` of display byte `+0x13` belongs to a mechanic that never runs. Only
-the midnight allegiance refresh (`0x1E88F`) touches it, through two helpers:
+Bit `0x08` of display byte `+0x13` marks a small overseas port that has just
+changed hands at midnight. Only the midnight allegiance refresh (`0x1E88F`)
+touches it, through three helpers:
 
 - `0x1E81E`, called when a nation has at least 75% Support but the cached
   controller names another, writes the new controller and then sets `0x08`
@@ -160,32 +170,32 @@ While set, the bit doubles the port's Economy in the Palace totals and, through
 the same totals, in the monthly Guild Profit.
 
 The setting path needs Support and the cached controller to disagree at
-midnight, and nothing in play makes them disagree for a port with ID 42 or
-higher. The investment handler refreshes the cache at once (`0x327C3`, writing
-only the low three bits, `0x32823–0x3282E`); the new-game mismatches are
-Bordeaux, Nantes, Oslo, Stockholm, Algiers, and Tunis, IDs 4–37; the story
+midnight. The player's investment never causes that: its handler refreshes
+the cache at once (`0x327C3`, writing only the low three bits,
+`0x32823–0x3282E`). A computer merchant fleet's investment does: the fleet
+Invest handler (`0x39991–0x39B0C`,
+[Investing and trading](npc/fleet-objectives.md#investing-and-trading))
+raises its nation's Support and lowers the others' but calls neither the
+cache refresh nor any write to `+0x13`, so the port changes hands at the next
+midnight. A merchant fleet that takes a port with ID 42 or higher and Economy
+below 150 to 75% therefore flags it, for whichever nation, the player's
+included. The same investment adds to the port's Market or Shipyard account,
+so its Economy grows at month end and the flag eventually clears with the
+price rise. The other midnight mismatches never set the bit: the new-game ones
+(Bordeaux, Nantes, Oslo, Stockholm, Algiers, Tunis) have IDs 4–37, the story
 scripts that rewrite the low nibble (Ernst's and João's) leave every nation
-below 75% there, so midnight takes the reset path; and the blockade port
-seizure (`0x1D246`, which writes the cache at `0x1D2B3` and keeps `0x08`)
-never runs ([Monthly status update](friendship.md#monthly-status-update)). No
-port starts with the bit set in `DATA1.015`. The other executable writes to a
+below 75%, and the blockade port seizure (`0x1D246`, which writes the cache at
+`0x1D2B3` and keeps `0x08`) never runs
+([Monthly status update](friendship.md#monthly-status-update)). No port
+starts with the bit set in `DATA1.015`. The other executable writes to a
 `+0x13` byte address other record types.
 
-The design reads as a colony mechanic: a small overseas port newly taken over
-counts double until it grows to 150 Economy, when its prices rise.
-
-Interpretation, not established by the code: the mechanic looks cut off by
-accident rather than disabled. It is complete and live on every midnight, the
-neutral reset clears the bit deliberately (`0xF6`), and its ID-42 boundary is
-the one the game uses elsewhere for Europe and the Mediterranean against the
-rest (the later townsperson tips, [Townspeople](townspeople.md); Catalina's
-rumor at port IDs 0–41, [Catalina](storylines/catalina-erantzo.md)). The
-blockade seizure would not have triggered it either, since it writes the
-cache directly. The most likely lost trigger is the player's own investment:
-had it changed the controller only at midnight, like every other Support
-change, each small overseas port the player won would have been flagged, and
-the immediate refresh at `0x327C3` leaves the midnight path nothing to
-catch.
+The design reads as a colony mechanic for the computer nations: a small
+overseas port their fleets take counts double until it grows to 150 Economy,
+when its prices rise. The ID-42 boundary is the one the game uses elsewhere
+for Europe and the Mediterranean against the rest (the later townsperson tips,
+[Townspeople](townspeople.md); Catalina's rumor at port IDs 0–41,
+[Catalina](storylines/catalina-erantzo.md)).
 
 ## Regional maxima
 
