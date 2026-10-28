@@ -172,9 +172,20 @@ port starts with the bit set in `DATA1.015`. The other executable writes to a
 `+0x13` byte address other record types.
 
 The design reads as a colony mechanic: a small overseas port newly taken over
-counts double until it grows to 150 Economy, when its prices rise. It may have
-been meant for computer nations taking ports, which the dormant blockade
-seizure would have done.
+counts double until it grows to 150 Economy, when its prices rise.
+
+Interpretation, not established by the code: the mechanic looks cut off by
+accident rather than disabled. It is complete and live on every midnight, the
+neutral reset clears the bit deliberately (`0xF6`), and its ID-42 boundary is
+the one the game uses elsewhere for Europe and the Mediterranean against the
+rest (the later townsperson tips, [Townspeople](townspeople.md); Catalina's
+rumor at port IDs 0–41, [Catalina](storylines/catalina-erantzo.md)). The
+blockade seizure would not have triggered it either, since it writes the
+cache directly. The most likely lost trigger is the player's own investment:
+had it changed the controller only at midnight, like every other Support
+change, each small overseas port the player won would have been flagged, and
+the immediate refresh at `0x327C3` leaves the midnight path nothing to
+catch.
 
 ## Regional maxima
 
