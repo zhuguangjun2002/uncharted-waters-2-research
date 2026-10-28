@@ -52,24 +52,28 @@ function channel(value: number): number {
   return (dac << 2) | (dac >> 4);
 }
 
-/** The sea palettes, stored as blue, red, green per colour. */
+/** A 16-colour palette at `DS:offset`, stored as blue, red, green per colour. */
+export function readPaletteAt(exe: Buffer, offset: number): Rgb[] {
+  const start = exe.readUInt16LE(8) * 16 + DATA_SEGMENT * 16 + offset;
+  return Array.from({ length: 16 }, (_, colour): Rgb => {
+    const [blue, red, green] = exe.subarray(
+      start + colour * 3,
+      start + colour * 3 + 3,
+    );
+    return [channel(red!), channel(green!), channel(blue!)];
+  });
+}
+
+/** The sea palettes. */
 export async function readSeaPalettes(
   mainExePath: string,
 ): Promise<Record<SeaPaletteName, Rgb[]>> {
   const exe = await readFile(mainExePath);
-  const dataSegment = exe.readUInt16LE(8) * 16 + DATA_SEGMENT * 16;
   return Object.fromEntries(
-    SEA_PALETTE_NAMES.map((name, index) => {
-      const start = dataSegment + SEA_PALETTES + index * PALETTE_BYTES;
-      const colours = Array.from({ length: 16 }, (_, colour): Rgb => {
-        const [blue, red, green] = exe.subarray(
-          start + colour * 3,
-          start + colour * 3 + 3,
-        );
-        return [channel(red!), channel(green!), channel(blue!)];
-      });
-      return [name, colours];
-    }),
+    SEA_PALETTE_NAMES.map((name, index) => [
+      name,
+      readPaletteAt(exe, SEA_PALETTES + index * PALETTE_BYTES),
+    ]),
   ) as Record<SeaPaletteName, Rgb[]>;
 }
 

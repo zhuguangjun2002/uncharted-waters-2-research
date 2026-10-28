@@ -186,6 +186,14 @@ export async function run(): Promise<void> {
   for (const file of await readdir(eventSource))
     await copyFile(join(eventSource, file), join(eventArt, file));
 
+  // The Info menu's Chart at the start, as far as ships can chart, and whole.
+  const chartImages = await fresh(join(site, "public/images/chart"));
+  const chartSource = join(repoRoot, "scripts/chart/output");
+  for (const file of (await readdir(chartSource)).filter((name) =>
+    name.endsWith(".png"),
+  ))
+    await copyFile(join(chartSource, file), join(chartImages, file));
+
   // Each item's picture, by item name, cut from the 48 × 48 strip the
   // items share (several items use the same picture).
   const itemImages = await fresh(join(site, "public/images/items"));
@@ -285,9 +293,9 @@ export async function run(): Promise<void> {
   const mapTiles = await readFile(join(worldMap, "world-map.bin"));
   const tilePixels = await readFile(join(worldMap, "world-tiles.bin"));
   const day = (
-    JSON.parse(
-      await readFile(join(worldMap, "sea-palettes.json"), "utf8"),
-    ) as { day: number[][] }
+    JSON.parse(await readFile(join(worldMap, "sea-palettes.json"), "utf8")) as {
+      day: number[][];
+    }
   ).day;
   const average = Array.from({ length: tilePixels.length / 256 }, (_, tile) =>
     [0, 1, 2].map((channel) => {

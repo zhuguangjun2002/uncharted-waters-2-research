@@ -228,6 +228,19 @@ starts with a 13 by 10 European rectangle—130 cells—already known. That leav
 cartographer's map-completion message is triggered at 3,300 known cells, not at
 all 4,050 cells.
 
+Not every cell can be charted at sea. `scripts/chart` (`pnpm draw-chart`) flood-fills the decoded world map
+(`scripts/draw-world-map/output/world-map.bin`, 2,160 × 1,080 tiles) of every
+position where the fleet's 2 × 2 block is all below tile `0x34`
+([Sea map](../at-sea.md)), moving one tile in any direction from the sea off
+Lisbon with the map wrapping east to west, reaches positions whose cells and
+their eight neighbours cover 3,693 cells, the 130 starting cells included.
+About 357 inland cells are never charted, so reports can pay for at most about
+3,563 cells: 17,815 Adventure Fame and 285,040 gold. This is an upper bound:
+the fill allows every diagonal step the block fits through and ignores the
+window clamping at the map parts' edges ([Charting at sea](../at-sea.md#charting-at-sea)),
+both of which can only lower it. Past 3,300 known cells a report fills in the
+rest unpaid ([Chart](../at-sea.md#charting-at-sea)).
+
 ## Story awards
 
 The story script bytecode contains the following one-time Adventure Fame awards:

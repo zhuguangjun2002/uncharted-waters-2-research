@@ -11,6 +11,7 @@
     "save-editor": "tsx watch --clear-screen=false save-editor/server.ts",
     "test:save-editor": "node --import tsx --test save-editor/*.test.ts",
     "draw-world-map": "node --import tsx scripts/draw-world-map/index.ts",
+    "draw-chart": "node --import tsx scripts/chart/index.ts",
     "draw-fleet-start-positions": "node --import tsx scripts/draw-world-map/fleet-start-positions.ts",
     "draw-navigation-graph": "node --import tsx scripts/fleet-navigation/draw-graph.ts",
     "navigation-route": "node --import tsx scripts/fleet-navigation/index.ts",
