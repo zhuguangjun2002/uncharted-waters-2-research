@@ -87,10 +87,25 @@ async function shipyards(allShips: Record<string, Ship>) {
     shipyardToShips,
   };
 }
+// MAIN.EXE's data segment, and the sailing table in it at DS:0x08DA: eight
+// rows by the angle between the wind and the heading (0 = sailing downwind,
+// 4 = into the wind), eight columns by sail type (game-details/at-sea.md#fleet-speed).
+const DATA_SEGMENT = 0x3657;
+const SAIL_WIND_TABLE = 0x08da;
+
+async function sailWindTable(): Promise<number[][]> {
+  const exe = await readFile(join(repoRoot, "raw/MAIN.EXE"));
+  const start = exe.readUInt16LE(8) * 16 + DATA_SEGMENT * 16 + SAIL_WIND_TABLE;
+  return Array.from({ length: 8 }, (_, row) => [
+    ...exe.subarray(start + row * 8, start + row * 8 + 8),
+  ]);
+}
+
 export async function run(): Promise<void> {
   const output = await prepareOutput("ships"),
     allShips = await ships();
   await writeJson(join(output, "ships.json"), allShips);
+  await writeJson(join(output, "sail-wind.json"), await sailWindTable());
   const yards = await shipyards(allShips);
   await writeJson(join(output, "portToShipyard.json"), yards.portToShipyard);
   await writeJson(join(output, "shipyardToShips.json"), yards.shipyardToShips);

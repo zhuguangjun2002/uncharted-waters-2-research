@@ -28,6 +28,9 @@ const JSON_FILES = [
   "scripts/ships/output/ships.json",
   "scripts/ships/output/portToShipyard.json",
   "scripts/ships/output/shipyardToShips.json",
+  "scripts/ships/output/sail-wind.json",
+  "scripts/winds-current-anomalies/output/winds.json",
+  "scripts/sea-events/output/sea-events.json",
   "scripts/goods/output/goods.json",
   "scripts/goods/output/port-markets.json",
   "scripts/goods/output/markets.json",
@@ -193,6 +196,13 @@ export async function run(): Promise<void> {
     name.endsWith(".png"),
   ))
     await copyFile(join(chartSource, file), join(chartImages, file));
+
+  // The sea panel's dials, your fleet's sprites, and a sea tile, for the
+  // speed calculator, and the rats and scurvy pictures.
+  const seaImages = await fresh(join(site, "public/images/sea"));
+  const seaSource = join(repoRoot, "scripts/sea-panel/output");
+  for (const file of await readdir(seaSource))
+    await copyFile(join(seaSource, file), join(seaImages, file));
 
   // Each item's picture, by item name, cut from the 48 × 48 strip the
   // items share (several items use the same picture).

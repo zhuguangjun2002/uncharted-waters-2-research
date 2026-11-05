@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp, { type OverlayOptions } from "sharp";
-import { prepareOutput, repoRoot } from "../shared.js";
+import { prepareOutput, repoRoot, writeJson } from "../shared.js";
 
 const width = 2160,
   height = 1080;
@@ -69,6 +69,24 @@ export async function run(): Promise<void> {
     shift(bytes.subarray(450, 900)),
     shift(bytes.subarray(900, 1350)),
   ];
+  // The three tables for the site's wind map: 30 × 15 regions, row by row,
+  // shifted like the pictures so column 0 is the world map's left edge. Each
+  // region is [direction, strength]: the direction is where the air or water
+  // moves toward, 0 north and clockwise, and the strength 0–7. `weather` is
+  // what can happen in each region: 0 nothing, then 1 Storm, 2 No Wind, 3 Fog
+  // from the current byte's top bits where the wind byte has bit 7, and 4 for
+  // the two Storm regions that can also take a ship (wind bit 6 as well).
+  const regions = (values: Uint8Array) =>
+    [...values].map((value) => [(value >> 3) & 7, value & 7]);
+  const weather = [...parts[0]!].map((wind, index) =>
+    wind & 0x80 ? (wind & 0x40 ? 4 : parts[2]![index]! >> 6) : 0,
+  );
+  await writeJson(join(output, "winds.json"), {
+    summer: regions(parts[0]!),
+    winter: regions(parts[1]!),
+    current: regions(parts[2]!),
+    weather,
+  });
   for (const [part, name] of [
     "summer-winds",
     "winter-winds",
