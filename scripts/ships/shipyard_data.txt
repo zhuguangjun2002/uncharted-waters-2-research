@@ -25,16 +25,16 @@
                                   |Frigate         |1000|
                                   |Full-rigged Ship|1000|
 
-|Marseille     |44N   5E|290 3/7| |Hansa Cog       | 100|
-|Bordeaux      |45N   1W|580 6/7| |Light Galley    | 100|
-|Nantes        |48N   2W|570 6/7| |Caravela Redonda| 200|
-|Copenhagen    |57N  12E|510 5/7| |Flemish Galleon | 400|
-|Oslo          |63N  10E|185 2/7| |Nao             | 500|
-|Stockholm     |62N  19E|470 4/7| |Pinnace         | 550|
-|Lubeck        |55N  10E|300 3/7| |La Reale        | 600|
-|Danzig        |56N  18E|280 3/7|
-|Riga          |59N  23E|160 2/7|
-|Bergen        |62N   5E|150 2/7|
+|Marseille     |44N   5E|290 3/8| |Hansa Cog       | 100|
+|Bordeaux      |45N   1W|580 6/8| |Light Galley    | 100|
+|Nantes        |48N   2W|570 6/8| |Caravela Redonda| 200|
+|Copenhagen    |57N  12E|510 5/8| |Flemish Galleon | 400|
+|Oslo          |63N  10E|185 2/8| |Nao             | 500|
+|Stockholm     |62N  19E|470 4/8| |Pinnace         | 550|
+|Lubeck        |55N  10E|300 3/8| |La Reale        | 600|
+|Danzig        |56N  18E|280 3/8| |Galleon         | 800|
+|Riga          |59N  23E|160 2/8|
+|Bergen        |62N   5E|150 2/8|
 
 |Genoa         |44N   8E|760 8/8| |Light Galley    | 100|
 |Pisa          |43N  10E|540 6/8| |Tallette        | 200|
